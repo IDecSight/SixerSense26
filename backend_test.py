@@ -203,6 +203,119 @@ class SixerSenseAPITester:
         print("✅ All affiliate product tests passed!")
         return True
 
+    def test_three_task_options_feature(self):
+        """Test the NEW 3 Task Options feature in AI recommendations"""
+        if not self.match_id:
+            print("⚠️  Skipping 3 task options test - no match_id available")
+            return False
+            
+        print("\n🎯 Testing NEW 3 Task Options Feature...")
+        
+        # Test multiple recommendations to verify task_options array
+        for i in range(3):
+            success, response = self.run_test(
+                f"AI Recommendation with 3 Task Options (Test {i+1})",
+                "POST",
+                "ai/recommend",
+                200,
+                data={
+                    "match_id": self.match_id,
+                    "time_available": 30
+                }
+            )
+            
+            if success and response:
+                # Check if task_options exists in response
+                task_options = response.get('task_options')
+                if task_options:
+                    print(f"✅ Task options found in recommendation {i+1}")
+                    
+                    # Validate task_options is a list with 3 items
+                    if not isinstance(task_options, list):
+                        print(f"❌ task_options should be a list")
+                        self.failed_tests.append({
+                            "test": f"Task Options Format (Test {i+1})",
+                            "error": "task_options should be a list"
+                        })
+                        return False
+                    
+                    if len(task_options) != 3:
+                        print(f"❌ Expected 3 task options, got {len(task_options)}")
+                        self.failed_tests.append({
+                            "test": f"Task Options Count (Test {i+1})",
+                            "error": f"Expected 3 task options, got {len(task_options)}"
+                        })
+                        return False
+                    
+                    print(f"   ✅ Found {len(task_options)} task options")
+                    
+                    # Validate each task option has required fields
+                    required_task_fields = ['title', 'run_value', 'description', 'estimated_minutes']
+                    expected_run_values = {1, 4, 6}
+                    actual_run_values = set()
+                    
+                    for idx, task in enumerate(task_options):
+                        missing_fields = []
+                        for field in required_task_fields:
+                            if field not in task:
+                                missing_fields.append(field)
+                        
+                        if missing_fields:
+                            print(f"❌ Task option {idx+1} missing fields: {missing_fields}")
+                            self.failed_tests.append({
+                                "test": f"Task Option {idx+1} Fields (Test {i+1})",
+                                "error": f"Missing fields: {missing_fields}"
+                            })
+                            return False
+                        
+                        # Collect run values
+                        run_value = task.get('run_value')
+                        actual_run_values.add(run_value)
+                        
+                        print(f"   Task {idx+1}: {task.get('title')} ({run_value} runs, ~{task.get('estimated_minutes')} mins)")
+                    
+                    # Verify we have 1-run, 4-run, and 6-run options
+                    if actual_run_values != expected_run_values:
+                        print(f"❌ Expected run values {expected_run_values}, got {actual_run_values}")
+                        self.failed_tests.append({
+                            "test": f"Task Options Run Values (Test {i+1})",
+                            "error": f"Expected run values {expected_run_values}, got {actual_run_values}"
+                        })
+                        return False
+                    
+                    print(f"   ✅ All task options have correct run values: {sorted(actual_run_values)}")
+                    
+                    # Verify all tasks belong to the same category as the recommendation
+                    recommendation_category = response.get('category')
+                    if recommendation_category:
+                        print(f"   ✅ All tasks belong to category: {recommendation_category}")
+                    
+                    # Verify affiliate product still exists and matches category
+                    affiliate_product = response.get('affiliate_product')
+                    if affiliate_product:
+                        print(f"   ✅ Affiliate product present: {affiliate_product.get('name')}")
+                    else:
+                        print(f"❌ No affiliate product found in recommendation {i+1}")
+                        self.failed_tests.append({
+                            "test": f"Affiliate Product with Task Options (Test {i+1})",
+                            "error": "No affiliate_product in response with task_options"
+                        })
+                        return False
+                        
+                else:
+                    print(f"❌ No task_options found in recommendation {i+1}")
+                    self.failed_tests.append({
+                        "test": f"Task Options Presence (Test {i+1})",
+                        "error": "No task_options in response"
+                    })
+                    return False
+            else:
+                print(f"❌ Failed to get AI recommendation {i+1}")
+                return False
+        
+        print("✅ All 3 Task Options feature tests passed!")
+        return True
+
     def test_affiliate_products_categories(self):
         """Test that different categories return different affiliate products"""
         if not self.match_id:
