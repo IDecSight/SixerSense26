@@ -51,6 +51,9 @@ class User(BaseModel):
     is_premium: bool = False
     wallet_balance: float = 0.0
     profile: Optional[UserProfile] = None
+    win_streak: int = 0
+    next_target: int = 60
+    total_bonus_runs: int = 0
     created_at: datetime
 
 class UserSession(BaseModel):
@@ -69,6 +72,7 @@ class Match(BaseModel):
     total_wickets: int = 0
     completed_tasks: int = 0
     overs: float = 0.0
+    bonus_runs: int = 0
     status: str = "in_progress"  # in_progress, won, lost
     created_at: datetime
 
@@ -89,7 +93,7 @@ class Transaction(BaseModel):
     user_id: str
     amount: float
     currency: str
-    type: str  # deposit, conversion
+    type: str  # deposit, conversion, run_purchase
     status: str  # pending, completed, failed
     runs_converted: Optional[int] = None
     payment_id: Optional[str] = None
@@ -119,6 +123,13 @@ class ProfileUpdateRequest(BaseModel):
     life_stage: str
     daily_availability: str
     preferred_focus_areas: List[str]
+
+class BuyRunsRequest(BaseModel):
+    amount: float
+
+class UpdateFormatRequest(BaseModel):
+    match_id: str
+    format: str
 
 # ==================== AUTH HELPER ====================
 
@@ -338,6 +349,9 @@ async def process_auth_session(request: AuthSessionRequest):
                 "is_premium": False,
                 "wallet_balance": 0.0,
                 "profile": default_profile,
+                "win_streak": 0,
+                "next_target": 60,
+                "total_bonus_runs": 0,
                 "created_at": datetime.now(timezone.utc)
             }
             await db.users.insert_one(user_doc)
@@ -358,6 +372,20 @@ async def process_auth_session(request: AuthSessionRequest):
                     {"$set": {"profile": default_profile}}
                 )
                 user_doc["profile"] = default_profile
+            
+            # Ensure new fields exist
+            if "win_streak" not in user_doc:
+                await db.users.update_one(
+                    {"user_id": user_id},
+                    {"$set": {
+                        "win_streak": 0,
+                        "next_target": 60,
+                        "total_bonus_runs": 0
+                    }}
+                )
+                user_doc["win_streak"] = 0
+                user_doc["next_target"] = 60
+                user_doc["total_bonus_runs"] = 0
         
         # Create user session
         session_token = emergent_session_token
@@ -380,17 +408,22 @@ async def process_auth_session(request: AuthSessionRequest):
         existing_match = await db.matches.find_one({"user_id": user_id, "date": today}, {"_id": 0})
         
         if not existing_match:
+            # Get user's next target
+            user_data = await db.users.find_one({"user_id": user_id})
+            target_score = user_data.get("next_target", 60)
+            
             match_id = f"match_{uuid.uuid4().hex[:12]}"
             match_doc = {
                 "match_id": match_id,
                 "user_id": user_id,
                 "date": today,
                 "format": "T20",
-                "target_score": 60,
+                "target_score": target_score,
                 "total_runs": 0,
                 "total_wickets": 0,
                 "completed_tasks": 0,
                 "overs": 0.0,
+                "bonus_runs": 0,
                 "status": "in_progress",
                 "created_at": datetime.now(timezone.utc)
             }
@@ -478,6 +511,10 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
     )
     
     if not match_doc:
+        # Get user's next target
+        user_data = await db.users.find_one({"user_id": current_user})
+        target_score = user_data.get("next_target", 60) if user_data else 60
+        
         # Create today's match
         match_id = f"match_{uuid.uuid4().hex[:12]}"
         match_doc = {
@@ -485,11 +522,12 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
             "user_id": current_user,
             "date": today,
             "format": "T20",
-            "target_score": 60,
+            "target_score": target_score,
             "total_runs": 0,
             "total_wickets": 0,
             "completed_tasks": 0,
             "overs": 0.0,
+            "bonus_runs": 0,
             "status": "in_progress",
             "created_at": datetime.now(timezone.utc)
         }
@@ -539,18 +577,18 @@ async def get_match_history(current_user: str = Depends(get_current_user), limit
     return matches
 
 @api_router.post("/matches/update-format")
-async def update_match_format(match_id: str, format: str, current_user: str = Depends(get_current_user)):
+async def update_match_format(req: UpdateFormatRequest, current_user: str = Depends(get_current_user)):
     """Update match format"""
     # Update target based on format
     target_map = {"T20": 60, "ODI": 150, "Test": 100}
-    target = target_map.get(format, 60)
+    target = target_map.get(req.format, 60)
     
     await db.matches.update_one(
-        {"match_id": match_id, "user_id": current_user},
-        {"$set": {"format": format, "target_score": target}}
+        {"match_id": req.match_id, "user_id": current_user},
+        {"$set": {"format": req.format, "target_score": target}}
     )
     
-    return {"message": "Format updated successfully"}
+    return {"message": "Format updated successfully", "format": req.format, "target_score": target}
 
 # ==================== TASK ROUTES ====================
 
@@ -614,8 +652,34 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
     
     # Check if match is won
     status = match_doc["status"]
+    bonus_runs = 0
+    
     if new_runs >= match_doc["target_score"] and match_doc["total_wickets"] < 10:
         status = "won"
+        
+        # Calculate bonus runs (5 runs per wicket remaining)
+        wickets_remaining = 10 - match_doc["total_wickets"]
+        bonus_runs = wickets_remaining * 5
+        new_runs += bonus_runs
+        
+        # Get user data
+        user_doc = await db.users.find_one({"user_id": current_user})
+        win_streak = user_doc.get("win_streak", 0) + 1
+        
+        # Increase difficulty for next match
+        next_target = match_doc["target_score"] + (10 * win_streak)
+        
+        # Update user
+        await db.users.update_one(
+            {"user_id": current_user},
+            {
+                "$set": {
+                    "win_streak": win_streak,
+                    "next_target": next_target
+                },
+                "$inc": {"total_bonus_runs": bonus_runs}
+            }
+        )
     
     await db.matches.update_one(
         {"match_id": task_doc["match_id"]},
@@ -624,6 +688,7 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
                 "total_runs": new_runs,
                 "completed_tasks": new_completed,
                 "overs": new_overs,
+                "bonus_runs": bonus_runs,
                 "status": status
             }
         }
@@ -632,6 +697,7 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
     return {
         "message": "Task completed",
         "runs_earned": task_doc["run_value"],
+        "bonus_runs": bonus_runs,
         "total_runs": new_runs,
         "status": status
     }
@@ -659,6 +725,12 @@ async def mark_distraction(task_id: str, current_user: str = Depends(get_current
     # Check if match is lost
     if new_wickets >= 10:
         status = "lost"
+        
+        # Reset win streak on loss
+        await db.users.update_one(
+            {"user_id": current_user},
+            {"$set": {"win_streak": 0, "next_target": 60}}
+        )
     
     await db.matches.update_one(
         {"match_id": task_doc["match_id"]},
@@ -850,6 +922,63 @@ async def get_transactions(current_user: str = Depends(get_current_user)):
     ).sort("created_at", -1).limit(50).to_list(50)
     
     return transactions
+
+@api_router.post("/wallet/buy-runs")
+async def buy_runs(req: BuyRunsRequest, current_user: str = Depends(get_current_user)):
+    """Convert wallet balance to game runs"""
+    # Check if user is premium
+    user_doc = await db.users.find_one({"user_id": current_user})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not user_doc.get("is_premium", False):
+        raise HTTPException(status_code=403, detail="Premium membership required to buy runs")
+    
+    # Pricing: $1 = 10 runs
+    runs_to_add = int(req.amount * 10)
+    
+    if user_doc["wallet_balance"] < req.amount:
+        raise HTTPException(status_code=400, detail="Insufficient wallet balance")
+    
+    # Deduct from wallet
+    new_balance = user_doc["wallet_balance"] - req.amount
+    
+    # Create transaction
+    transaction_id = f"txn_{uuid.uuid4().hex[:12]}"
+    transaction = {
+        "transaction_id": transaction_id,
+        "user_id": current_user,
+        "amount": req.amount,
+        "currency": "USD",
+        "type": "run_purchase",
+        "status": "completed",
+        "runs_converted": runs_to_add,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.transactions.insert_one(transaction)
+    await db.users.update_one(
+        {"user_id": current_user},
+        {"$set": {"wallet_balance": new_balance}}
+    )
+    
+    # Add runs to current match
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    match = await db.matches.find_one({"user_id": current_user, "date": today})
+    
+    if match:
+        new_runs = match["total_runs"] + runs_to_add
+        await db.matches.update_one(
+            {"match_id": match["match_id"]},
+            {"$set": {"total_runs": new_runs}}
+        )
+    
+    return {
+        "message": "Runs purchased successfully",
+        "runs_added": runs_to_add,
+        "new_balance": new_balance,
+        "exchange_rate": "$1 = 10 runs"
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
