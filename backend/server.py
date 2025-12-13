@@ -505,7 +505,7 @@ async def get_profile(current_user: str = Depends(get_current_user)):
 
 @api_router.get("/matches/today")
 async def get_today_match(current_user: str = Depends(get_current_user)):
-    """Get today's match"""
+    """Get today's match - returns null if no match exists for today"""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     match_doc = await db.matches.find_one(
         {"user_id": current_user, "date": today},
@@ -513,51 +513,93 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
     )
     
     if not match_doc:
-        # Get user's next target
-        user_data = await db.users.find_one({"user_id": current_user})
-        target_score = user_data.get("next_target", 60) if user_data else 60
+        # Return null to indicate no match exists - user needs to select format
+        return None
+    
+    # Get tasks for this match
+    tasks = await db.tasks.find(
+        {"match_id": match_doc["match_id"]},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(None)
+    
+    match_doc["tasks"] = tasks
+    return match_doc
+
+@api_router.post("/matches/start")
+async def start_today_match(
+    request: Request,
+    current_user: str = Depends(get_current_user)
+):
+    """Start today's match with selected format"""
+    body = await request.json()
+    match_format = body.get("format", "T20")
+    
+    # Validate format
+    if match_format not in ["T20", "ODI", "Test"]:
+        raise HTTPException(status_code=400, detail="Invalid match format")
+    
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Check if match already exists
+    existing_match = await db.matches.find_one(
+        {"user_id": current_user, "date": today}
+    )
+    if existing_match:
+        raise HTTPException(status_code=400, detail="Match already exists for today")
+    
+    # Get user's next target
+    user_data = await db.users.find_one({"user_id": current_user})
+    base_target = user_data.get("next_target", 60) if user_data else 60
+    
+    # Set target based on format
+    format_targets = {
+        "T20": base_target,
+        "ODI": base_target * 2.5,
+        "Test": base_target * 1.67
+    }
+    target_score = int(format_targets.get(match_format, base_target))
+    
+    # Create today's match
+    match_id = f"match_{uuid.uuid4().hex[:12]}"
+    match_doc = {
+        "match_id": match_id,
+        "user_id": current_user,
+        "date": today,
+        "format": match_format,
+        "target_score": target_score,
+        "total_runs": 0,
+        "total_wickets": 0,
+        "completed_tasks": 0,
+        "overs": 0.0,
+        "bonus_runs": 0,
+        "status": "in_progress",
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.matches.insert_one(match_doc)
+    match_doc.pop("_id", None)
+    
+    # Generate default tasks based on profile
+    user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+    if user_doc and "profile" in user_doc:
+        profile_data = UserProfile(**user_doc["profile"])
+        default_tasks = await generate_default_tasks(current_user, profile_data)
         
-        # Create today's match
-        match_id = f"match_{uuid.uuid4().hex[:12]}"
-        match_doc = {
-            "match_id": match_id,
-            "user_id": current_user,
-            "date": today,
-            "format": "T20",
-            "target_score": target_score,
-            "total_runs": 0,
-            "total_wickets": 0,
-            "completed_tasks": 0,
-            "overs": 0.0,
-            "bonus_runs": 0,
-            "status": "in_progress",
-            "created_at": datetime.now(timezone.utc)
-        }
-        await db.matches.insert_one(match_doc)
-        match_doc.pop("_id", None)
-        
-        # Generate default tasks based on profile
-        user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
-        if user_doc and "profile" in user_doc:
-            profile_data = UserProfile(**user_doc["profile"])
-            default_tasks = await generate_default_tasks(current_user, profile_data)
-            
-            # Insert default tasks
-            for task_template in default_tasks:
-                task_id = f"task_{uuid.uuid4().hex[:12]}"
-                task_doc = {
-                    "task_id": task_id,
-                    "user_id": current_user,
-                    "match_id": match_id,
-                    "title": task_template["title"],
-                    "category": task_template["category"],
-                    "run_value": task_template["run_value"],
-                    "estimated_minutes": task_template["minutes"],
-                    "status": "pending",
-                    "completed_at": None,
-                    "created_at": datetime.now(timezone.utc)
-                }
-                await db.tasks.insert_one(task_doc)
+        # Insert default tasks
+        for task_template in default_tasks:
+            task_id = f"task_{uuid.uuid4().hex[:12]}"
+            task_doc = {
+                "task_id": task_id,
+                "user_id": current_user,
+                "match_id": match_id,
+                "title": task_template["title"],
+                "category": task_template["category"],
+                "run_value": task_template["run_value"],
+                "estimated_minutes": task_template["minutes"],
+                "status": "pending",
+                "completed_at": None,
+                "created_at": datetime.now(timezone.utc)
+            }
+            await db.tasks.insert_one(task_doc)
     
     # Get tasks for this match
     tasks = await db.tasks.find(
