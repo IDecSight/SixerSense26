@@ -756,6 +756,7 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
             "$set": {
                 "total_runs": new_runs,
                 "completed_tasks": new_completed,
+                "balls_played": new_balls_played,
                 "overs": new_overs,
                 "bonus_runs": bonus_runs,
                 "status": status
