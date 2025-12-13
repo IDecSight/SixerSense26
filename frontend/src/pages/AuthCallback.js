@@ -40,7 +40,6 @@ export const AuthCallback = () => {
     };
 
     processAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
