@@ -18,7 +18,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
         time_available: 30
       });
       setRecommendation(response.data);
-      setSelectedTask(null); // Reset selected task
+      setSelectedTask(null);
     } catch (error) {
       toast.error('Failed to get recommendation');
     } finally {
@@ -49,13 +49,13 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
   };
 
   return (
-    <Card className="border-accent/30 bg-gradient-to-br from-accent/5 to-accent/10" data-testid="captains-call">
+    <Card className="border-deep-teal/20 bg-calm-beige shadow-lg" data-testid="captains-call">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-accent" />
-            <CardTitle className="text-xl font-teko uppercase tracking-tight">
-              Captain&apos;s Call
+            <Sparkles className="w-5 h-5 text-soft-peach" />
+            <CardTitle className="text-xl font-heading font-bold uppercase tracking-tight text-deep-teal">
+              Captain's Call
             </CardTitle>
           </div>
           {recommendation && (
@@ -65,12 +65,13 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
               onClick={getRecommendation}
               disabled={loading}
               data-testid="recalculate-btn"
+              className="text-deep-teal hover:text-soft-peach"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           )}
         </div>
-        <CardDescription>
+        <CardDescription className="text-deep-teal/60 font-body">
           AI-powered task recommendation based on your match situation
         </CardDescription>
       </CardHeader>
@@ -79,7 +80,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
           <Button
             onClick={getRecommendation}
             disabled={loading}
-            className="w-full h-12"
+            className="w-full h-12 bg-soft-peach hover:bg-soft-peach/90 text-primary-navy font-heading font-medium"
             data-testid="get-recommendation-btn"
           >
             {loading ? (
@@ -96,89 +97,89 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
           </Button>
         ) : (
           <div className="space-y-4">
-            <div className="p-4 rounded-lg bg-card border border-accent/20">
+            <div className="p-4 rounded-lg bg-white/50 border border-deep-teal/20">
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 rounded-md bg-accent/20 text-accent text-xs font-medium uppercase">
+                <span className="px-2 py-1 rounded-md bg-soft-peach/20 text-soft-peach text-xs font-body font-medium uppercase">
                   {recommendation.category}
                 </span>
-                <span className="px-2 py-1 rounded-full bg-primary/20 text-primary text-xs font-mono-score font-bold">
+                <span className="px-2 py-1 rounded-full bg-soft-peach/30 text-soft-peach text-xs font-mono-score font-bold">
                   {recommendation.run_value} RUNS
                 </span>
               </div>
-              <h4 className="font-semibold text-lg mb-3" data-testid="recommendation-task">
+              <h4 className="font-heading font-semibold text-lg mb-3 text-deep-teal" data-testid="recommendation-task">
                 {recommendation.task}
               </h4>
               
               {/* Balance Reasoning */}
               {recommendation.balance_reasoning && (
-                <div className="mb-3 p-2 rounded bg-accent/10 border border-accent/20">
-                  <p className="text-xs font-medium text-accent uppercase mb-1">Life Balance Insight</p>
-                  <p className="text-sm text-foreground">{recommendation.balance_reasoning}</p>
+                <div className="mb-3 p-2 rounded bg-soft-peach/10 border border-soft-peach/20">
+                  <p className="text-xs font-body font-medium text-soft-peach uppercase mb-1">Life Balance Insight</p>
+                  <p className="text-sm font-body text-deep-teal">{recommendation.balance_reasoning}</p>
                 </div>
               )}
               
               <div className="space-y-1.5 mb-3">
                 {recommendation.reasoning?.map((reason, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <span className="text-accent mt-0.5">•</span>
+                  <div key={idx} className="flex items-start gap-2 text-sm text-deep-teal/70 font-body">
+                    <span className="text-soft-peach mt-0.5">•</span>
                     <span>{reason}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Task Options - 3 recommendations for this category */}
+              {/* Task Options - 3 recommendations */}
               {recommendation.task_options && recommendation.task_options.length > 0 && (
                 <div className="mb-4 space-y-2">
-                  <p className="text-xs font-medium text-accent uppercase mb-2">Choose Your Task (Choose 1 of 3)</p>
+                  <p className="text-xs font-body font-medium text-soft-peach uppercase mb-2">Choose Your Task (Choose 1 of 3)</p>
                   {recommendation.task_options.map((task, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedTask(task)}
                       className={`w-full text-left p-3 rounded-lg border transition-all ${
                         selectedTask?.run_value === task.run_value
-                          ? 'border-accent bg-accent/10 ring-2 ring-accent/50'
-                          : 'border-accent/20 bg-card hover:border-accent/40'
+                          ? 'border-soft-peach bg-soft-peach/10 ring-2 ring-soft-peach/30'
+                          : 'border-deep-teal/20 bg-white/30 hover:border-soft-peach/40'
                       }`}
                       data-testid={`task-option-${task.run_value}`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold text-sm">{task.title}</span>
-                        <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-mono-score font-bold">
+                        <span className="font-heading font-semibold text-sm text-deep-teal">{task.title}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-soft-peach/20 text-soft-peach text-xs font-mono-score font-bold">
                           {task.run_value} RUNS
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground">{task.description}</p>
-                      <p className="text-xs text-accent/60 mt-1">~{task.estimated_minutes} mins</p>
+                      <p className="text-xs text-deep-teal/60 font-body">{task.description}</p>
+                      <p className="text-xs text-soft-peach/60 mt-1 font-body">~{task.estimated_minutes} mins</p>
                     </button>
                   ))}
                 </div>
               )}
 
-              {/* Affiliate Product */}
+              {/* Affiliate Product - Elegant Styling */}
               {recommendation.affiliate_product && (
-                <div className="mt-4 p-3 rounded-lg bg-green-900/20 border border-green-500/30">
+                <div className="mt-4 p-3 rounded-lg bg-soft-peach/5 border border-soft-peach/20">
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-600/30 flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-soft-peach/20 flex items-center justify-center">
                       <span className="text-lg">🎁</span>
                     </div>
                     <div className="flex-1 space-y-2">
                       <div>
-                        <p className="text-xs font-medium text-green-400 uppercase mb-1">Recommended Tool</p>
-                        <h5 className="font-semibold text-sm text-white">{recommendation.affiliate_product.name}</h5>
-                        <p className="text-xs text-muted-foreground mt-1">{recommendation.affiliate_product.description}</p>
+                        <p className="text-xs font-body font-medium text-soft-peach uppercase mb-1">Recommended Tool</p>
+                        <h5 className="font-heading font-semibold text-sm text-deep-teal">{recommendation.affiliate_product.name}</h5>
+                        <p className="text-xs text-deep-teal/60 font-body mt-1">{recommendation.affiliate_product.description}</p>
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-green-400">{recommendation.affiliate_product.price}</span>
-                        <span className="text-xs text-muted-foreground">•</span>
-                        <span className="text-xs text-green-400">Earn {recommendation.affiliate_product.run_reward} bonus runs</span>
+                        <span className="text-sm font-mono-score font-bold text-soft-peach">{recommendation.affiliate_product.price}</span>
+                        <span className="text-xs text-deep-teal/40">•</span>
+                        <span className="text-xs text-soft-peach font-body">Earn {recommendation.affiliate_product.run_reward} bonus runs</span>
                       </div>
 
                       <a
                         href={recommendation.affiliate_product.affiliate_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-green-600 hover:bg-green-700 text-white text-xs font-medium transition-colors"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-soft-peach hover:bg-soft-peach/90 text-primary-navy text-xs font-heading font-medium transition-colors"
                         data-testid="affiliate-link"
                       >
                         View Product
@@ -189,13 +190,13 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
 
                       {recommendation.affiliate_product.action_tasks && recommendation.affiliate_product.action_tasks.length > 0 && (
                         <details className="mt-2">
-                          <summary className="text-xs text-green-400 cursor-pointer hover:text-green-300">
+                          <summary className="text-xs text-soft-peach cursor-pointer hover:text-soft-peach/80 font-body">
                             Earn bonus runs after purchase ({recommendation.affiliate_product.action_tasks.length} actions)
                           </summary>
                           <ul className="mt-2 space-y-1 pl-4">
                             {recommendation.affiliate_product.action_tasks.map((action, idx) => (
-                              <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
-                                <span className="text-green-500 mt-0.5">✓</span>
+                              <li key={idx} className="text-xs text-deep-teal/60 flex items-start gap-1 font-body">
+                                <span className="text-soft-peach mt-0.5">✓</span>
                                 <span>{action}</span>
                               </li>
                             ))}
@@ -210,7 +211,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
             <Button
               onClick={() => addTaskFromRecommendation(selectedTask || recommendation.task_options?.[0] || { title: recommendation.task, run_value: recommendation.run_value })}
               disabled={loading || (recommendation.task_options && !selectedTask)}
-              className="w-full h-12"
+              className="w-full h-12 bg-soft-peach hover:bg-soft-peach/90 text-primary-navy font-heading font-medium"
               data-testid="add-recommendation-btn"
             >
               <Plus className="w-4 h-4 mr-2" />
