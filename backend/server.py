@@ -987,19 +987,30 @@ Return ONLY a JSON object:
             fallback_cat = available_cats[0] if available_cats else "Health"
             default_tasks = get_default_tasks_for_category(fallback_cat)
             
+            # Add country-specific affiliate products
+            user_country = user_doc.get("country", DEFAULT_COUNTRY)
+            country_products = get_products_for_country(user_country)
+            category_products = country_products.get(fallback_cat, [])
+            
             # Add affiliate product to each task option
             if default_tasks:
-                for task in default_tasks:
-                    affiliate_product = get_random_product(fallback_cat)
-                    if affiliate_product:
-                        task["affiliate_product"] = affiliate_product
+                for idx, task in enumerate(default_tasks):
+                    if category_products and idx < len(category_products):
+                        product = category_products[idx].copy()
+                        product["price"] = format_price(product["price"], product["currency"])
+                        task["affiliate_product"] = product
             
-            affiliate_product = get_random_product(fallback_cat)
+            affiliate_product = None
+            if category_products:
+                product = category_products[0].copy()
+                product["price"] = format_price(product["price"], product["currency"])
+                affiliate_product = product
+            
             fallback = {
                 "task": f"Quick {fallback_cat.lower()} check-in",
                 "category": fallback_cat,
                 "run_value": 1,
-                "balance_reasoning": f"{fallback_cat} needs more attention - only {balance[fallback_cat]['count']} tasks completed recently",
+                "balance_reasoning": f"{fallback_cat} needs more attention - only {balance.get(fallback_cat, {}).get('count', 0)} tasks completed recently",
                 "reasoning": ["Helps maintain life balance", "Quick and impactful"],
                 "task_options": default_tasks if default_tasks else []
             }
