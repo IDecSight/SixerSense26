@@ -223,7 +223,7 @@ export const Dashboard = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-md">
-                  Today's Balls
+                  Today's Tasks
                 </h2>
                 <Button
                   onClick={() => setShowAddTask(true)}
