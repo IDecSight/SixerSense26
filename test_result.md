@@ -159,6 +159,39 @@ frontend:
         - working: true
           agent: "testing"
           comment: "3 TASK OPTIONS FRONTEND FULLY VERIFIED ✅ - Code analysis confirms CaptainsCall.js correctly implements 3 task options display: 1) Checks for task_options array in AI response (line 130). 2) Maps through task_options to create selectable cards (line 133). 3) Implements selectedTask state management with setSelectedTask. 4) Visual feedback: selected task gets border-accent bg-accent/10 ring-2 ring-accent/50 styling. 5) Button logic: disabled when task_options present but no selection (line 212). 6) Button text changes: 'Select a Task First' vs 'Add X-Run Task' based on selection. 7) Proper test IDs for E2E testing (task-option-{run_value}). 8) Maintains affiliate product display alongside task options. Frontend implementation is COMPLETE and ready for user interaction."
+  - task: "Authentication Flow - No Double Login Modal"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ CRITICAL AUTHENTICATION FLOW TEST PASSED - Tested both 'Start Free' and 'Start Your First Match' buttons. Both provide seamless direct redirect to Google auth (https://auth.emergentagent.com) with NO intermediate modal appearing. The handleAuthClick function correctly calls handleGoogleAuth() which immediately redirects to auth.emergentagent.com. No double login prompt detected. Authentication flow is working as expected."
+  - task: "Dashboard Today's Tasks Heading"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ DASHBOARD HEADING TEST FAILED - Cannot access dashboard page to verify 'Today's Tasks' vs 'Today's Balls' heading. Dashboard requires valid authentication token but mock tokens don't work with backend. Backend returns 401/404 for protected routes. Need proper authentication setup or test-friendly auth bypass to verify dashboard content. The heading text verification cannot be completed without accessing the authenticated dashboard."
+  - task: "Wallet INR Currency Symbol"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Wallet.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ WALLET CURRENCY TEST FAILED - Cannot access wallet page to verify ₹ vs $ currency symbols. Wallet page requires valid authentication but mock tokens don't work. Found 1 $ symbol in page source (from PostHog analytics script, not app content). Cannot verify wallet balance display, exchange rate (₹1 = 10 runs), or transaction currency symbols without proper authentication. Need authenticated access to test currency display correctly."
 
 metadata:
   created_by: "main_agent"
