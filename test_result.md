@@ -201,9 +201,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "3 Task Options Feature in AI Recommendations"
-    - "Display 3 Task Options in Captain's Call Component"
-  stuck_tasks: []
+    - "Dashboard Today's Tasks Heading"
+    - "Wallet INR Currency Symbol"
+  stuck_tasks:
+    - "Dashboard Today's Tasks Heading"
+    - "Wallet INR Currency Symbol"
   test_all: false
   test_priority: "high_first"
 
