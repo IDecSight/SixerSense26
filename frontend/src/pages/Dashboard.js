@@ -119,15 +119,15 @@ export const Dashboard = () => {
   const dismissedTasks = match.tasks?.filter(t => t.status === 'dismissed') || [];
 
   return (
-    <div className="min-h-screen bg-primary-navy" data-testid="dashboard">
-      {/* Header - Elegant Navy & Beige */}
-      <header className="sticky top-0 z-50 border-b border-deep-teal/20 backdrop-blur-xl bg-calm-beige/5">
+    <div className="min-h-screen bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF]" data-testid="dashboard">
+      {/* Header - Glossy Blue Style */}
+      <header className="sticky top-0 z-50 border-b border-white/20 backdrop-blur-xl bg-white/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
-                <span className="text-soft-peach">SIXER</span>
-                <span className="text-calm-beige ml-1">SENSE</span>
+                <span className="text-white">SIXER</span>
+                <span className="text-yellow-200 ml-1">SENSE</span>
               </h1>
             </div>
             <nav className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export const Dashboard = () => {
                 size="sm"
                 onClick={() => navigate('/history')}
                 data-testid="history-btn"
-                className="text-calm-beige hover:text-soft-peach hover:bg-soft-peach/10"
+                className="text-white hover:text-yellow-200 hover:bg-white/10"
               >
                 <History className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline font-body">History</span>
@@ -146,7 +146,7 @@ export const Dashboard = () => {
                 size="sm"
                 onClick={() => navigate('/wallet')}
                 data-testid="wallet-btn"
-                className="text-calm-beige hover:text-soft-peach hover:bg-soft-peach/10"
+                className="text-white hover:text-yellow-200 hover:bg-white/10"
               >
                 <Wallet className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline font-body">Wallet</span>
@@ -156,7 +156,7 @@ export const Dashboard = () => {
                 size="sm"
                 onClick={() => navigate('/settings')}
                 data-testid="settings-btn"
-                className="text-calm-beige hover:text-soft-peach hover:bg-soft-peach/10"
+                className="text-white hover:text-yellow-200 hover:bg-white/10"
               >
                 <SettingsIcon className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline font-body">Settings</span>
@@ -166,7 +166,7 @@ export const Dashboard = () => {
                 size="sm"
                 onClick={handleLogout}
                 data-testid="logout-btn"
-                className="text-dusty-rose hover:text-dusty-rose/80 hover:bg-dusty-rose/10"
+                className="text-red-200 hover:text-red-100 hover:bg-red-500/10"
               >
                 <LogOut className="w-4 h-4" />
               </Button>
@@ -182,12 +182,12 @@ export const Dashboard = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Match Format Selector */}
             {match && match.status === 'in_progress' && match.completed_tasks === 0 && (
-              <Card className="border-soft-peach/20 bg-calm-beige">
+              <Card className="border-white/20 bg-white/10 backdrop-blur-lg shadow-xl">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-sm font-heading font-medium mb-1 text-deep-teal">Match Format</p>
-                      <p className="text-xs text-deep-teal/60 font-body">Choose your format before starting</p>
+                      <p className="text-sm font-heading font-medium mb-1 text-white">Match Format</p>
+                      <p className="text-xs text-white/80 font-body">Choose your format before starting</p>
                     </div>
                     <Select 
                       value={match.format} 
