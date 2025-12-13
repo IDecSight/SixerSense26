@@ -1,85 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Manrope:wght@400;500;700&family=JetBrains+Mono&display=swap');
+/* Import Elegant Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-    margin: 0;
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-    font-family:
-        source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
-
 @layer base {
     :root {
-        /* Cricket Scoreboard Color System */
-        --background: 225 73% 57%;  /* Royal Blue #4169e1 */
-        --foreground: 0 0% 100%;  /* White */
-        --card: 225 73% 50%;  /* Darker Royal Blue for cards */
-        --card-foreground: 0 0% 100%;  /* White */
-        --popover: 225 73% 50%;
-        --popover-foreground: 0 0% 100%;
+        /* New Elegant Color Palette */
+        --primary-navy: 213 53% 15%;        /* #152238 - Main background */
+        --calm-beige: 43 44% 92%;           /* #F0EAD6 - Card surfaces */
+        --soft-peach: 6 100% 84%;           /* #FFB3A7 - Success/Runs */
+        --dusty-rose: 347 31% 74%;          /* #D8A7AF - Warnings/Wickets */
+        --deep-teal: 184 30% 33%;           /* #3B6C6F - Primary text */
         
-        /* Runs - Green */
-        --primary: 142 76% 36%;  /* Cricket Green */
-        --primary-foreground: 0 0% 100%;
-        
-        /* Wickets - Red */
-        --destructive: 0 84% 60%;  /* Cricket Red */
-        --destructive-foreground: 0 0% 100%;
-        
-        /* Secondary - Light Blue for info */
-        --secondary: 199 89% 48%;
-        --secondary-foreground: 0 0% 100%;
-        
-        /* Accent - Yellow for highlights */
-        --accent: 45 93% 47%;
-        --accent-foreground: 225 73% 57%;
-        
-        --muted: 225 73% 40%;
-        --muted-foreground: 0 0% 85%;
-        
-        --border: 225 50% 35%;
-        --input: 225 50% 35%;
-        --ring: 142 76% 36%;
-        --radius: 0.75rem;
-    }
-    
-    .dark {
-        /* Dark mode uses deeper blues */
-        --background: 225 73% 25%;
-        --foreground: 0 0% 100%;
-        --card: 225 73% 30%;
-        --card-foreground: 0 0% 100%;
-        --popover: 225 73% 30%;
-        --popover-foreground: 0 0% 100%;
-        
-        --primary: 142 76% 36%;
-        --primary-foreground: 0 0% 100%;
-        
-        --destructive: 0 84% 60%;
-        --destructive-foreground: 0 0% 100%;
-        
-        --secondary: 199 89% 48%;
-        --secondary-foreground: 0 0% 100%;
-        
-        --muted: 225 73% 20%;
-        --muted-foreground: 0 0% 75%;
-        
-        --accent: 45 93% 47%;
-        --accent-foreground: 225 73% 25%;
-        
-        --border: 225 50% 25%;
-        --input: 225 50% 25%;
-        --ring: 142 76% 36%;
+        /* Shadcn UI Variables mapped to new palette */
+        --background: 213 53% 15%;          /* Primary Navy */
+        --foreground: 43 44% 92%;           /* Calm Beige */
+        --card: 43 44% 92%;                 /* Calm Beige */
+        --card-foreground: 184 30% 33%;     /* Deep Teal */
+        --popover: 43 44% 92%;              /* Calm Beige */
+        --popover-foreground: 184 30% 33%;  /* Deep Teal */
+        --primary: 6 100% 84%;              /* Soft Peach */
+        --primary-foreground: 213 53% 15%;  /* Primary Navy */
+        --secondary: 213 53% 20%;           /* Darker Navy */
+        --secondary-foreground: 43 44% 92%; /* Calm Beige */
+        --muted: 213 30% 25%;               /* Muted Navy */
+        --muted-foreground: 184 20% 50%;    /* Muted Teal */
+        --accent: 6 100% 84%;               /* Soft Peach */
+        --accent-foreground: 213 53% 15%;   /* Primary Navy */
+        --destructive: 347 31% 74%;         /* Dusty Rose */
+        --destructive-foreground: 213 53% 15%; /* Primary Navy */
+        --border: 184 20% 40%;              /* Teal border */
+        --input: 43 44% 92%;                /* Calm Beige */
+        --ring: 6 100% 84%;                 /* Soft Peach */
+        --radius: 0.5rem;
     }
 }
 
@@ -89,65 +44,86 @@ code {
     }
     body {
         @apply bg-background text-foreground;
+        font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
+            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 }
 
-@layer base {
-    [data-debug-wrapper="true"] {
-        display: contents !important;
-    }
-
-    [data-debug-wrapper="true"] > * {
-        margin-left: inherit;
-        margin-right: inherit;
-        margin-top: inherit;
-        margin-bottom: inherit;
-        padding-left: inherit;
-        padding-right: inherit;
-        padding-top: inherit;
-        padding-bottom: inherit;
-        column-gap: inherit;
-        row-gap: inherit;
-        gap: inherit;
-        border-left-width: inherit;
-        border-right-width: inherit;
-        border-top-width: inherit;
-        border-bottom-width: inherit;
-        border-left-style: inherit;
-        border-right-style: inherit;
-        border-top-style: inherit;
-        border-bottom-style: inherit;
-        border-left-color: inherit;
-        border-right-color: inherit;
-        border-top-color: inherit;
-        border-bottom-color: inherit;
-    }
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* Custom utility classes */
+/* Custom Elegant Theme Utilities */
 @layer utilities {
-    .font-teko {
-        font-family: 'Teko', sans-serif;
-    }
-    .font-mono-score {
-        font-family: 'JetBrains Mono', monospace;
-    }
-    .text-gradient {
-        background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+    /* Typography */
+    .font-heading {
+        font-family: 'Poppins', 'Montserrat', sans-serif;
     }
     
-    /* Cricket Scoreboard Utilities */
+    .font-body {
+        font-family: 'Inter', 'Roboto', sans-serif;
+    }
+    
+    .font-mono-score {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+    
+    /* Color Classes */
     .runs-color {
-        color: hsl(142, 76%, 36%);  /* Green */
+        color: hsl(var(--soft-peach));
     }
+    
     .wickets-color {
-        color: hsl(0, 84%, 60%);  /* Red */
+        color: hsl(var(--dusty-rose));
     }
+    
+    .text-primary-navy {
+        color: hsl(var(--primary-navy));
+    }
+    
+    .text-calm-beige {
+        color: hsl(var(--calm-beige));
+    }
+    
+    .text-deep-teal {
+        color: hsl(var(--deep-teal));
+    }
+    
+    .bg-primary-navy {
+        background-color: hsl(var(--primary-navy));
+    }
+    
+    .bg-calm-beige {
+        background-color: hsl(var(--calm-beige));
+    }
+    
+    .bg-soft-peach {
+        background-color: hsl(var(--soft-peach));
+    }
+    
+    .bg-dusty-rose {
+        background-color: hsl(var(--dusty-rose));
+    }
+    
+    .border-soft-peach {
+        border-color: hsl(var(--soft-peach));
+    }
+    
+    .border-dusty-rose {
+        border-color: hsl(var(--dusty-rose));
+    }
+    
+    .border-deep-teal {
+        border-color: hsl(var(--deep-teal));
+    }
+    
+    /* Elegant Scoreboard */
     .scoreboard-bg {
-        background: hsl(221, 83%, 25%);
-        border: 2px solid hsl(221, 50%, 40%);
+        background: hsl(var(--primary-navy));
+        border: 2px solid hsl(var(--deep-teal) / 0.3);
     }
 }
