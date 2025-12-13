@@ -114,7 +114,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
                 </div>
               )}
               
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 mb-3">
                 {recommendation.reasoning?.map((reason, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <span className="text-accent mt-0.5">•</span>
@@ -122,6 +122,59 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
                   </div>
                 ))}
               </div>
+
+              {/* Affiliate Product */}
+              {recommendation.affiliate_product && (
+                <div className="mt-4 p-3 rounded-lg bg-green-900/20 border border-green-500/30">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-600/30 flex items-center justify-center">
+                      <span className="text-lg">🎁</span>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div>
+                        <p className="text-xs font-medium text-green-400 uppercase mb-1">Recommended Tool</p>
+                        <h5 className="font-semibold text-sm text-white">{recommendation.affiliate_product.name}</h5>
+                        <p className="text-xs text-muted-foreground mt-1">{recommendation.affiliate_product.description}</p>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-green-400">{recommendation.affiliate_product.price}</span>
+                        <span className="text-xs text-muted-foreground">•</span>
+                        <span className="text-xs text-green-400">Earn {recommendation.affiliate_product.run_reward} bonus runs</span>
+                      </div>
+
+                      <a
+                        href={recommendation.affiliate_product.affiliate_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-green-600 hover:bg-green-700 text-white text-xs font-medium transition-colors"
+                        data-testid="affiliate-link"
+                      >
+                        View Product
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+
+                      {recommendation.affiliate_product.action_tasks && recommendation.affiliate_product.action_tasks.length > 0 && (
+                        <details className="mt-2">
+                          <summary className="text-xs text-green-400 cursor-pointer hover:text-green-300">
+                            Earn bonus runs after purchase ({recommendation.affiliate_product.action_tasks.length} actions)
+                          </summary>
+                          <ul className="mt-2 space-y-1 pl-4">
+                            {recommendation.affiliate_product.action_tasks.map((action, idx) => (
+                              <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
+                                <span className="text-green-500 mt-0.5">✓</span>
+                                <span>{action}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </details>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <Button
               onClick={addTaskFromRecommendation}
