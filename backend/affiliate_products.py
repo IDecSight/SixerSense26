@@ -7,7 +7,7 @@ affiliate_products = {
             "name": "Fitbit Charge 6 Fitness Tracker",
             "description": "Track your health metrics, workouts, and sleep patterns",
             "affiliate_link": "https://www.amazon.com/dp/B0CC5XRNFG?tag=sixersense-20",
-            "price": "$159.95",
+            "price": "₹13,299",
             "run_reward": 10,
             "action_tasks": [
                 "Complete a 30-minute workout tracked on Fitbit",
@@ -19,7 +19,7 @@ affiliate_products = {
             "name": "Yoga Mat - Extra Thick Exercise Mat",
             "description": "High-density foam yoga mat for home workouts",
             "affiliate_link": "https://www.amazon.com/dp/B07HNSVV8K?tag=sixersense-20",
-            "price": "$29.99",
+            "price": "₹2,499",
             "run_reward": 6,
             "action_tasks": [
                 "Complete a 15-minute yoga session",
@@ -31,7 +31,7 @@ affiliate_products = {
             "name": "Vitamins - Multivitamin for Daily Health",
             "description": "Complete multivitamin with essential nutrients",
             "affiliate_link": "https://www.amazon.com/dp/B00280M10U?tag=sixersense-20",
-            "price": "$24.99",
+            "price": "₹2,099",
             "run_reward": 4,
             "action_tasks": [
                 "Take vitamins daily for 7 days",
@@ -45,7 +45,7 @@ affiliate_products = {
             "name": "Udemy Course - Complete Python Bootcamp",
             "description": "Master Python programming from beginner to advanced",
             "affiliate_link": "https://click.linksynergy.com/deeplink?id=*RiXlGRZQ8&mid=39197&murl=https://www.udemy.com/course/complete-python-bootcamp/",
-            "price": "$89.99",
+            "price": "₹7,499",
             "run_reward": 15,
             "action_tasks": [
                 "Complete 3 course modules",
@@ -57,7 +57,7 @@ affiliate_products = {
             "name": "Kindle Unlimited - Unlimited Reading",
             "description": "Access millions of books and audiobooks",
             "affiliate_link": "https://www.amazon.com/kindle-dbs/hz/subscribe/ku?tag=sixersense-20",
-            "price": "$11.99/month",
+            "price": "₹999/month",
             "run_reward": 8,
             "action_tasks": [
                 "Read 1 professional development book",
@@ -69,7 +69,7 @@ affiliate_products = {
             "name": "Notion Pro - Productivity Workspace",
             "description": "All-in-one workspace for notes, tasks, and projects",
             "affiliate_link": "https://affiliate.notion.so/sixersense",
-            "price": "$10/month",
+            "price": "₹833/month",
             "run_reward": 6,
             "action_tasks": [
                 "Set up your workspace",
@@ -95,7 +95,7 @@ affiliate_products = {
             "name": "The Intelligent Investor Book",
             "description": "Classic book on value investing by Benjamin Graham",
             "affiliate_link": "https://www.amazon.com/dp/0060555661?tag=sixersense-20",
-            "price": "$24.99",
+            "price": "₹2,099",
             "run_reward": 8,
             "action_tasks": [
                 "Read 3 chapters",
@@ -107,7 +107,7 @@ affiliate_products = {
             "name": "Acorns - Automated Investing App",
             "description": "Invest spare change automatically",
             "affiliate_link": "https://www.acorns.com/invite/?code=SIXER2024",
-            "price": "$3/month",
+            "price": "₹249/month",
             "run_reward": 12,
             "action_tasks": [
                 "Set up automatic investments",
@@ -121,7 +121,7 @@ affiliate_products = {
             "name": "The 5 Love Languages Book",
             "description": "Improve your relationships by understanding love languages",
             "affiliate_link": "https://www.amazon.com/dp/080241270X?tag=sixersense-20",
-            "price": "$16.99",
+            "price": "₹1,419",
             "run_reward": 6,
             "action_tasks": [
                 "Read the book and identify your love language",
@@ -133,7 +133,7 @@ affiliate_products = {
             "name": "HelloFresh Meal Kit Subscription",
             "description": "Enjoy cooking together with easy meal kits",
             "affiliate_link": "https://www.hellofresh.com/pages/share?c=SIXER50",
-            "price": "$60/week",
+            "price": "₹4,999/week",
             "run_reward": 10,
             "action_tasks": [
                 "Cook 3 meals together",
@@ -147,7 +147,7 @@ affiliate_products = {
             "name": "Headspace - Meditation & Sleep App",
             "description": "Guided meditation and mindfulness exercises",
             "affiliate_link": "https://www.headspace.com/join/sixer-sense",
-            "price": "$12.99/month",
+            "price": "₹1,083/month",
             "run_reward": 12,
             "action_tasks": [
                 "Complete 7 days of meditation",
@@ -159,7 +159,7 @@ affiliate_products = {
             "name": "Atomic Habits Book by James Clear",
             "description": "Transform your habits and achieve your goals",
             "affiliate_link": "https://www.amazon.com/dp/0735211299?tag=sixersense-20",
-            "price": "$27.99",
+            "price": "₹2,332",
             "run_reward": 10,
             "action_tasks": [
                 "Read and implement 3 habit strategies",
@@ -171,7 +171,7 @@ affiliate_products = {
             "name": "Calm App - Meditation and Relaxation",
             "description": "Sleep stories, meditation, and relaxation techniques",
             "affiliate_link": "https://www.calm.com/partners/sixer",
-            "price": "$14.99/month",
+            "price": "₹1,249/month",
             "run_reward": 8,
             "action_tasks": [
                 "Use daily calm meditation for 5 days",
@@ -185,7 +185,7 @@ affiliate_products = {
             "name": "Audible Subscription - Audiobooks",
             "description": "Listen to unlimited audiobooks and podcasts",
             "affiliate_link": "https://www.amazon.com/hz/audible/mlp?tag=sixersense-20",
-            "price": "$14.95/month",
+            "price": "₹1,246/month",
             "run_reward": 8,
             "action_tasks": [
                 "Finish 1 audiobook",
@@ -197,7 +197,7 @@ affiliate_products = {
             "name": "MasterClass Subscription - Learn from Experts",
             "description": "Learn cooking, writing, business from world-class instructors",
             "affiliate_link": "https://www.masterclass.com?via=sixer",
-            "price": "$120/year",
+            "price": "₹9,999/year",
             "run_reward": 15,
             "action_tasks": [
                 "Complete 2 class sessions",
@@ -209,7 +209,7 @@ affiliate_products = {
             "name": "Kindle Paperwhite - E-Reader",
             "description": "Read books anywhere with glare-free display",
             "affiliate_link": "https://www.amazon.com/dp/B08KTZ8249?tag=sixersense-20",
-            "price": "$139.99",
+            "price": "₹11,666",
             "run_reward": 12,
             "action_tasks": [
                 "Read for 30 minutes daily",
