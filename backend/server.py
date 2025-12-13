@@ -15,6 +15,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 from collections import defaultdict
 from affiliate_products import get_random_product
+from default_tasks import get_default_tasks_for_category, DEFAULT_TASKS_BY_CATEGORY
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
