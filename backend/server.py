@@ -666,6 +666,10 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
     if not match_doc:
         raise HTTPException(status_code=404, detail="No active match found")
     
+    # Calculate balls consumed for this task
+    estimated_minutes = task.estimated_minutes or 15  # Default 15 min
+    balls_consumed = calculate_balls_for_task(estimated_minutes)
+    
     task_id = f"task_{uuid.uuid4().hex[:12]}"
     task_doc = {
         "task_id": task_id,
@@ -674,7 +678,8 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
         "title": task.title,
         "category": task.category,
         "run_value": task.run_value,
-        "estimated_minutes": task.estimated_minutes,
+        "estimated_minutes": estimated_minutes,
+        "balls_consumed": balls_consumed,
         "status": "pending",
         "completed_at": None,
         "created_at": datetime.now(timezone.utc)
