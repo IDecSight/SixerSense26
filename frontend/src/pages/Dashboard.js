@@ -67,21 +67,6 @@ export const Dashboard = () => {
     fetchMatch();
   }, []);
 
-  const handleFormatChange = async (format) => {
-    try {
-      const response = await apiClient.post('/matches/update-format', {
-        match_id: match.match_id,
-        format: format
-      });
-      toast.success('Match format updated!', {
-        description: `Target set to ${response.data.target_score} runs`
-      });
-      fetchMatch();
-    } catch (error) {
-      toast.error('Failed to update format');
-    }
-  };
-
   const handleCompleteTask = async (taskId) => {
     try {
       const response = await apiClient.patch(`/tasks/${taskId}/complete`);
