@@ -85,11 +85,11 @@ export const ProfileForm = ({ onProfileUpdated }) => {
 
   if (initialLoad) {
     return (
-      <Card>
+      <Card className="bg-white/10 backdrop-blur-lg border-white/20 shadow-xl">
         <CardContent className="py-8">
           <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-muted rounded w-3/4"></div>
-            <div className="h-4 bg-muted rounded w-1/2"></div>
+            <div className="h-4 bg-white/20 rounded w-3/4"></div>
+            <div className="h-4 bg-white/20 rounded w-1/2"></div>
           </div>
         </CardContent>
       </Card>
@@ -97,13 +97,13 @@ export const ProfileForm = ({ onProfileUpdated }) => {
   }
 
   return (
-    <Card data-testid="profile-form">
+    <Card className="bg-white/10 backdrop-blur-lg border-white/20 shadow-xl" data-testid="profile-form">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-white font-heading">
+          <User className="w-5 h-5 text-green-200" />
           Your Profile
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-white/80 font-body">
           Customize your experience and get personalized task recommendations
         </CardDescription>
       </CardHeader>
@@ -111,30 +111,30 @@ export const ProfileForm = ({ onProfileUpdated }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Primary Goal */}
           <div className="space-y-2">
-            <Label htmlFor="primary_goal" className="flex items-center gap-2">
-              <Target className="w-4 h-4" />
+            <Label htmlFor="primary_goal" className="flex items-center gap-2 text-white font-body">
+              <Target className="w-4 h-4 text-green-200" />
               Primary Goal
             </Label>
             <Select
               value={profile.primary_goal}
               onValueChange={(value) => setProfile({ ...profile, primary_goal: value })}
             >
-              <SelectTrigger data-testid="primary-goal-select">
+              <SelectTrigger className="bg-white/10 border-white/20 text-white" data-testid="primary-goal-select">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Balance">Overall Life Balance</SelectItem>
-                <SelectItem value="Career growth">Career Growth</SelectItem>
-                <SelectItem value="Health">Health & Wellness</SelectItem>
-                <SelectItem value="Wealth">Wealth Building</SelectItem>
+              <SelectContent className="bg-[#4169E1] border-white/20 text-white">
+                <SelectItem value="Balance" className="text-white hover:bg-white/10">Overall Life Balance</SelectItem>
+                <SelectItem value="Career growth" className="text-white hover:bg-white/10">Career Growth</SelectItem>
+                <SelectItem value="Health" className="text-white hover:bg-white/10">Health & Wellness</SelectItem>
+                <SelectItem value="Wealth" className="text-white hover:bg-white/10">Wealth Building</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Profession */}
           <div className="space-y-2">
-            <Label htmlFor="profession" className="flex items-center gap-2">
-              <Briefcase className="w-4 h-4" />
+            <Label htmlFor="profession" className="flex items-center gap-2 text-white font-body">
+              <Briefcase className="w-4 h-4 text-green-200" />
               Profession (Optional)
             </Label>
             <Input
@@ -142,81 +142,86 @@ export const ProfileForm = ({ onProfileUpdated }) => {
               value={profile.profession || ''}
               onChange={(e) => setProfile({ ...profile, profession: e.target.value })}
               placeholder="e.g., Software Engineer, Student, Entrepreneur"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-body"
               data-testid="profession-input"
             />
           </div>
 
           {/* Life Stage */}
           <div className="space-y-2">
-            <Label htmlFor="life_stage">Life Stage</Label>
+            <Label htmlFor="life_stage" className="text-white font-body">Life Stage</Label>
             <Select
               value={profile.life_stage}
               onValueChange={(value) => setProfile({ ...profile, life_stage: value })}
             >
-              <SelectTrigger data-testid="life-stage-select">
+              <SelectTrigger className="bg-white/10 border-white/20 text-white" data-testid="life-stage-select">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Student">Student</SelectItem>
-                <SelectItem value="Working Professional">Working Professional</SelectItem>
-                <SelectItem value="Entrepreneur">Entrepreneur</SelectItem>
+              <SelectContent className="bg-[#4169E1] border-white/20 text-white">
+                <SelectItem value="Student" className="text-white hover:bg-white/10">Student</SelectItem>
+                <SelectItem value="Working Professional" className="text-white hover:bg-white/10">Working Professional</SelectItem>
+                <SelectItem value="Entrepreneur" className="text-white hover:bg-white/10">Entrepreneur</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Daily Availability */}
           <div className="space-y-2">
-            <Label htmlFor="daily_availability" className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
+            <Label htmlFor="daily_availability" className="flex items-center gap-2 text-white font-body">
+              <Clock className="w-4 h-4 text-green-200" />
               Daily Availability
             </Label>
             <Select
               value={profile.daily_availability}
               onValueChange={(value) => setProfile({ ...profile, daily_availability: value })}
             >
-              <SelectTrigger data-testid="availability-select">
+              <SelectTrigger className="bg-white/10 border-white/20 text-white" data-testid="availability-select">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Low">Low (1-2 hours)</SelectItem>
-                <SelectItem value="Medium">Medium (3-5 hours)</SelectItem>
-                <SelectItem value="High">High (6+ hours)</SelectItem>
+              <SelectContent className="bg-[#4169E1] border-white/20 text-white">
+                <SelectItem value="Low" className="text-white hover:bg-white/10">Low (1-2 hours)</SelectItem>
+                <SelectItem value="Medium" className="text-white hover:bg-white/10">Medium (2-4 hours)</SelectItem>
+                <SelectItem value="High" className="text-white hover:bg-white/10">High (4+ hours)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Preferred Focus Areas */}
+          {/* Focus Areas */}
           <div className="space-y-3">
-            <Label>Preferred Focus Areas (Select 2-3)</Label>
-            <p className="text-sm text-muted-foreground">
-              AI will prioritize these categories in recommendations
-            </p>
+            <Label className="text-white font-body">Preferred Focus Areas (Choose 2-3)</Label>
             <div className="grid grid-cols-2 gap-3">
-              {categories.map((category) => {
-                const isSelected = profile.preferred_focus_areas?.includes(category);
-                return (
-                  <div
-                    key={category}
-                    onClick={() => handleFocusAreaToggle(category)}
-                    className={`
-                      flex items-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all
-                      ${
-                        isSelected
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                      }
-                    `}
-                    data-testid={`focus-area-${category.toLowerCase().replace('/', '-')}`}
+              {categories.map((category) => (
+                <div
+                  key={category}
+                  className="flex items-center space-x-2"
+                  data-testid={`focus-area-${category.toLowerCase().replace('/', '-')}`}
+                >
+                  <Checkbox
+                    id={category}
+                    checked={profile.preferred_focus_areas?.includes(category)}
+                    onCheckedChange={() => handleFocusAreaToggle(category)}
+                    className="border-white/30 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                  />
+                  <label
+                    htmlFor={category}
+                    className="text-sm font-body text-white cursor-pointer"
                   >
-                    <Checkbox checked={isSelected} className="pointer-events-none" />
-                    <span className="text-sm font-medium">{category}</span>
-                  </div>
-                );
-              })}
+                    {category}
+                  </label>
+                </div>
+              ))}
             </div>
+            <p className="text-xs text-white/70 font-body">
+              Selected: {profile.preferred_focus_areas?.length || 0} / 3
+            </p>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full" data-testid="save-profile-btn">
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-white hover:bg-white/90 text-[#4169E1] font-heading shadow-lg"
+            data-testid="save-profile-btn"
+          >
             {loading ? 'Saving...' : 'Save Profile'}
           </Button>
         </form>
