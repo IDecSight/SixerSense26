@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { ArrowLeft, Wallet as WalletIcon, CreditCard, TrendingUp, Zap } from 'lucide-react';
+import { PremiumUpgradeModal } from '../components/PremiumUpgradeModal';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
@@ -13,35 +14,62 @@ export const Wallet = () => {
   const [isPremium, setIsPremium] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
 
   useEffect(() => {
-    const fetchWalletData = async () => {
-      try {
-        const [balanceRes, transactionsRes] = await Promise.all([
-          apiClient.get('/wallet/balance'),
-          apiClient.get('/wallet/transactions')
-        ]);
-        setBalance(balanceRes.data.balance);
-        setIsPremium(balanceRes.data.is_premium);
-        setTransactions(transactionsRes.data);
-      } catch (error) {
-        console.error('Error fetching wallet data:', error);
-        toast.error('Failed to load wallet data');
-      } finally {
-        setLoading(false);
-      }
+    const loadWalletData = async () => {
+      await fetchWalletData();
+      setLoading(false);
     };
-
-    fetchWalletData();
+    loadWalletData();
   }, []);
 
   const [buyAmount, setBuyAmount] = useState('');
   const [buyingRuns, setBuyingRuns] = useState(false);
 
+  const fetchWalletData = async () => {
+    try {
+      const [balanceRes, transactionsRes] = await Promise.all([
+        apiClient.get('/wallet/balance'),
+        apiClient.get('/wallet/transactions')
+      ]);
+      setBalance(balanceRes.data.balance);
+      setIsPremium(balanceRes.data.is_premium);
+      setTransactions(transactionsRes.data);
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+      toast.error('Failed to load wallet data');
+    }
+  };
+
   const handleAddFunds = () => {
     toast.info('Payment integration coming soon!', {
       description: 'Dodo Payments will be integrated shortly'
     });
+  };
+
+  const handleUpgradeToPremium = async () => {
+    setUpgrading(true);
+    try {
+      const response = await apiClient.post('/users/upgrade-premium');
+      toast.success('🎉 Welcome to Premium!', {
+        description: `₹${response.data.welcome_bonus} added to your wallet`
+      });
+      setShowUpgradeModal(false);
+      setIsPremium(true);
+      // Refresh wallet data
+      await fetchWalletData();
+    } catch (error) {
+      console.error('Error upgrading to premium:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Failed to upgrade to premium');
+      }
+    } finally {
+      setUpgrading(false);
+    }
   };
 
   const handleBuyRuns = async () => {
@@ -216,7 +244,11 @@ export const Wallet = () => {
                     <span className="text-sm">Advanced analytics and insights</span>
                   </li>
                 </ul>
-                <Button className="w-full" variant="secondary">
+                <Button 
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-[#4169E1] font-heading font-bold"
+                  onClick={() => setShowUpgradeModal(true)}
+                  data-testid="upgrade-premium-btn"
+                >
                   Upgrade Now
                 </Button>
               </CardContent>
