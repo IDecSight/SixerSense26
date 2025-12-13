@@ -24,10 +24,14 @@ export const Settings = () => {
 
   useEffect(() => {
     fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleProfileUpdated = () => {
-    fetchUser();
+    // Prevent infinite loops by not re-fetching immediately
+    setTimeout(() => {
+      fetchUser();
+    }, 100);
   };
 
   if (loading) {
