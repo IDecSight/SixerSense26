@@ -148,20 +148,26 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
                     }`}>
                       <button
                         onClick={() => setSelectedTask(task)}
-                        className="w-full text-left p-3"
+                        className="w-full text-left p-3 hover:bg-white/5 transition-colors"
                         data-testid={`task-option-${task.run_value}`}
                       >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-heading font-semibold text-sm text-white">{task.title}</span>
-                          <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-200 text-xs font-mono-score font-bold">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <span className="font-heading font-semibold text-sm text-white leading-tight flex-1">
+                            {task.title}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-200 text-xs font-mono-score font-bold border border-green-400/30 flex-shrink-0">
                             {task.run_value} RUNS
                           </span>
                         </div>
-                        <p className="text-xs text-white/70 font-body">{task.description}</p>
-                        <p className="text-xs text-green-200/60 mt-1 font-body flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          ~{task.estimated_minutes} mins
+                        <p className="text-xs text-white/70 font-body leading-relaxed mb-2">
+                          {task.description}
                         </p>
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/10 border border-white/20 w-fit">
+                          <Clock className="w-3 h-3 text-green-300" />
+                          <span className="text-xs font-body font-medium text-white">
+                            ~{task.estimated_minutes} minutes
+                          </span>
+                        </div>
                       </button>
                       
                       {/* Individual Affiliate Product for THIS specific task */}
