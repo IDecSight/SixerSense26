@@ -26,9 +26,9 @@ export const MatchHistory = () => {
   }, []);
 
   const getMatchBadge = (match) => {
-    if (match.status === 'won') return { label: 'WON', color: 'bg-primary text-primary-foreground' };
-    if (match.status === 'lost') return { label: 'LOST', color: 'bg-destructive text-destructive-foreground' };
-    return { label: 'IN PROGRESS', color: 'bg-secondary text-secondary-foreground' };
+    if (match.status === 'won') return { label: 'WON', color: 'bg-soft-peach text-primary-navy' };
+    if (match.status === 'lost') return { label: 'LOST', color: 'bg-dusty-rose text-primary-navy' };
+    return { label: 'IN PROGRESS', color: 'bg-deep-teal/20 text-deep-teal' };
   };
 
   if (loading) {
@@ -48,7 +48,7 @@ export const MatchHistory = () => {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <h1 className="text-3xl font-teko font-bold uppercase tracking-tight">
+            <h1 className="text-3xl font-heading font-bold uppercase tracking-tight text-calm-beige">
               Match History
             </h1>
           </div>
@@ -57,11 +57,11 @@ export const MatchHistory = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {matches.length === 0 ? (
-          <Card>
+          <Card className="bg-calm-beige border-deep-teal/20">
             <CardContent className="py-12 text-center">
-              <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg text-muted-foreground">No match history yet</p>
-              <Button onClick={() => navigate('/dashboard')} className="mt-4">
+              <Trophy className="w-16 h-16 mx-auto mb-4 text-soft-peach" />
+              <p className="text-lg text-deep-teal/60 font-body">No match history yet</p>
+              <Button onClick={() => navigate('/dashboard')} className="mt-4 bg-soft-peach hover:bg-soft-peach/90 text-primary-navy font-heading">
                 Start Your First Match
               </Button>
             </CardContent>
@@ -75,11 +75,11 @@ export const MatchHistory = () => {
                 : '0';
 
               return (
-                <Card key={match.match_id} className="hover:shadow-lg transition-shadow">
+                <Card key={match.match_id} className="hover:shadow-lg transition-shadow bg-calm-beige border-deep-teal/20">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-xl font-teko uppercase tracking-tight">
+                        <CardTitle className="text-xl font-heading uppercase tracking-tight text-deep-teal">
                           {new Date(match.date).toLocaleDateString('en-US', { 
                             weekday: 'long', 
                             year: 'numeric', 
@@ -87,11 +87,11 @@ export const MatchHistory = () => {
                             day: 'numeric' 
                           })}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-deep-teal/60 mt-1 font-body">
                           {match.format} Format
                         </p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${badge.color}`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-heading font-bold uppercase ${badge.color}`}>
                         {badge.label}
                       </span>
                     </div>
