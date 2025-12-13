@@ -871,9 +871,15 @@ Return ONLY a JSON object:
             if "balance_reasoning" not in recommendation:
                 recommendation["balance_reasoning"] = f"Balancing your life across all categories"
             
-            # Add affiliate product for this category
+            # Get category and add 3 task options with affiliate product
             category = recommendation.get("category")
             if category:
+                # Get 3 default tasks for this category (1, 4, 6 runs)
+                default_tasks = get_default_tasks_for_category(category)
+                if default_tasks:
+                    recommendation["task_options"] = default_tasks
+                
+                # Add affiliate product for this category
                 affiliate_product = get_random_product(category)
                 if affiliate_product:
                     recommendation["affiliate_product"] = affiliate_product
@@ -883,13 +889,15 @@ Return ONLY a JSON object:
             logging.error(f"JSON parse error: {str(e)}, Response: {response}")
             # Fallback recommendation from priority categories
             fallback_cat = available_cats[0] if available_cats else "Health"
+            default_tasks = get_default_tasks_for_category(fallback_cat)
             affiliate_product = get_random_product(fallback_cat)
             fallback = {
                 "task": f"Quick {fallback_cat.lower()} check-in",
                 "category": fallback_cat,
                 "run_value": 1,
                 "balance_reasoning": f"{fallback_cat} needs more attention - only {balance[fallback_cat]['count']} tasks completed recently",
-                "reasoning": ["Helps maintain life balance", "Quick and impactful"]
+                "reasoning": ["Helps maintain life balance", "Quick and impactful"],
+                "task_options": default_tasks if default_tasks else []
             }
             if affiliate_product:
                 fallback["affiliate_product"] = affiliate_product
@@ -898,13 +906,15 @@ Return ONLY a JSON object:
     except Exception as e:
         logging.error(f"AI recommendation error: {str(e)}")
         # Return fallback
+        default_tasks = get_default_tasks_for_category("Career")
         affiliate_product = get_random_product("Career")
         fallback = {
             "task": "Review your goals for the day",
             "category": "Career",
             "run_value": 1,
             "balance_reasoning": "Career focus helps maintain productivity momentum",
-            "reasoning": ["Helps prioritize", "Quick planning task"]
+            "reasoning": ["Helps prioritize", "Quick planning task"],
+            "task_options": default_tasks if default_tasks else []
         }
         if affiliate_product:
             fallback["affiliate_product"] = affiliate_product
