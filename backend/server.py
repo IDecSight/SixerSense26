@@ -871,15 +871,21 @@ Return ONLY a JSON object:
             if "balance_reasoning" not in recommendation:
                 recommendation["balance_reasoning"] = f"Balancing your life across all categories"
             
-            # Get category and add 3 task options with affiliate product
+            # Get category and add 3 task options with affiliate products
             category = recommendation.get("category")
             if category:
                 # Get 3 default tasks for this category (1, 4, 6 runs)
                 default_tasks = get_default_tasks_for_category(category)
                 if default_tasks:
+                    # Add affiliate product to EACH task option
+                    for task in default_tasks:
+                        affiliate_product = get_random_product(category)
+                        if affiliate_product:
+                            task["affiliate_product"] = affiliate_product
+                    
                     recommendation["task_options"] = default_tasks
                 
-                # Add affiliate product for this category
+                # Also add main affiliate product for backward compatibility
                 affiliate_product = get_random_product(category)
                 if affiliate_product:
                     recommendation["affiliate_product"] = affiliate_product
@@ -890,6 +896,14 @@ Return ONLY a JSON object:
             # Fallback recommendation from priority categories
             fallback_cat = available_cats[0] if available_cats else "Health"
             default_tasks = get_default_tasks_for_category(fallback_cat)
+            
+            # Add affiliate product to each task option
+            if default_tasks:
+                for task in default_tasks:
+                    affiliate_product = get_random_product(fallback_cat)
+                    if affiliate_product:
+                        task["affiliate_product"] = affiliate_product
+            
             affiliate_product = get_random_product(fallback_cat)
             fallback = {
                 "task": f"Quick {fallback_cat.lower()} check-in",
@@ -907,6 +921,14 @@ Return ONLY a JSON object:
         logging.error(f"AI recommendation error: {str(e)}")
         # Return fallback
         default_tasks = get_default_tasks_for_category("Career")
+        
+        # Add affiliate product to each task option
+        if default_tasks:
+            for task in default_tasks:
+                affiliate_product = get_random_product("Career")
+                if affiliate_product:
+                    task["affiliate_product"] = affiliate_product
+        
         affiliate_product = get_random_product("Career")
         fallback = {
             "task": "Review your goals for the day",
