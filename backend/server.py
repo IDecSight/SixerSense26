@@ -1146,6 +1146,27 @@ async def upgrade_to_premium(current_user: str = Depends(get_current_user)):
         "new_balance": new_balance
     }
 
+@api_router.delete("/matches/today")
+async def delete_today_match(current_user: str = Depends(get_current_user)):
+    """Delete today's match to allow format selection"""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Find today's match
+    match_doc = await db.matches.find_one(
+        {"user_id": current_user, "date": today}
+    )
+    
+    if not match_doc:
+        raise HTTPException(status_code=404, detail="No match found for today")
+    
+    # Delete all tasks for this match
+    await db.tasks.delete_many({"match_id": match_doc["match_id"]})
+    
+    # Delete the match
+    await db.matches.delete_one({"match_id": match_doc["match_id"]})
+    
+    return {"message": "Match deleted successfully. You can now select a new format."}
+
 # Include the router in the main app
 app.include_router(api_router)
 
