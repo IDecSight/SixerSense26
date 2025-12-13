@@ -33,8 +33,11 @@ export const MatchHistory = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto"></div>
+          <p className="text-lg font-medium text-white">Loading history...</p>
+        </div>
       </div>
     );
   }
@@ -99,36 +102,36 @@ export const MatchHistory = () => {
                   <CardContent>
                     <div className="grid grid-cols-3 gap-4">
                       <div className="text-center">
-                        <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground">
+                        <div className="flex items-center justify-center gap-1.5 mb-2 text-white/70">
                           <Target className="w-4 h-4" />
-                          <span className="text-xs uppercase font-medium">Runs</span>
+                          <span className="text-xs uppercase font-medium font-body">Runs</span>
                         </div>
                         <div className="space-y-1">
-                          <div className="font-mono-score text-2xl font-bold text-primary">
+                          <div className="font-mono-score text-2xl font-bold text-green-200">
                             {match.total_runs}
                           </div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-xs text-white/60 font-body">
                             / {match.target_score}
                           </div>
                         </div>
                       </div>
                       
                       <div className="text-center">
-                        <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground">
+                        <div className="flex items-center justify-center gap-1.5 mb-2 text-white/70">
                           <Shield className="w-4 h-4" />
-                          <span className="text-xs uppercase font-medium">Wickets</span>
+                          <span className="text-xs uppercase font-medium font-body">Wickets</span>
                         </div>
-                        <div className="font-mono-score text-2xl font-bold text-destructive">
+                        <div className="font-mono-score text-2xl font-bold text-red-200">
                           {match.total_wickets}/10
                         </div>
                       </div>
 
                       <div className="text-center">
-                        <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground">
+                        <div className="flex items-center justify-center gap-1.5 mb-2 text-white/70">
                           <Trophy className="w-4 h-4" />
-                          <span className="text-xs uppercase font-medium">Strike Rate</span>
+                          <span className="text-xs uppercase font-medium font-body">Strike Rate</span>
                         </div>
-                        <div className="font-mono-score text-2xl font-bold">
+                        <div className="font-mono-score text-2xl font-bold text-yellow-200">
                           {strikeRate}
                         </div>
                       </div>
