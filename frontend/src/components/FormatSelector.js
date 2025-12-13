@@ -46,7 +46,7 @@ export const FormatSelector = ({ onSelectFormat, loading }) => {
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-yellow-200" />
+              <Trophy className="w-8 h-8 text-green-400" />
             </div>
           </div>
           <CardTitle className="text-3xl font-heading font-bold text-white mb-2 drop-shadow-lg">
