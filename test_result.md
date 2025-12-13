@@ -223,6 +223,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Match Format Selection Feature"
     - "Dashboard Today's Tasks Heading"
     - "Wallet INR Currency Symbol"
   stuck_tasks:
