@@ -19,7 +19,8 @@ const LandingPage = () => {
   });
 
   const handleGoogleAuth = () => {
-    window.location.href = `${process.env.REACT_APP_BACKEND_URL}/api/auth/google`;
+    const redirectUrl = window.location.origin + '/dashboard';
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   const handleSubmit = async (e) => {
