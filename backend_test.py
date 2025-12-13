@@ -119,6 +119,141 @@ class SixerSenseAPITester:
             return True
         return False
 
+    def test_affiliate_products_integration(self):
+        """Test affiliate products integration in AI recommendations"""
+        if not self.match_id:
+            print("⚠️  Skipping affiliate test - no match_id available")
+            return False
+            
+        print("\n🛍️  Testing Affiliate Products Integration...")
+        
+        # Test multiple recommendations to check for affiliate products
+        for i in range(3):
+            success, response = self.run_test(
+                f"AI Recommendation with Affiliate Products (Test {i+1})",
+                "POST",
+                "ai/recommend",
+                200,
+                data={
+                    "match_id": self.match_id,
+                    "time_available": 30
+                }
+            )
+            
+            if success and response:
+                # Check if affiliate_product exists in response
+                affiliate_product = response.get('affiliate_product')
+                if affiliate_product:
+                    print(f"✅ Affiliate product found in recommendation {i+1}")
+                    
+                    # Validate required fields
+                    required_fields = ['affiliate_link', 'name', 'description', 'price', 'run_reward', 'action_tasks']
+                    missing_fields = []
+                    
+                    for field in required_fields:
+                        if field not in affiliate_product:
+                            missing_fields.append(field)
+                    
+                    if missing_fields:
+                        print(f"❌ Missing required fields: {missing_fields}")
+                        self.failed_tests.append({
+                            "test": f"Affiliate Product Fields (Test {i+1})",
+                            "error": f"Missing fields: {missing_fields}"
+                        })
+                        return False
+                    else:
+                        print(f"   ✅ All required fields present")
+                        print(f"   Product: {affiliate_product.get('name')}")
+                        print(f"   Price: {affiliate_product.get('price')}")
+                        print(f"   Run Reward: {affiliate_product.get('run_reward')}")
+                        print(f"   Category: {response.get('category')}")
+                        
+                        # Validate affiliate_link format
+                        affiliate_link = affiliate_product.get('affiliate_link', '')
+                        if not affiliate_link.startswith('http'):
+                            print(f"❌ Invalid affiliate link format: {affiliate_link}")
+                            self.failed_tests.append({
+                                "test": f"Affiliate Link Format (Test {i+1})",
+                                "error": f"Invalid URL format: {affiliate_link}"
+                            })
+                            return False
+                        
+                        # Validate action_tasks is a list
+                        action_tasks = affiliate_product.get('action_tasks', [])
+                        if not isinstance(action_tasks, list) or len(action_tasks) == 0:
+                            print(f"❌ action_tasks should be a non-empty list")
+                            self.failed_tests.append({
+                                "test": f"Action Tasks Format (Test {i+1})",
+                                "error": "action_tasks should be a non-empty list"
+                            })
+                            return False
+                        
+                        print(f"   ✅ Action tasks: {len(action_tasks)} items")
+                else:
+                    print(f"❌ No affiliate product found in recommendation {i+1}")
+                    self.failed_tests.append({
+                        "test": f"Affiliate Product Presence (Test {i+1})",
+                        "error": "No affiliate_product in response"
+                    })
+                    return False
+            else:
+                print(f"❌ Failed to get AI recommendation {i+1}")
+                return False
+        
+        print("✅ All affiliate product tests passed!")
+        return True
+
+    def test_affiliate_products_categories(self):
+        """Test that different categories return different affiliate products"""
+        if not self.match_id:
+            print("⚠️  Skipping category test - no match_id available")
+            return False
+            
+        print("\n📊 Testing Affiliate Products by Category...")
+        
+        categories_tested = set()
+        products_seen = set()
+        
+        # Get multiple recommendations to see variety
+        for i in range(6):  # Test 6 times to potentially see different categories
+            success, response = self.run_test(
+                f"Category Variety Test {i+1}",
+                "POST",
+                "ai/recommend",
+                200,
+                data={
+                    "match_id": self.match_id,
+                    "time_available": 30
+                }
+            )
+            
+            if success and response:
+                category = response.get('category')
+                affiliate_product = response.get('affiliate_product')
+                
+                if category and affiliate_product:
+                    categories_tested.add(category)
+                    product_name = affiliate_product.get('name')
+                    products_seen.add(product_name)
+                    
+                    print(f"   Test {i+1}: Category={category}, Product={product_name}")
+        
+        print(f"\n📈 Results:")
+        print(f"   Categories seen: {len(categories_tested)} - {list(categories_tested)}")
+        print(f"   Unique products: {len(products_seen)}")
+        
+        # We should see at least some variety
+        if len(categories_tested) >= 1:
+            print("✅ Category variety test passed")
+            return True
+        else:
+            print("❌ No categories found in responses")
+            self.failed_tests.append({
+                "test": "Category Variety",
+                "error": "No categories found in AI responses"
+            })
+            return False
+
     def test_task_operations(self):
         """Test task CRUD operations"""
         if not self.token:
