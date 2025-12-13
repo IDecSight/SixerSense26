@@ -30,10 +30,11 @@ export const PremiumUpgradeModal = ({ open, onClose, onUpgrade, loading }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-2xl border-yellow-200/30 bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF] shadow-2xl relative overflow-hidden">
-        {/* Decorative Background */}
-        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center py-8">
+        <Card className="w-full max-w-2xl border-yellow-200/30 bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF] shadow-2xl relative overflow-hidden my-auto">
+          {/* Decorative Background */}
+          <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
         
         <CardHeader className="relative z-10 pb-2">
           <button
@@ -138,7 +139,8 @@ export const PremiumUpgradeModal = ({ open, onClose, onUpgrade, loading }) => {
             No payment required • Instant activation • Cancel anytime
           </p>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
