@@ -58,39 +58,40 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent data-testid="add-task-modal">
+      <DialogContent className="bg-white/10 backdrop-blur-lg border-white/20 text-white shadow-2xl" data-testid="add-task-modal">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-teko uppercase tracking-tight">
+          <DialogTitle className="text-2xl font-heading uppercase tracking-tight text-white drop-shadow-md">
             Add New Task (Ball)
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-white/80 font-body">
             Every task is one ball. Complete it to score runs!
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Task Description</Label>
+            <Label htmlFor="title" className="text-white font-body">Task Description</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g., Complete morning workout"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-body"
               data-testid="task-title-input"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category" className="text-white font-body">Category</Label>
             <Select
               value={formData.category}
               onValueChange={(value) => setFormData({ ...formData, category: value })}
             >
-              <SelectTrigger data-testid="category-select">
+              <SelectTrigger className="bg-white/10 border-white/20 text-white" data-testid="category-select">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#4169E1] border-white/20 text-white">
                 {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
+                  <SelectItem key={cat} value={cat} className="text-white hover:bg-white/10">
                     {cat}
                   </SelectItem>
                 ))}
@@ -100,24 +101,24 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="run_value">Run Value</Label>
+              <Label htmlFor="run_value" className="text-white font-body">Run Value</Label>
               <Select
                 value={formData.run_value.toString()}
                 onValueChange={(value) => setFormData({ ...formData, run_value: parseInt(value) })}
               >
-                <SelectTrigger data-testid="run-value-select">
+                <SelectTrigger className="bg-white/10 border-white/20 text-white" data-testid="run-value-select">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 Run (Low effort)</SelectItem>
-                  <SelectItem value="4">4 Runs (Medium)</SelectItem>
-                  <SelectItem value="6">6 Runs (High impact)</SelectItem>
+                <SelectContent className="bg-[#4169E1] border-white/20 text-white">
+                  <SelectItem value="1" className="text-white hover:bg-white/10">1 Run (Low effort)</SelectItem>
+                  <SelectItem value="4" className="text-white hover:bg-white/10">4 Runs (Medium)</SelectItem>
+                  <SelectItem value="6" className="text-white hover:bg-white/10">6 Runs (High impact)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="estimated_minutes">Time (mins)</Label>
+              <Label htmlFor="estimated_minutes" className="text-white font-body">Time (mins)</Label>
               <Input
                 id="estimated_minutes"
                 type="number"
@@ -125,6 +126,7 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
                 max="180"
                 value={formData.estimated_minutes}
                 onChange={(e) => setFormData({ ...formData, estimated_minutes: e.target.value })}
+                className="bg-white/10 border-white/20 text-white font-body"
                 data-testid="time-input"
               />
             </div>
@@ -136,10 +138,11 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 font-heading"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} data-testid="submit-task-btn">
+            <Button type="submit" disabled={loading} className="bg-white hover:bg-white/90 text-[#4169E1] font-heading shadow-lg" data-testid="submit-task-btn">
               {loading ? 'Adding...' : 'Add Task'}
             </Button>
           </DialogFooter>
