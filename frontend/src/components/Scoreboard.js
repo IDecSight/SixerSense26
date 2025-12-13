@@ -8,6 +8,7 @@ export const Scoreboard = ({ match, onChangeFormat }) => {
   const progressPercent = (match.total_runs / match.target_score) * 100;
   const wicketsRemaining = 10 - match.total_wickets;
   const canChangeFormat = match.completed_tasks === 0 && match.total_runs === 0;
+  const canRestart = true; // Always allow restart
 
   return (
     <Card 
@@ -24,18 +25,22 @@ export const Scoreboard = ({ match, onChangeFormat }) => {
                 {match.format} Format
               </h2>
             </div>
-            {canChangeFormat && onChangeFormat && (
-              <Button
-                onClick={onChangeFormat}
-                size="sm"
-                variant="ghost"
-                className="text-white/70 hover:text-white hover:bg-white/10 text-xs"
-                title="Change format"
-                data-testid="change-format-btn"
-              >
-                <RefreshCw className="w-3 h-3 mr-1" />
-                Change
-              </Button>
+            {onChangeFormat && (
+              <div className="flex gap-2">
+                {canRestart && (
+                  <Button
+                    onClick={onChangeFormat}
+                    size="sm"
+                    variant="ghost"
+                    className="text-yellow-300 hover:text-yellow-200 hover:bg-yellow-500/10 text-xs border border-yellow-400/30"
+                    title="Restart match with new format"
+                    data-testid="restart-match-btn"
+                  >
+                    <RefreshCw className="w-3 h-3 mr-1" />
+                    Restart Match
+                  </Button>
+                )}
+              </div>
             )}
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-md bg-green-500/20 border-2 border-green-300/40">
