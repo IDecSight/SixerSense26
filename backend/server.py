@@ -62,6 +62,7 @@ class User(BaseModel):
     profile: Optional[UserProfile] = None
     country: str = DEFAULT_COUNTRY  # User's country code (e.g., "IN", "US")
     currency: str = "INR"  # User's preferred currency
+    playing_xi: Optional[List[Dict]] = None  # 11 players representing life roles
     win_streak: int = 0
     next_target: int = 60
     total_bonus_runs: int = 0
