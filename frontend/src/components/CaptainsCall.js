@@ -126,6 +126,34 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
                 ))}
               </div>
 
+              {/* Task Options - 3 recommendations for this category */}
+              {recommendation.task_options && recommendation.task_options.length > 0 && (
+                <div className="mb-4 space-y-2">
+                  <p className="text-xs font-medium text-accent uppercase mb-2">Choose Your Task (Choose 1 of 3)</p>
+                  {recommendation.task_options.map((task, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedTask(task)}
+                      className={`w-full text-left p-3 rounded-lg border transition-all ${
+                        selectedTask?.run_value === task.run_value
+                          ? 'border-accent bg-accent/10 ring-2 ring-accent/50'
+                          : 'border-accent/20 bg-card hover:border-accent/40'
+                      }`}
+                      data-testid={`task-option-${task.run_value}`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-sm">{task.title}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-mono-score font-bold">
+                          {task.run_value} RUNS
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{task.description}</p>
+                      <p className="text-xs text-accent/60 mt-1">~{task.estimated_minutes} mins</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Affiliate Product */}
               {recommendation.affiliate_product && (
                 <div className="mt-4 p-3 rounded-lg bg-green-900/20 border border-green-500/30">
@@ -180,13 +208,13 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
               )}
             </div>
             <Button
-              onClick={addTaskFromRecommendation}
-              disabled={loading}
+              onClick={() => addTaskFromRecommendation(selectedTask || recommendation.task_options?.[0] || { title: recommendation.task, run_value: recommendation.run_value })}
+              disabled={loading || (recommendation.task_options && !selectedTask)}
               className="w-full h-12"
               data-testid="add-recommendation-btn"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add to Match
+              {selectedTask ? `Add ${selectedTask.run_value}-Run Task` : 'Select a Task First'}
             </Button>
           </div>
         )}
