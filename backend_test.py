@@ -403,6 +403,26 @@ def main():
         data={"match_id": "test_match", "time_available": 30}
     )
     
+    # Test 4: Try to test with authenticated user if possible
+    print("\n🔑 Attempting Authenticated Tests...")
+    auth_success = tester.test_with_mock_auth()
+    
+    if auth_success:
+        print("\n🏏 Testing Match Operations...")
+        tester.test_match_operations()
+        
+        print("\n🤖 Testing AI Recommendations with Affiliate Products...")
+        tester.test_affiliate_products_integration()
+        
+        print("\n📊 Testing Affiliate Product Categories...")
+        tester.test_affiliate_products_categories()
+        
+        print("\n💰 Testing Wallet Operations...")
+        tester.test_wallet_operations()
+        
+        print("\n📝 Testing Task Operations...")
+        tester.test_task_operations()
+    
     # Print results
     print("\n" + "=" * 50)
     print("📊 TEST RESULTS")
