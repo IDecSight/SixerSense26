@@ -15,7 +15,7 @@ import json
 
 class AffiliateProductsTester:
     def __init__(self):
-        self.base_url = "https://sixer-sense.preview.emergentagent.com"
+        self.base_url = "https://productivity-pitch.preview.emergentagent.com"
         self.tests_run = 0
         self.tests_passed = 0
         self.failed_tests = []
