@@ -42,15 +42,15 @@ export const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="settings-page">
-      <header className="border-b border-border/50 backdrop-blur-xl bg-background/80">
+    <div className="min-h-screen bg-primary-navy" data-testid="settings-page">
+      <header className="border-b border-deep-teal/20 backdrop-blur-xl bg-calm-beige/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="text-calm-beige hover:text-soft-peach hover:bg-soft-peach/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <h1 className="text-3xl font-teko font-bold uppercase tracking-tight">
+            <h1 className="text-3xl font-heading font-bold uppercase tracking-tight text-calm-beige">
               Settings
             </h1>
           </div>
@@ -60,10 +60,10 @@ export const Settings = () => {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
           {/* Account Info */}
-          <Card>
+          <Card className="bg-calm-beige border-deep-teal/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 font-heading text-deep-teal">
+                <User className="w-5 h-5 text-soft-peach" />
                 Account Information
               </CardTitle>
             </CardHeader>
@@ -73,14 +73,14 @@ export const Settings = () => {
                   <img 
                     src={user.picture} 
                     alt={user.name}
-                    className="w-16 h-16 rounded-full border-2 border-primary"
+                    className="w-16 h-16 rounded-full border-2 border-soft-peach"
                   />
                 )}
                 <div>
-                  <p className="font-semibold text-lg">{user?.name}</p>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
+                  <p className="font-heading font-semibold text-lg text-deep-teal">{user?.name}</p>
+                  <p className="text-sm text-deep-teal/60 font-body">{user?.email}</p>
                   {user?.is_premium && (
-                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-bold uppercase">
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-soft-peach/20 text-soft-peach text-xs font-heading font-bold uppercase">
                       Premium
                     </span>
                   )}
@@ -93,31 +93,31 @@ export const Settings = () => {
           <ProfileForm onProfileUpdated={handleProfileUpdated} />
 
           {/* Notifications */}
-          <Card>
+          <Card className="bg-calm-beige border-deep-teal/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 font-heading text-deep-teal">
+                <Bell className="w-5 h-5 text-soft-peach" />
                 Notifications
               </CardTitle>
-              <CardDescription>Manage your notification preferences</CardDescription>
+              <CardDescription className="text-deep-teal/60 font-body">Manage your notification preferences</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Notification settings coming soon</p>
+              <p className="text-sm text-deep-teal/60 font-body">Notification settings coming soon</p>
             </CardContent>
           </Card>
 
           {/* Calendar Sync */}
-          <Card>
+          <Card className="bg-calm-beige border-deep-teal/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 font-heading text-deep-teal">
+                <Calendar className="w-5 h-5 text-soft-peach" />
                 Google Calendar Sync
               </CardTitle>
-              <CardDescription>Sync your tasks with Google Calendar</CardDescription>
+              <CardDescription className="text-deep-teal/60 font-body">Sync your tasks with Google Calendar</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">Calendar sync coming soon</p>
-              <Button variant="secondary" disabled>
+              <p className="text-sm text-deep-teal/60 mb-4 font-body">Calendar sync coming soon</p>
+              <Button variant="secondary" disabled className="bg-deep-teal/10 text-deep-teal font-heading">
                 Connect Calendar
               </Button>
             </CardContent>
