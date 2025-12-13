@@ -1266,6 +1266,117 @@ async def update_user_location(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+class CommentaryRequest(BaseModel):
+    event_type: str  # task_completed, wicket_lost, over_completed, match_won, match_lost
+    task_name: Optional[str] = None
+    category: Optional[str] = None
+    run_value: Optional[int] = None
+    current_runs: int
+    current_wickets: int
+    match_format: str
+    target_score: Optional[int] = None
+
+@api_router.post("/commentary/generate")
+async def generate_commentary(req: CommentaryRequest, current_user: str = Depends(get_current_user)):
+    """Generate live cricket-style commentary for user actions"""
+    try:
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="AI service not configured")
+        
+        # Build context-aware system message
+        system_message = """You are a live Match Commentary Agent for the Sixer Sense app.
+
+Your job is to generate short, engaging cricket-style commentary based on the user's real productivity actions.
+
+You must make the app feel alive, fun, and motivating — never judgmental.
+
+TONE & STYLE:
+- Cricket commentator style
+- Encouraging, witty, calm confidence
+- Never sarcastic, never shaming
+- 1–2 short sentences max
+- Simple English, high energy
+
+COMMENTARY RULES:
+1. Never repeat the same line within the same day.
+2. Match tone to event:
+   - Success → celebratory
+   - Wicket → calm, recovery-focused
+   - Loss → respectful, encouraging
+3. Do NOT mention money, betting, or gambling.
+4. Do NOT over-hype small actions.
+5. Make the user feel in control.
+
+OUTPUT FORMAT (MANDATORY):
+Return ONLY the commentary line as plain text.
+No emojis.
+No formatting.
+No explanations."""
+
+        # Build event-specific prompt
+        if req.event_type == "task_completed":
+            if req.run_value == 6:
+                prompt = f"HIGH-VALUE TASK! User just completed '{req.task_name}' ({req.category}) for 6 RUNS! Score: {req.current_runs}/{req.current_wickets}. Match format: {req.match_format}. Generate exciting commentary."
+            elif req.run_value == 4:
+                prompt = f"User completed '{req.task_name}' ({req.category}) for 4 runs. Score: {req.current_runs}/{req.current_wickets}. Match format: {req.match_format}. Generate positive commentary."
+            else:
+                prompt = f"User completed '{req.task_name}' ({req.category}) for 1 run. Score: {req.current_runs}/{req.current_wickets}. Match format: {req.match_format}. Generate encouraging commentary."
+        
+        elif req.event_type == "wicket_lost":
+            prompt = f"WICKET! User lost focus/missed a task. Score: {req.current_runs}/{req.current_wickets}. Match format: {req.match_format}. Generate calm, recovery-focused commentary. No blame."
+        
+        elif req.event_type == "over_completed":
+            prompt = f"OVER COMPLETED! User finished 6 tasks. Score: {req.current_runs}/{req.current_wickets}. Match format: {req.match_format}. Generate celebratory commentary about the over."
+        
+        elif req.event_type == "match_won":
+            prompt = f"MATCH WON! User achieved target of {req.target_score} runs! Final score: {req.current_runs}/{req.current_wickets}. Match format: {req.match_format}. Generate victory commentary."
+        
+        elif req.event_type == "match_lost":
+            prompt = f"Match ended. User scored {req.current_runs} runs, target was {req.target_score}. Match format: {req.match_format}. Generate respectful, encouraging commentary about tomorrow."
+        
+        else:
+            prompt = f"Generate cricket commentary for: {req.event_type}. Score: {req.current_runs}/{req.current_wickets}."
+        
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"commentary_{current_user}",
+            system_message=system_message
+        )
+        chat.with_model("openai", "gpt-4o-mini")  # Use faster model for real-time commentary
+        
+        user_message = UserMessage(text=prompt)
+        response = await chat.send_message(user_message)
+        
+        # Clean response - remove any extra formatting
+        commentary = response.strip()
+        commentary = commentary.replace("**", "").replace("*", "").replace("_", "")
+        
+        # Ensure it's concise (max 150 characters)
+        if len(commentary) > 150:
+            sentences = commentary.split(".")
+            commentary = sentences[0] + "."
+        
+        return {
+            "commentary": commentary,
+            "event_type": req.event_type
+        }
+    
+    except Exception as e:
+        logging.error(f"Commentary generation error: {str(e)}")
+        # Fallback commentary
+        fallbacks = {
+            "task_completed": "Task completed! Keep the momentum going.",
+            "wicket_lost": "Focus reset. You're still in this match.",
+            "over_completed": "Solid over! Six tasks down.",
+            "match_won": "Victory! You've conquered today's match.",
+            "match_lost": "Match done. Tomorrow's a fresh start."
+        }
+        return {
+            "commentary": fallbacks.get(req.event_type, "Well played!"),
+            "event_type": req.event_type
+        }
+
 # Include the router in the main app
 app.include_router(api_router)
 
