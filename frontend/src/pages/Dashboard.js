@@ -128,7 +128,7 @@ export const Dashboard = () => {
     );
   }
 
-  if (showFormatSelector) {
+  if (showFormatSelector || (!loading && !match)) {
     return (
       <FormatSelector 
         onSelectFormat={handleStartMatch}
