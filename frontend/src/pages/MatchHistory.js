@@ -44,7 +44,7 @@ export const MatchHistory = () => {
       <header className="border-b border-white/20 backdrop-blur-xl bg-white/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="text-white hover:text-yellow-200 hover:bg-white/10">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/home')} className="text-white hover:text-yellow-200 hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
