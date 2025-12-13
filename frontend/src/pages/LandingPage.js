@@ -57,7 +57,7 @@ const LandingPage = () => {
             You need a system that makes progress unavoidable.
           </p>
           <p className="text-lg text-white/90 mb-10 max-w-2xl mx-auto font-body drop-shadow-md">
-            Sixer Sense is an AI-powered productivity system that turns your daily tasks into a game — so you finally finish what you start.
+            Sixer Sense is an AI-powered productivity system that turns your daily tasks into a cricket match — so you finally finish what you start.
           </p>
           <Button 
             onClick={handleAuthClick}
