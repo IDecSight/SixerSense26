@@ -34,10 +34,52 @@ export const Wallet = () => {
     fetchWalletData();
   }, []);
 
+  const [buyAmount, setBuyAmount] = useState('');
+  const [buyingRuns, setBuyingRuns] = useState(false);
+
   const handleAddFunds = () => {
     toast.info('Payment integration coming soon!', {
       description: 'Dodo Payments will be integrated shortly'
     });
+  };
+
+  const handleBuyRuns = async () => {
+    if (!buyAmount || parseFloat(buyAmount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    const amount = parseFloat(buyAmount);
+    if (amount > balance) {
+      toast.error('Insufficient wallet balance');
+      return;
+    }
+
+    setBuyingRuns(true);
+    try {
+      const response = await apiClient.post('/wallet/buy-runs', { amount });
+      toast.success('Runs purchased!', {
+        description: `+${response.data.runs_added} runs added to today's match`
+      });
+      setBuyAmount('');
+      // Refresh wallet data
+      const [balanceRes, transactionsRes] = await Promise.all([
+        apiClient.get('/wallet/balance'),
+        apiClient.get('/wallet/transactions')
+      ]);
+      setBalance(balanceRes.data.balance);
+      setTransactions(transactionsRes.data);
+    } catch (error) {
+      if (error.response?.status === 403) {
+        toast.error('Premium membership required', {
+          description: 'Upgrade to premium to buy runs'
+        });
+      } else {
+        toast.error('Failed to purchase runs');
+      }
+    } finally {
+      setBuyingRuns(false);
+    }
   };
 
   if (loading) {
