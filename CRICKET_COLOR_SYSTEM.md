@@ -12,9 +12,9 @@ The application now follows a professional cricket scoreboard-inspired color sys
 
 #### **Royal Blue** - Primary Background
 ```css
-HSL: 221, 83%, 53%
-RGB: 22, 93, 219
-HEX: #165DDB
+HSL: 225, 73%, 57%
+RGB: 65, 105, 225
+HEX: #4169e1
 ```
 
 **Usage:**
