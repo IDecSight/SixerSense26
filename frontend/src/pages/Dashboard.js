@@ -215,6 +215,15 @@ export const Dashboard = () => {
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={handleChangeFormat}
+                title="Restart Match"
+                className="text-white hover:text-yellow-400 hover:bg-white/10"
+              >
+                <span className="text-xs font-body">Restart</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate('/history')}
                 data-testid="history-btn"
                 className="text-white hover:text-green-400 hover:bg-white/10"
