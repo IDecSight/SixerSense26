@@ -33,6 +33,7 @@ export const Wallet = () => {
     };
 
     fetchWalletData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [buyAmount, setBuyAmount] = useState('');
