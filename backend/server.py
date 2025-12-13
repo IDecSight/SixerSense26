@@ -1096,7 +1096,54 @@ async def buy_runs(req: BuyRunsRequest, current_user: str = Depends(get_current_
         "message": "Runs purchased successfully",
         "runs_added": runs_to_add,
         "new_balance": new_balance,
-        "exchange_rate": "$1 = 10 runs"
+        "exchange_rate": "₹1 = 10 runs"
+    }
+
+@api_router.post("/users/upgrade-premium")
+async def upgrade_to_premium(current_user: str = Depends(get_current_user)):
+    """Upgrade user to premium membership"""
+    user_doc = await db.users.find_one({"user_id": current_user})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_doc.get("is_premium", False):
+        raise HTTPException(status_code=400, detail="User is already premium")
+    
+    # Add ₹100 to wallet as welcome bonus
+    welcome_bonus = 100.0
+    new_balance = user_doc.get("wallet_balance", 0.0) + welcome_bonus
+    
+    # Upgrade user to premium
+    await db.users.update_one(
+        {"user_id": current_user},
+        {
+            "$set": {
+                "is_premium": True,
+                "wallet_balance": new_balance,
+                "upgraded_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    # Create transaction for welcome bonus
+    transaction_id = f"txn_{uuid.uuid4().hex[:12]}"
+    transaction = {
+        "transaction_id": transaction_id,
+        "user_id": current_user,
+        "amount": welcome_bonus,
+        "currency": "INR",
+        "type": "premium_welcome_bonus",
+        "status": "completed",
+        "runs_converted": None,
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.transactions.insert_one(transaction)
+    
+    return {
+        "message": "Successfully upgraded to Premium!",
+        "is_premium": True,
+        "welcome_bonus": welcome_bonus,
+        "new_balance": new_balance
     }
 
 # Include the router in the main app
