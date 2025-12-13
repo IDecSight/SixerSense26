@@ -251,8 +251,8 @@ Overs: 7.2
 ```css
 :root {
   /* Background & Surface */
-  --background: 221 83% 53%;     /* Royal Blue */
-  --card: 221 83% 48%;            /* Darker Royal Blue */
+  --background: 225 73% 57%;     /* Royal Blue #4169e1 */
+  --card: 225 73% 50%;            /* Darker Royal Blue */
   --foreground: 0 0% 100%;        /* White */
   
   /* Status Colors */
