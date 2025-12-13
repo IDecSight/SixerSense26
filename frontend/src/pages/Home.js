@@ -98,10 +98,10 @@ export const Home = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Target className="w-8 h-8 text-yellow-200" />
+              <Target className="w-8 h-8 text-green-400" />
               <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
-                <span className="text-white">SIXER</span>
-                <span className="text-yellow-200 ml-1">SENSE</span>
+                <span className="text-green-400">SIXER</span>
+                <span className="text-white ml-1">SENSE</span>
               </h1>
             </div>
             <Button
@@ -141,9 +141,9 @@ export const Home = () => {
             Ready to win today?
           </p>
           {user?.is_premium && (
-            <div className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-400/20 to-yellow-500/20 border-2 border-yellow-200/30">
-              <Crown className="w-4 h-4 text-yellow-200" />
-              <span className="text-sm font-heading font-bold text-yellow-200 uppercase">Premium Member</span>
+            <div className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full bg-gradient-to-r from-green-400/20 to-green-500/20 border-2 border-green-300/30">
+              <Crown className="w-4 h-4 text-green-300" />
+              <span className="text-sm font-heading font-bold text-green-300 uppercase">Premium Member</span>
             </div>
           )}
         </div>
@@ -178,7 +178,7 @@ export const Home = () => {
         <Card className="border-white/20 bg-white/10 backdrop-blur-lg shadow-2xl">
           <CardHeader>
             <CardTitle className="text-white font-heading flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-200" />
+              <Zap className="w-5 h-5 text-green-400" />
               Quick Stats
             </CardTitle>
             <CardDescription className="text-white/80 font-body">
@@ -188,25 +188,25 @@ export const Home = () => {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="text-center p-4 rounded-lg bg-white/5 border border-white/10">
-                <p className="text-3xl font-mono-score font-bold text-green-200 mb-1">
+                <p className="text-3xl font-mono-score font-bold text-green-400 mb-1">
                   {user?.win_streak || 0}
                 </p>
                 <p className="text-xs text-white/70 font-body uppercase">Win Streak</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-white/5 border border-white/10">
-                <p className="text-3xl font-mono-score font-bold text-yellow-200 mb-1">
+                <p className="text-3xl font-mono-score font-bold text-green-300 mb-1">
                   {user?.total_bonus_runs || 0}
                 </p>
                 <p className="text-xs text-white/70 font-body uppercase">Bonus Runs</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-white/5 border border-white/10">
-                <p className="text-3xl font-mono-score font-bold text-blue-200 mb-1">
+                <p className="text-3xl font-mono-score font-bold text-green-300 mb-1">
                   {user?.next_target || 60}
                 </p>
                 <p className="text-xs text-white/70 font-body uppercase">Next Target</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-white/5 border border-white/10">
-                <p className="text-3xl font-mono-score font-bold text-purple-200 mb-1">
+                <p className="text-3xl font-mono-score font-bold text-green-400 mb-1">
                   ₹{user?.wallet_balance?.toFixed(0) || 0}
                 </p>
                 <p className="text-xs text-white/70 font-body uppercase">Wallet</p>
