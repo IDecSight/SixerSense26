@@ -1,11 +1,13 @@
 import React from 'react';
 import { Card } from './ui/card';
-import { Target, Zap, Shield } from 'lucide-react';
+import { Target, Zap, Shield, RefreshCw } from 'lucide-react';
+import { Button } from './ui/button';
 import { formatOvers } from '../lib/utils';
 
-export const Scoreboard = ({ match }) => {
+export const Scoreboard = ({ match, onChangeFormat }) => {
   const progressPercent = (match.total_runs / match.target_score) * 100;
   const wicketsRemaining = 10 - match.total_wickets;
+  const canChangeFormat = match.completed_tasks === 0 && match.total_runs === 0;
 
   return (
     <Card 
@@ -15,11 +17,26 @@ export const Scoreboard = ({ match }) => {
       {/* Scoreboard Header */}
       <div className="relative px-6 py-4 bg-white/5 border-b-2 border-white/10">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-white/70 uppercase tracking-widest font-body">Today's Match</p>
-            <h2 className="text-3xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-lg" data-testid="match-format">
-              {match.format} Format
-            </h2>
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-xs text-white/70 uppercase tracking-widest font-body">Today's Match</p>
+              <h2 className="text-3xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-lg" data-testid="match-format">
+                {match.format} Format
+              </h2>
+            </div>
+            {canChangeFormat && onChangeFormat && (
+              <Button
+                onClick={onChangeFormat}
+                size="sm"
+                variant="ghost"
+                className="text-white/70 hover:text-white hover:bg-white/10 text-xs"
+                title="Change format"
+                data-testid="change-format-btn"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Change
+              </Button>
+            )}
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-md bg-green-500/20 border-2 border-green-300/40">
             <Zap className="w-5 h-5 text-green-200" />
