@@ -525,8 +525,23 @@ async def get_profile(current_user: str = Depends(get_current_user)):
 
 @api_router.get("/matches/today")
 async def get_today_match(current_user: str = Depends(get_current_user)):
-    """Get today's match - returns null if no match exists for today"""
+    """Get today's match - auto-creates fresh match for new day"""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    current_datetime = datetime.now(timezone.utc)
+    
+    # Check for any existing match from a previous day and archive it
+    old_matches = await db.matches.find(
+        {"user_id": current_user, "date": {"$ne": today}, "status": "in_progress"}
+    ).to_list(None)
+    
+    for old_match in old_matches:
+        # Auto-expire old matches
+        await db.matches.update_one(
+            {"match_id": old_match["match_id"]},
+            {"$set": {"status": "expired"}}
+        )
+    
+    # Look for today's match
     match_doc = await db.matches.find_one(
         {"user_id": current_user, "date": today},
         {"_id": 0}
@@ -536,10 +551,8 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
         # Return null to indicate no match exists - user needs to select format
         return None
     
-    # Check if match should auto-expire (day is over)
-    current_datetime = datetime.now(timezone.utc)
+    # Check if match should auto-expire (day is over) - shouldn't happen with above logic
     if should_match_end_automatically(match_doc["date"], current_datetime):
-        # Match expired - mark as lost if not won
         if match_doc["status"] == "in_progress":
             await db.matches.update_one(
                 {"match_id": match_doc["match_id"]},
