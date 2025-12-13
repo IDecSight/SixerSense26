@@ -1176,6 +1176,74 @@ async def delete_today_match(current_user: str = Depends(get_current_user)):
     
     return {"message": "Match deleted successfully. You can now select a new format."}
 
+@api_router.get("/users/location")
+async def detect_user_location(request: Request):
+    """Detect user's location based on IP address"""
+    try:
+        # Try to get real IP from headers (in case of proxy/load balancer)
+        client_ip = request.headers.get("X-Forwarded-For", request.client.host).split(",")[0].strip()
+        
+        # For localhost/development, return default
+        if client_ip in ["127.0.0.1", "localhost", "::1"]:
+            return {
+                "country": DEFAULT_COUNTRY,
+                "currency": get_currency_for_country(DEFAULT_COUNTRY),
+                "detected": False
+            }
+        
+        # Use ip-api.com for geolocation (free, no API key needed)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"http://ip-api.com/json/{client_ip}")
+            if response.status_code == 200:
+                data = response.json()
+                country_code = data.get("countryCode", DEFAULT_COUNTRY)
+                
+                return {
+                    "country": country_code,
+                    "currency": get_currency_for_country(country_code),
+                    "detected": True,
+                    "ip": client_ip
+                }
+    except Exception as e:
+        print(f"Error detecting location: {str(e)}")
+    
+    # Fallback to default
+    return {
+        "country": DEFAULT_COUNTRY,
+        "currency": get_currency_for_country(DEFAULT_COUNTRY),
+        "detected": False
+    }
+
+@api_router.post("/users/update-location")
+async def update_user_location(
+    request: Request,
+    current_user: str = Depends(get_current_user)
+):
+    """Update user's country and currency preferences"""
+    try:
+        body = await request.json()
+        country = body.get("country", DEFAULT_COUNTRY)
+        currency = get_currency_for_country(country)
+        
+        await db.users.update_one(
+            {"user_id": current_user},
+            {
+                "$set": {
+                    "country": country,
+                    "currency": currency,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {
+            "message": "Location updated successfully",
+            "country": country,
+            "currency": currency
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
