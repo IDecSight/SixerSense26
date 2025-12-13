@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Plus, History, Wallet, Settings as SettingsIcon, LogOut } from 'lucide-react';
 import { Scoreboard } from '../components/Scoreboard';
 import { TaskCard } from '../components/TaskCard';
