@@ -870,6 +870,13 @@ Return ONLY a JSON object:
             if "balance_reasoning" not in recommendation:
                 recommendation["balance_reasoning"] = f"Balancing your life across all categories"
             
+            # Add affiliate product for this category
+            category = recommendation.get("category")
+            if category:
+                affiliate_product = get_random_product(category)
+                if affiliate_product:
+                    recommendation["affiliate_product"] = affiliate_product
+            
             return recommendation
         except Exception as e:
             logging.error(f"JSON parse error: {str(e)}, Response: {response}")
