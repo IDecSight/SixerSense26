@@ -23,6 +23,7 @@ export const MatchHistory = () => {
     };
 
     fetchHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMatchBadge = (match) => {
