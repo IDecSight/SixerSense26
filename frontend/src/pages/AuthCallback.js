@@ -17,7 +17,7 @@ export const AuthCallback = () => {
         const sessionId = params.get('session_id');
 
         if (!sessionId) {
-          navigate('/');
+          navigate('/', { replace: true });
           return;
         }
 
@@ -35,12 +35,13 @@ export const AuthCallback = () => {
         });
       } catch (error) {
         console.error('Auth error:', error);
-        navigate('/');
+        navigate('/', { replace: true });
       }
     };
 
     processAuth();
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
