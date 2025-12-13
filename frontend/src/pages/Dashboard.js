@@ -163,22 +163,31 @@ export const Dashboard = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/home')}
-                className="text-white hover:text-yellow-200 hover:bg-white/10"
+                className="text-white hover:text-green-400 hover:bg-white/10"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
-                <span className="text-white">SIXER</span>
-                <span className="text-yellow-200 ml-1">SENSE</span>
+                <span className="text-green-400">SIXER</span>
+                <span className="text-white ml-1">SENSE</span>
               </h1>
             </div>
             <nav className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={fetchMatch}
+                title="Refresh Match"
+                className="text-white hover:text-green-400 hover:bg-white/10"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate('/history')}
                 data-testid="history-btn"
-                className="text-white hover:text-yellow-200 hover:bg-white/10"
+                className="text-white hover:text-green-400 hover:bg-white/10"
               >
                 <History className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline font-body">History</span>
@@ -188,7 +197,7 @@ export const Dashboard = () => {
                 size="sm"
                 onClick={() => navigate('/wallet')}
                 data-testid="wallet-btn"
-                className="text-white hover:text-yellow-200 hover:bg-white/10"
+                className="text-white hover:text-green-400 hover:bg-white/10"
               >
                 <Wallet className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline font-body">Wallet</span>
@@ -198,7 +207,7 @@ export const Dashboard = () => {
                 size="sm"
                 onClick={() => navigate('/settings')}
                 data-testid="settings-btn"
-                className="text-white hover:text-yellow-200 hover:bg-white/10"
+                className="text-white hover:text-green-400 hover:bg-white/10"
               >
                 <SettingsIcon className="w-4 h-4 md:mr-2" />
                 <span className="hidden md:inline font-body">Settings</span>
