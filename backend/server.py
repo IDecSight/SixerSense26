@@ -1237,7 +1237,7 @@ async def upgrade_to_premium(current_user: str = Depends(get_current_user)):
 
 @api_router.delete("/matches/today")
 async def delete_today_match(current_user: str = Depends(get_current_user)):
-    """Delete today's match to allow format selection"""
+    """Delete today's match to restart fresh - can be done anytime"""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
     # Find today's match
@@ -1248,13 +1248,22 @@ async def delete_today_match(current_user: str = Depends(get_current_user)):
     if not match_doc:
         raise HTTPException(status_code=404, detail="No match found for today")
     
-    # Delete all tasks for this match
-    await db.tasks.delete_many({"match_id": match_doc["match_id"]})
+    # Archive the match instead of deleting (for history)
+    await db.matches.update_one(
+        {"match_id": match_doc["match_id"]},
+        {"$set": {"status": "abandoned", "abandoned_at": datetime.now(timezone.utc)}}
+    )
     
-    # Delete the match
-    await db.matches.delete_one({"match_id": match_doc["match_id"]})
+    # Mark all tasks as dismissed
+    await db.tasks.update_many(
+        {"match_id": match_doc["match_id"], "status": "pending"},
+        {"$set": {"status": "dismissed"}}
+    )
     
-    return {"message": "Match deleted successfully. You can now select a new format."}
+    return {
+        "message": "Match restarted successfully. Select a new format to begin fresh!",
+        "can_restart": True
+    }
 
 @api_router.get("/users/location")
 async def detect_user_location(request: Request):
