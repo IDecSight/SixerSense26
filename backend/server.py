@@ -7,12 +7,13 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional
+from typing import List, Optional, Dict
 import uuid
 from datetime import datetime, timezone, timedelta
 from jose import JWTError, jwt
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
+from collections import defaultdict
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -35,6 +36,13 @@ api_router = APIRouter(prefix="/api")
 
 # ==================== MODELS ====================
 
+class UserProfile(BaseModel):
+    primary_goal: str = "Balance"  # Career growth, Health, Wealth, Balance
+    profession: Optional[str] = None
+    life_stage: str = "Working Professional"  # Student, Working Professional, Entrepreneur
+    daily_availability: str = "Medium"  # Low, Medium, High
+    preferred_focus_areas: List[str] = ["Career", "Health"]  # 2-3 from six categories
+
 class User(BaseModel):
     user_id: str
     email: str
@@ -42,6 +50,7 @@ class User(BaseModel):
     picture: Optional[str] = None
     is_premium: bool = False
     wallet_balance: float = 0.0
+    profile: Optional[UserProfile] = None
     created_at: datetime
 
 class UserSession(BaseModel):
@@ -104,6 +113,13 @@ class AIRecommendRequest(BaseModel):
     match_id: str
     time_available: Optional[int] = 30
 
+class ProfileUpdateRequest(BaseModel):
+    primary_goal: str
+    profession: Optional[str] = None
+    life_stage: str
+    daily_availability: str
+    preferred_focus_areas: List[str]
+
 # ==================== AUTH HELPER ====================
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -118,7 +134,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 async def get_current_user(authorization: Optional[str] = Header(None)):
     if not authorization:
-        # Check cookie as fallback
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     try:
@@ -134,6 +149,147 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
         return user_id
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+# ==================== HELPER FUNCTIONS ====================
+
+async def calculate_category_balance(user_id: str, days: int = 7) -> Dict[str, Dict]:
+    """Calculate task completion balance across categories for recent days"""
+    categories = ["Health", "Career", "Finance", "Relationships", "Spiritual/Mindset", "Travel/Leisure"]
+    
+    # Get date range
+    end_date = datetime.now(timezone.utc)
+    start_date = end_date - timedelta(days=days)
+    start_date_str = start_date.strftime("%Y-%m-%d")
+    
+    # Get all tasks from recent days
+    matches = await db.matches.find(
+        {"user_id": user_id, "date": {"$gte": start_date_str}}
+    ).to_list(None)
+    
+    match_ids = [m["match_id"] for m in matches]
+    
+    if not match_ids:
+        # Return balanced zero state
+        return {cat: {"count": 0, "runs": 0, "minutes": 0} for cat in categories}
+    
+    tasks = await db.tasks.find(
+        {"match_id": {"$in": match_ids}, "status": "completed"},
+        {"_id": 0}
+    ).to_list(None)
+    
+    # Calculate stats per category
+    balance = {cat: {"count": 0, "runs": 0, "minutes": 0} for cat in categories}
+    
+    for task in tasks:
+        cat = task.get("category")
+        if cat in balance:
+            balance[cat]["count"] += 1
+            balance[cat]["runs"] += task.get("run_value", 0)
+            balance[cat]["minutes"] += task.get("estimated_minutes", 0)
+    
+    return balance
+
+async def get_least_focused_categories(balance: Dict[str, Dict], limit: int = 3) -> List[str]:
+    """Get categories with least attention"""
+    # Sort by count (primary) and runs (secondary)
+    sorted_cats = sorted(balance.items(), key=lambda x: (x[1]["count"], x[1]["runs"]))
+    return [cat for cat, _ in sorted_cats[:limit]]
+
+async def get_recent_recommendation_categories(user_id: str, limit: int = 3) -> List[str]:
+    """Get last N recommendation categories to avoid repetition"""
+    # This would track AI recommendations in a separate collection
+    # For now, use recent completed tasks as proxy
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    match = await db.matches.find_one({"user_id": user_id, "date": today})
+    
+    if not match:
+        return []
+    
+    tasks = await db.tasks.find(
+        {"match_id": match["match_id"], "status": "completed"},
+        {"_id": 0}
+    ).sort("completed_at", -1).limit(limit).to_list(limit)
+    
+    return [task["category"] for task in tasks]
+
+async def generate_default_tasks(user_id: str, profile: UserProfile) -> List[Dict]:
+    """Generate balanced default tasks based on user profile"""
+    default_tasks = []
+    
+    # Base task templates by category
+    task_templates = {
+        "Health": [
+            {"title": "Morning exercise routine (15 mins)", "run_value": 4, "minutes": 15},
+            {"title": "Drink 8 glasses of water today", "run_value": 1, "minutes": 5},
+            {"title": "Take a mindful walk", "run_value": 1, "minutes": 10}
+        ],
+        "Career": [
+            {"title": "Complete priority work task", "run_value": 6, "minutes": 60},
+            {"title": "Learn something new (skill/course)", "run_value": 4, "minutes": 30},
+            {"title": "Review daily goals and plan tomorrow", "run_value": 1, "minutes": 10}
+        ],
+        "Finance": [
+            {"title": "Review budget and expenses", "run_value": 4, "minutes": 20},
+            {"title": "Track today's spending", "run_value": 1, "minutes": 5},
+            {"title": "Research investment opportunity", "run_value": 4, "minutes": 30}
+        ],
+        "Relationships": [
+            {"title": "Call or message a loved one", "run_value": 1, "minutes": 15},
+            {"title": "Plan quality time with family/friends", "run_value": 4, "minutes": 20},
+            {"title": "Send appreciation message to someone", "run_value": 1, "minutes": 5}
+        ],
+        "Spiritual/Mindset": [
+            {"title": "10-minute meditation or reflection", "run_value": 4, "minutes": 10},
+            {"title": "Write gratitude journal (3 things)", "run_value": 1, "minutes": 5},
+            {"title": "Practice deep breathing exercises", "run_value": 1, "minutes": 5}
+        ],
+        "Travel/Leisure": [
+            {"title": "Enjoy a hobby for 20 mins", "run_value": 4, "minutes": 20},
+            {"title": "Watch/read something entertaining", "run_value": 1, "minutes": 30},
+            {"title": "Plan weekend leisure activity", "run_value": 1, "minutes": 10}
+        ]
+    }
+    
+    # Weight distribution based on profile
+    weights = {cat: 1 for cat in task_templates.keys()}
+    
+    # Increase weight for preferred focus areas
+    for area in profile.preferred_focus_areas:
+        if area in weights:
+            weights[area] = 2
+    
+    # Adjust based on primary goal
+    if profile.primary_goal == "Career growth":
+        weights["Career"] = 3
+        weights["Finance"] = 2
+    elif profile.primary_goal == "Health":
+        weights["Health"] = 3
+        weights["Spiritual/Mindset"] = 2
+    elif profile.primary_goal == "Wealth":
+        weights["Finance"] = 3
+        weights["Career"] = 2
+    
+    # Adjust based on daily availability
+    if profile.daily_availability == "Low":
+        # Pick 1 task per category, prefer low-effort
+        for cat, templates in task_templates.items():
+            selected = min(templates, key=lambda x: x["minutes"])
+            if weights[cat] >= 2:  # Only add if weighted
+                default_tasks.append({**selected, "category": cat})
+    elif profile.daily_availability == "High":
+        # Pick 2 tasks per category
+        for cat, templates in task_templates.items():
+            count = min(2, weights[cat])
+            for i in range(count):
+                if i < len(templates):
+                    default_tasks.append({**templates[i], "category": cat})
+    else:  # Medium
+        # Pick 1 task per category, balanced
+        for cat, templates in task_templates.items():
+            if weights[cat] >= 1 and templates:
+                default_tasks.append({**templates[0], "category": cat})
+    
+    return default_tasks
 
 # ==================== AUTH ROUTES ====================
 
@@ -165,8 +321,15 @@ async def process_auth_session(request: AuthSessionRequest):
         user_doc = await db.users.find_one({"email": email}, {"_id": 0})
         
         if not user_doc:
-            # Create new user
+            # Create new user with default profile
             user_id = f"user_{uuid.uuid4().hex[:12]}"
+            default_profile = {
+                "primary_goal": "Balance",
+                "profession": None,
+                "life_stage": "Working Professional",
+                "daily_availability": "Medium",
+                "preferred_focus_areas": ["Career", "Health"]
+            }
             user_doc = {
                 "user_id": user_id,
                 "email": email,
@@ -174,12 +337,27 @@ async def process_auth_session(request: AuthSessionRequest):
                 "picture": picture,
                 "is_premium": False,
                 "wallet_balance": 0.0,
+                "profile": default_profile,
                 "created_at": datetime.now(timezone.utc)
             }
             await db.users.insert_one(user_doc)
             user_doc.pop("_id", None)
         else:
             user_id = user_doc["user_id"]
+            # Ensure profile exists for existing users
+            if "profile" not in user_doc or not user_doc["profile"]:
+                default_profile = {
+                    "primary_goal": "Balance",
+                    "profession": None,
+                    "life_stage": "Working Professional",
+                    "daily_availability": "Medium",
+                    "preferred_focus_areas": ["Career", "Health"]
+                }
+                await db.users.update_one(
+                    {"user_id": user_id},
+                    {"$set": {"profile": default_profile}}
+                )
+                user_doc["profile"] = default_profile
         
         # Create user session
         session_token = emergent_session_token
@@ -217,6 +395,27 @@ async def process_auth_session(request: AuthSessionRequest):
                 "created_at": datetime.now(timezone.utc)
             }
             await db.matches.insert_one(match_doc)
+            
+            # Generate default tasks based on profile
+            profile_data = UserProfile(**user_doc.get("profile", {}))
+            default_tasks = await generate_default_tasks(user_id, profile_data)
+            
+            # Insert default tasks
+            for task_template in default_tasks:
+                task_id = f"task_{uuid.uuid4().hex[:12]}"
+                task_doc = {
+                    "task_id": task_id,
+                    "user_id": user_id,
+                    "match_id": match_id,
+                    "title": task_template["title"],
+                    "category": task_template["category"],
+                    "run_value": task_template["run_value"],
+                    "estimated_minutes": task_template["minutes"],
+                    "status": "pending",
+                    "completed_at": None,
+                    "created_at": datetime.now(timezone.utc)
+                }
+                await db.tasks.insert_one(task_doc)
         
         # Create JWT token
         access_token = create_access_token({"sub": user_id})
@@ -244,6 +443,28 @@ async def logout(current_user: str = Depends(get_current_user)):
     """Logout user"""
     await db.user_sessions.delete_one({"user_id": current_user})
     return {"message": "Logged out successfully"}
+
+# ==================== PROFILE ROUTES ====================
+
+@api_router.patch("/profile")
+async def update_profile(profile_data: ProfileUpdateRequest, current_user: str = Depends(get_current_user)):
+    """Update user profile"""
+    profile_dict = profile_data.model_dump()
+    
+    await db.users.update_one(
+        {"user_id": current_user},
+        {"$set": {"profile": profile_dict}}
+    )
+    
+    return {"message": "Profile updated successfully", "profile": profile_dict}
+
+@api_router.get("/profile")
+async def get_profile(current_user: str = Depends(get_current_user)):
+    """Get user profile"""
+    user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user_doc.get("profile", {})
 
 # ==================== MATCH ROUTES ====================
 
@@ -274,6 +495,29 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
         }
         await db.matches.insert_one(match_doc)
         match_doc.pop("_id", None)
+        
+        # Generate default tasks based on profile
+        user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+        if user_doc and "profile" in user_doc:
+            profile_data = UserProfile(**user_doc["profile"])
+            default_tasks = await generate_default_tasks(current_user, profile_data)
+            
+            # Insert default tasks
+            for task_template in default_tasks:
+                task_id = f"task_{uuid.uuid4().hex[:12]}"
+                task_doc = {
+                    "task_id": task_id,
+                    "user_id": current_user,
+                    "match_id": match_id,
+                    "title": task_template["title"],
+                    "category": task_template["category"],
+                    "run_value": task_template["run_value"],
+                    "estimated_minutes": task_template["minutes"],
+                    "status": "pending",
+                    "completed_at": None,
+                    "created_at": datetime.now(timezone.utc)
+                }
+                await db.tasks.insert_one(task_doc)
     
     # Get tasks for this match
     tasks = await db.tasks.find(
@@ -436,28 +680,74 @@ async def mark_distraction(task_id: str, current_user: str = Depends(get_current
 
 @api_router.post("/ai/recommend")
 async def get_ai_recommendation(req: AIRecommendRequest, current_user: str = Depends(get_current_user)):
-    """Get AI task recommendation"""
+    """Get AI task recommendation with life balance logic"""
     try:
+        # Get user profile
+        user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+        if not user_doc:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        profile = UserProfile(**user_doc.get("profile", {}))
+        
         # Get match details
         match_doc = await db.matches.find_one({"match_id": req.match_id})
         if not match_doc:
             raise HTTPException(status_code=404, detail="Match not found")
         
-        # Get existing tasks
-        tasks = await db.tasks.find({"match_id": req.match_id}, {"_id": 0}).to_list(None)
+        # Calculate category balance (last 7 days)
+        balance = await calculate_category_balance(current_user, days=7)
         
-        # Create AI prompt
+        # Get underrepresented categories
+        least_focused = await get_least_focused_categories(balance, limit=3)
+        
+        # Get recent recommendation categories to avoid repetition
+        recent_cats = await get_recent_recommendation_categories(current_user, limit=3)
+        
+        # Filter out recently used categories if possible
+        available_cats = [cat for cat in least_focused if cat not in recent_cats]
+        if not available_cats:
+            available_cats = least_focused  # Use least focused even if recent
+        
+        # Format balance info for AI
+        balance_summary = "\n".join([
+            f"- {cat}: {stats['count']} tasks, {stats['runs']} runs, {stats['minutes']} minutes"
+            for cat, stats in balance.items()
+        ])
+        
+        # Create AI prompt with balance logic
         system_message = f"""You are a productivity coach and cricket strategist for Sixer Sense app.
 The user's day is a cricket match. Each task = one ball. Runs scored = productivity.
 
-Current Match Status:
+🎯 USER PROFILE:
+- Primary Goal: {profile.primary_goal}
+- Life Stage: {profile.life_stage}
+- Daily Availability: {profile.daily_availability}
+- Preferred Focus: {', '.join(profile.preferred_focus_areas)}
+
+📊 CURRENT MATCH STATUS:
 - Format: {match_doc['format']}
 - Target: {match_doc['target_score']} runs
 - Current Runs: {match_doc['total_runs']}
 - Wickets Lost: {match_doc['total_wickets']}/10
 - Overs: {match_doc['overs']:.1f}
 
-Recommend ONE specific, actionable task across these categories:
+⚖️ LIFE BALANCE ANALYSIS (Last 7 Days):
+{balance_summary}
+
+🎯 PRIORITY CATEGORIES (Need More Attention):
+{', '.join(available_cats)}
+
+🚫 AVOID CATEGORIES (Recently Recommended):
+{', '.join(recent_cats) if recent_cats else 'None'}
+
+📋 RECOMMENDATION RULES:
+1. MUST prioritize underrepresented categories: {', '.join(available_cats)}
+2. AVOID recommending same category more than twice consecutively
+3. Consider user's primary goal and preferred focus areas
+4. Match task complexity to available time: {req.time_available} minutes
+5. Provide clear reasoning for category selection based on balance analysis
+
+Six Categories Available:
 - Health (exercise, nutrition)
 - Career (work, learning)
 - Finance (budget, investments)
@@ -465,17 +755,12 @@ Recommend ONE specific, actionable task across these categories:
 - Spiritual/Mindset (meditation, reflection)
 - Travel/Leisure (hobbies, fun)
 
-Consider:
-1. Time available: {req.time_available} minutes
-2. Energy levels (morning/afternoon/evening)
-3. Impact on overall goals
-4. Match situation (need quick runs or steady progress?)
-
 Return ONLY a JSON object:
 {{
   "task": "Specific task title",
-  "category": "Category name",
+  "category": "Must be from priority categories if possible",
   "run_value": 1/4/6,
+  "balance_reasoning": "Why this category was chosen based on life balance (e.g., 'Finance is underplayed with only 2 tasks in 7 days')",
   "reasoning": ["Bullet point 1", "Bullet point 2"]
 }}"""
         
@@ -491,7 +776,7 @@ Return ONLY a JSON object:
         chat.with_model("openai", "gpt-4o")
         
         user_message = UserMessage(
-            text=f"Recommend a task for someone with {req.time_available} minutes available. Consider it's {datetime.now(timezone.utc).strftime('%H:%M')} UTC."
+            text=f"Recommend a life-balanced task. Time available: {req.time_available} minutes. Current time: {datetime.now(timezone.utc).strftime('%H:%M')} UTC. Remember to prioritize: {', '.join(available_cats)}"
         )
         
         response = await chat.send_message(user_message)
@@ -507,14 +792,22 @@ Return ONLY a JSON object:
                 response_text = response_text.split("```")[1].split("```")[0].strip()
             
             recommendation = json.loads(response_text)
+            
+            # Ensure balance_reasoning exists
+            if "balance_reasoning" not in recommendation:
+                recommendation["balance_reasoning"] = f"Balancing your life across all categories"
+            
             return recommendation
-        except:
-            # Fallback recommendation
+        except Exception as e:
+            logging.error(f"JSON parse error: {str(e)}, Response: {response}")
+            # Fallback recommendation from priority categories
+            fallback_cat = available_cats[0] if available_cats else "Health"
             return {
-                "task": "Take a 5-minute walk",
-                "category": "Health",
+                "task": f"Quick {fallback_cat.lower()} check-in",
+                "category": fallback_cat,
                 "run_value": 1,
-                "reasoning": ["Quick energy boost", "Improves focus"]
+                "balance_reasoning": f"{fallback_cat} needs more attention - only {balance[fallback_cat]['count']} tasks completed recently",
+                "reasoning": ["Helps maintain life balance", "Quick and impactful"]
             }
     
     except Exception as e:
@@ -524,8 +817,15 @@ Return ONLY a JSON object:
             "task": "Review your goals for the day",
             "category": "Career",
             "run_value": 1,
+            "balance_reasoning": "Career focus helps maintain productivity momentum",
             "reasoning": ["Helps prioritize", "Quick planning task"]
         }
+
+@api_router.get("/ai/balance")
+async def get_category_balance_api(current_user: str = Depends(get_current_user), days: int = 7):
+    """Get category balance for analytics"""
+    balance = await calculate_category_balance(current_user, days)
+    return balance
 
 # ==================== WALLET ROUTES ====================
 
