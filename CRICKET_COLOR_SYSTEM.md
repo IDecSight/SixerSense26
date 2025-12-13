@@ -262,8 +262,8 @@ Overs: 7.2
   --accent: 45 93% 47%;           /* Yellow - Highlights */
   
   /* UI Elements */
-  --muted: 221 83% 38%;
-  --border: 221 50% 30%;
+  --muted: 225 73% 40%;
+  --border: 225 50% 35%;
   --ring: 142 76% 36%;            /* Green focus rings */
 }
 ```
