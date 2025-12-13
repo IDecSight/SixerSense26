@@ -1,0 +1,147 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { ArrowLeft, Trophy, Target, Shield } from 'lucide-react';
+import apiClient from '../lib/api';
+
+export const MatchHistory = () => {
+  const navigate = useNavigate();
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await apiClient.get('/matches/history?limit=14');
+        setMatches(response.data);
+      } catch (error) {
+        console.error('Error fetching history:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, []);
+
+  const getMatchBadge = (match) => {
+    if (match.status === 'won') return { label: 'WON', color: 'bg-primary text-primary-foreground' };
+    if (match.status === 'lost') return { label: 'LOST', color: 'bg-destructive text-destructive-foreground' };
+    return { label: 'IN PROGRESS', color: 'bg-secondary text-secondary-foreground' };
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background" data-testid="match-history">
+      <header className="border-b border-border/50 backdrop-blur-xl bg-background/80">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <h1 className="text-3xl font-teko font-bold uppercase tracking-tight">
+              Match History
+            </h1>
+          </div>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        {matches.length === 0 ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-lg text-muted-foreground">No match history yet</p>
+              <Button onClick={() => navigate('/dashboard')} className="mt-4">
+                Start Your First Match
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {matches.map((match) => {
+              const badge = getMatchBadge(match);
+              const strikeRate = match.completed_tasks > 0 
+                ? ((match.total_runs / match.completed_tasks) * 100).toFixed(0) 
+                : '0';
+
+              return (
+                <Card key={match.match_id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-xl font-teko uppercase tracking-tight">
+                          {new Date(match.date).toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {match.format} Format
+                        </p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${badge.color}`}>
+                        {badge.label}
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground">
+                          <Target className="w-4 h-4" />
+                          <span className="text-xs uppercase font-medium">Runs</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="font-mono-score text-2xl font-bold text-primary">
+                            {match.total_runs}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            / {match.target_score}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground">
+                          <Shield className="w-4 h-4" />
+                          <span className="text-xs uppercase font-medium">Wickets</span>
+                        </div>
+                        <div className="font-mono-score text-2xl font-bold text-destructive">
+                          {match.total_wickets}/10
+                        </div>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground">
+                          <Trophy className="w-4 h-4" />
+                          <span className="text-xs uppercase font-medium">Strike Rate</span>
+                        </div>
+                        <div className="font-mono-score text-2xl font-bold">
+                          {strikeRate}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default MatchHistory;
