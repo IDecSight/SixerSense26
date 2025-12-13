@@ -105,6 +105,15 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
               <h4 className="font-semibold text-lg mb-3" data-testid="recommendation-task">
                 {recommendation.task}
               </h4>
+              
+              {/* Balance Reasoning */}
+              {recommendation.balance_reasoning && (
+                <div className="mb-3 p-2 rounded bg-accent/10 border border-accent/20">
+                  <p className="text-xs font-medium text-accent uppercase mb-1">Life Balance Insight</p>
+                  <p className="text-sm text-foreground">{recommendation.balance_reasoning}</p>
+                </div>
+              )}
+              
               <div className="space-y-1.5">
                 {recommendation.reasoning?.map((reason, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
