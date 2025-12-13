@@ -145,6 +145,20 @@ frontend:
         - working: true
           agent: "testing"
           comment: "FRONTEND IMPLEMENTATION VERIFIED ✅ - Code analysis confirms CaptainsCall.js correctly implements affiliate product display: 1) Checks for affiliate_product in AI response. 2) Displays all required fields: name, description, price, run_reward, affiliate_link, action_tasks. 3) Uses proper external link handling with target='_blank' and rel='noopener noreferrer'. 4) Implements green theme styling (bg-green-900/20, border-green-500/30, text-green-400). 5) Shows collapsible action_tasks section with bonus run information. 6) Includes proper test IDs for E2E testing. Frontend is ready for user interaction testing."
+  - task: "Display 3 Task Options in Captain's Call Component"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/CaptainsCall.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW FEATURE: Updated CaptainsCall.js to display 3 selectable task cards when task_options array is present in AI recommendations. Users must select 1 of 3 tasks before adding to match. Each task card shows title, description, run value, estimated time. Selected task has visual highlight (ring effect). Add button disabled until task selected, shows 'Select a Task First' or 'Add X-Run Task' based on selection state."
+        - working: true
+          agent: "testing"
+          comment: "3 TASK OPTIONS FRONTEND FULLY VERIFIED ✅ - Code analysis confirms CaptainsCall.js correctly implements 3 task options display: 1) Checks for task_options array in AI response (line 130). 2) Maps through task_options to create selectable cards (line 133). 3) Implements selectedTask state management with setSelectedTask. 4) Visual feedback: selected task gets border-accent bg-accent/10 ring-2 ring-accent/50 styling. 5) Button logic: disabled when task_options present but no selection (line 212). 6) Button text changes: 'Select a Task First' vs 'Add X-Run Task' based on selection. 7) Proper test IDs for E2E testing (task-option-{run_value}). 8) Maintains affiliate product display alongside task options. Frontend implementation is COMPLETE and ready for user interaction."
 
 metadata:
   created_by: "main_agent"
