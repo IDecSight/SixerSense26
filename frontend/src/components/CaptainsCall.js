@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 export const CaptainsCall = ({ matchId, onTaskCreated }) => {
   const [loading, setLoading] = useState(false);
   const [recommendation, setRecommendation] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   const getRecommendation = async () => {
     setLoading(true);
@@ -17,6 +18,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
         time_available: 30
       });
       setRecommendation(response.data);
+      setSelectedTask(null); // Reset selected task
     } catch (error) {
       toast.error('Failed to get recommendation');
     } finally {
@@ -24,19 +26,20 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
     }
   };
 
-  const addTaskFromRecommendation = async () => {
+  const addTaskFromRecommendation = async (taskToAdd) => {
     if (!recommendation) return;
     
     setLoading(true);
     try {
       await apiClient.post('/tasks', {
-        title: recommendation.task,
+        title: taskToAdd.title,
         category: recommendation.category,
-        run_value: recommendation.run_value,
-        estimated_minutes: 30
+        run_value: taskToAdd.run_value,
+        estimated_minutes: taskToAdd.estimated_minutes || 30
       });
       toast.success('Task added to your match!');
       setRecommendation(null);
+      setSelectedTask(null);
       onTaskCreated();
     } catch (error) {
       toast.error('Failed to add task');
