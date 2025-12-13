@@ -50,7 +50,7 @@ const LandingPage = () => {
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-white mb-6 leading-tight drop-shadow-lg">
-            Turn Every Day Into a Win.
+            Play smart. Score high. Earn more.
           </h2>
           <p className="text-xl sm:text-2xl text-white/95 mb-4 font-body font-light drop-shadow-md">
             You don't need more motivation.<br />
