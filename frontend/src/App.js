@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import MatchHistory from './pages/MatchHistory';
 import Wallet from './pages/Wallet';
 import Settings from './pages/Settings';
+import DebugPanel from './pages/DebugPanel';
 import './App.css';
 
 // Protected Route Component
@@ -72,6 +73,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/debug" 
+        element={
+          <ProtectedRoute>
+            <DebugPanel />
           </ProtectedRoute>
         } 
       />
