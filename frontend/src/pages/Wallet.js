@@ -136,6 +136,55 @@ export const Wallet = () => {
             </CardContent>
           </Card>
 
+          {/* Buy Runs (Premium Only) */}
+          {isPremium && (
+            <Card className="border-green-500/30 bg-green-900/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-green-400" />
+                  Buy Runs
+                </CardTitle>
+                <CardDescription>
+                  Convert your wallet balance to game runs
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-3 rounded-lg bg-green-900/20 border border-green-500/30">
+                  <p className="text-sm font-medium text-green-300 mb-1">Exchange Rate</p>
+                  <p className="text-2xl font-mono-score font-bold text-green-400">$1 = 10 runs</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Amount to Convert ($)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max={balance}
+                    placeholder="Enter amount"
+                    value={buyAmount}
+                    onChange={(e) => setBuyAmount(e.target.value)}
+                    data-testid="buy-runs-input"
+                  />
+                  {buyAmount && parseFloat(buyAmount) > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      You will receive: <span className="font-bold text-green-400">{(parseFloat(buyAmount) * 10).toFixed(0)} runs</span>
+                    </p>
+                  )}
+                </div>
+
+                <Button 
+                  onClick={handleBuyRuns} 
+                  disabled={!buyAmount || parseFloat(buyAmount) <= 0 || parseFloat(buyAmount) > balance || buyingRuns}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  data-testid="buy-runs-btn"
+                >
+                  {buyingRuns ? 'Processing...' : `Buy ${buyAmount ? (parseFloat(buyAmount) * 10).toFixed(0) : 0} Runs`}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Premium Features */}
           {!isPremium && (
             <Card className="border-accent/30">
@@ -152,7 +201,7 @@ export const Wallet = () => {
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-start gap-2">
                     <span className="text-accent mt-1">✓</span>
-                    <span className="text-sm">Convert wallet balance to runs</span>
+                    <span className="text-sm">Convert wallet balance to runs ($1 = 10 runs)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-accent mt-1">✓</span>
