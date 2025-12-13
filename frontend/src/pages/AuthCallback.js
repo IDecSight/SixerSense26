@@ -28,8 +28,8 @@ export const AuthCallback = () => {
         localStorage.setItem('auth_token', response.data.access_token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
 
-        // Redirect to dashboard
-        navigate('/dashboard', { 
+        // Redirect to home page
+        navigate('/home', { 
           replace: true,
           state: { user: response.data.user } 
         });
