@@ -360,6 +360,34 @@ class SixerSenseAPITester:
         
         return False
 
+    def test_with_mock_auth(self):
+        """Try to create a test user with mock authentication"""
+        print("⚠️  Note: This will attempt to create a test user but may fail due to auth requirements")
+        
+        # For now, we'll create a mock JWT token to test the structure
+        # In a real scenario, you'd need a valid Emergent Auth session
+        import jwt
+        from datetime import datetime, timedelta, timezone
+        
+        try:
+            # Create a mock JWT token (this won't work with the real backend due to secret key)
+            mock_payload = {
+                "sub": "test_user_123",
+                "exp": datetime.now(timezone.utc) + timedelta(hours=1)
+            }
+            
+            # This is just for testing structure - won't work with real backend
+            mock_token = jwt.encode(mock_payload, "mock_secret", algorithm="HS256")
+            self.token = mock_token
+            self.user_id = "test_user_123"
+            
+            print("🔧 Created mock token for testing (will likely fail auth)")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Failed to create mock auth: {str(e)}")
+            return False
+
 def main():
     print("🏏 Starting Sixer Sense API Testing...")
     print("=" * 50)
