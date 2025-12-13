@@ -768,6 +768,26 @@ async def get_ai_recommendation(req: AIRecommendRequest, current_user: str = Dep
         if not match_doc:
             raise HTTPException(status_code=404, detail="Match not found")
         
+        # Calculate available hours in the day
+        current_hour = datetime.now(timezone.utc).hour
+        hours_remaining = 24 - current_hour  # Hours left until midnight
+        
+        # Get total time spent on tasks today
+        tasks_today = await db.tasks.find({"match_id": req.match_id}).to_list(1000)
+        total_minutes_spent = sum(task.get("estimated_minutes", 0) for task in tasks_today)
+        available_minutes = (hours_remaining * 60) - total_minutes_spent
+        
+        # Determine recommended time bracket
+        if available_minutes < 60:
+            time_bracket = "short"  # Quick 5-15 min tasks
+            suggested_run_value = 1
+        elif available_minutes < 180:
+            time_bracket = "medium"  # 20-30 min tasks
+            suggested_run_value = 4
+        else:
+            time_bracket = "long"  # 30+ min tasks
+            suggested_run_value = 6
+        
         # Calculate category balance (last 7 days)
         balance = await calculate_category_balance(current_user, days=7)
         
@@ -805,6 +825,13 @@ The user's day is a cricket match. Each task = one ball. Runs scored = productiv
 - Wickets Lost: {match_doc['total_wickets']}/10
 - Overs: {match_doc['overs']:.1f}
 
+⏰ TIME AVAILABILITY:
+- Current Hour: {current_hour}:00
+- Hours Remaining Today: {hours_remaining} hours
+- Minutes Already Spent: {total_minutes_spent} minutes
+- Available Minutes: {available_minutes} minutes
+- Recommended Time Bracket: {time_bracket} (prefer {suggested_run_value}-run tasks)
+
 ⚖️ LIFE BALANCE ANALYSIS (Last 7 Days):
 {balance_summary}
 
@@ -818,8 +845,9 @@ The user's day is a cricket match. Each task = one ball. Runs scored = productiv
 1. MUST prioritize underrepresented categories: {', '.join(available_cats)}
 2. AVOID recommending same category more than twice consecutively
 3. Consider user's primary goal and preferred focus areas
-4. Match task complexity to available time: {req.time_available} minutes
-5. Provide clear reasoning for category selection based on balance analysis
+4. Match task complexity to available time: {available_minutes} minutes remaining today
+5. Prefer {suggested_run_value}-run tasks given current time availability
+6. Provide clear reasoning for category selection based on balance analysis
 
 Six Categories Available:
 - Health (exercise, nutrition)
