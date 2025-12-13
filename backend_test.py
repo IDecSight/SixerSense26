@@ -6,7 +6,7 @@ import asyncio
 import aiohttp
 
 class SixerSenseAPITester:
-    def __init__(self, base_url="https://wicketwise-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://sixer-sense.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.user_id = None
