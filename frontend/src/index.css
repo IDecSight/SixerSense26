@@ -20,47 +20,66 @@ code {
 
 @layer base {
     :root {
-        --background: 210 40% 98%;
-        --foreground: 222 47% 11%;
-        --card: 0 0% 100%;
-        --card-foreground: 222 47% 11%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 222 47% 11%;
-        --primary: 148 100% 42%;
-        --primary-foreground: 210 40% 98%;
-        --secondary: 217 91% 60%;
-        --secondary-foreground: 222 47% 11%;
-        --muted: 210 40% 96.1%;
-        --muted-foreground: 215.4 16.3% 46.9%;
+        /* Cricket Scoreboard Color System */
+        --background: 221 83% 53%;  /* Royal Blue */
+        --foreground: 0 0% 100%;  /* White */
+        --card: 221 83% 48%;  /* Darker Royal Blue for cards */
+        --card-foreground: 0 0% 100%;  /* White */
+        --popover: 221 83% 48%;
+        --popover-foreground: 0 0% 100%;
+        
+        /* Runs - Green */
+        --primary: 142 76% 36%;  /* Cricket Green */
+        --primary-foreground: 0 0% 100%;
+        
+        /* Wickets - Red */
+        --destructive: 0 84% 60%;  /* Cricket Red */
+        --destructive-foreground: 0 0% 100%;
+        
+        /* Secondary - Light Blue for info */
+        --secondary: 199 89% 48%;
+        --secondary-foreground: 0 0% 100%;
+        
+        /* Accent - Yellow for highlights */
         --accent: 45 93% 47%;
-        --accent-foreground: 222 47% 11%;
-        --destructive: 354 78% 56%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 214.3 31.8% 91.4%;
-        --input: 214.3 31.8% 91.4%;
-        --ring: 148 100% 42%;
+        --accent-foreground: 221 83% 53%;
+        
+        --muted: 221 83% 38%;
+        --muted-foreground: 0 0% 85%;
+        
+        --border: 221 50% 30%;
+        --input: 221 50% 30%;
+        --ring: 142 76% 36%;
         --radius: 0.75rem;
     }
+    
     .dark {
-        --background: 222 47% 11%;
-        --foreground: 210 40% 98%;
-        --card: 217 33% 17%;
-        --card-foreground: 210 40% 98%;
-        --popover: 222 47% 11%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 148 100% 42%;
-        --primary-foreground: 222 47% 11%;
-        --secondary: 217 91% 60%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 217 33% 17%;
-        --muted-foreground: 215 20.2% 65.1%;
+        /* Dark mode uses deeper blues */
+        --background: 221 83% 20%;
+        --foreground: 0 0% 100%;
+        --card: 221 83% 25%;
+        --card-foreground: 0 0% 100%;
+        --popover: 221 83% 25%;
+        --popover-foreground: 0 0% 100%;
+        
+        --primary: 142 76% 36%;
+        --primary-foreground: 0 0% 100%;
+        
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 100%;
+        
+        --secondary: 199 89% 48%;
+        --secondary-foreground: 0 0% 100%;
+        
+        --muted: 221 83% 15%;
+        --muted-foreground: 0 0% 75%;
+        
         --accent: 45 93% 47%;
-        --accent-foreground: 210 40% 98%;
-        --destructive: 354 78% 56%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 217 33% 17%;
-        --input: 217 33% 17%;
-        --ring: 148 100% 42%;
+        --accent-foreground: 221 83% 20%;
+        
+        --border: 221 50% 20%;
+        --input: 221 50% 20%;
+        --ring: 142 76% 36%;
     }
 }
 
@@ -118,5 +137,17 @@ code {
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+    }
+    
+    /* Cricket Scoreboard Utilities */
+    .runs-color {
+        color: hsl(142, 76%, 36%);  /* Green */
+    }
+    .wickets-color {
+        color: hsl(0, 84%, 60%);  /* Red */
+    }
+    .scoreboard-bg {
+        background: hsl(221, 83%, 25%);
+        border: 2px solid hsl(221, 50%, 40%);
     }
 }
