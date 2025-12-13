@@ -214,10 +214,15 @@ export const Dashboard = () => {
             
             <Scoreboard match={match} />
             
+            {/* Timeline View */}
+            {match.tasks && match.tasks.length > 0 && (
+              <TaskTimeline tasks={match.tasks} match={match} />
+            )}
+            
             {/* Tasks Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-teko font-bold uppercase tracking-tight">
+                <h2 className="text-2xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-md">
                   Today's Balls
                 </h2>
                 <Button
@@ -231,9 +236,9 @@ export const Dashboard = () => {
               </div>
 
               {match.tasks?.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
-                  <p className="text-muted-foreground mb-4">No tasks yet. Start your innings!</p>
-                  <Button onClick={() => setShowAddTask(true)}>
+                <div className="text-center py-12 border-2 border-dashed border-white/20 rounded-xl bg-white/5">
+                  <p className="text-white/80 mb-4 font-body">No tasks yet. Start your innings!</p>
+                  <Button onClick={() => setShowAddTask(true)} className="bg-white hover:bg-white/90 text-[#4169E1] font-heading shadow-lg">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Your First Task
                   </Button>
@@ -257,7 +262,7 @@ export const Dashboard = () => {
                   {/* Completed Tasks */}
                   {completedTasks.length > 0 && (
                     <details className="group" open={completedTasks.length < 5}>
-                      <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors p-2">
+                      <summary className="cursor-pointer text-sm font-heading font-medium text-white/80 hover:text-white transition-colors p-2">
                         Completed Tasks ({completedTasks.length})
                       </summary>
                       <div className="space-y-3 mt-2">
@@ -276,7 +281,7 @@ export const Dashboard = () => {
                   {/* Dismissed Tasks */}
                   {dismissedTasks.length > 0 && (
                     <details className="group">
-                      <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors p-2">
+                      <summary className="cursor-pointer text-sm font-heading font-medium text-white/80 hover:text-white transition-colors p-2">
                         Dismissed Tasks ({dismissedTasks.length})
                       </summary>
                       <div className="space-y-3 mt-2">
