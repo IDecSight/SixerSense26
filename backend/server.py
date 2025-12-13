@@ -1287,6 +1287,62 @@ class CommentaryRequest(BaseModel):
     match_format: str
     target_score: Optional[int] = None
 
+@api_router.post("/users/generate-players")
+async def generate_user_players(current_user: str = Depends(get_current_user)):
+    """Generate playing XI (11 players) for user based on profile"""
+    try:
+        user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+        if not user_doc:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get user profile
+        profile = user_doc.get("profile", {})
+        if not profile:
+            raise HTTPException(status_code=400, detail="Profile not set. Please complete profile first.")
+        
+        # Generate playing XI
+        playing_xi = generate_playing_xi(profile)
+        
+        # Update user with players
+        await db.users.update_one(
+            {"user_id": current_user},
+            {
+                "$set": {
+                    "playing_xi": playing_xi,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {
+            "message": "Playing XI generated successfully",
+            "playing_xi": playing_xi,
+            "total_players": len(playing_xi)
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.get("/users/playing-xi")
+async def get_playing_xi(current_user: str = Depends(get_current_user)):
+    """Get user's playing XI"""
+    user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    playing_xi = user_doc.get("playing_xi", [])
+    
+    if not playing_xi:
+        return {
+            "playing_xi": [],
+            "message": "No playing XI generated yet. Complete your profile first."
+        }
+    
+    return {
+        "playing_xi": playing_xi,
+        "total_players": len(playing_xi)
+    }
+
 @api_router.post("/commentary/generate")
 async def generate_commentary(req: CommentaryRequest, current_user: str = Depends(get_current_user)):
     """Generate live cricket-style commentary for user actions"""
