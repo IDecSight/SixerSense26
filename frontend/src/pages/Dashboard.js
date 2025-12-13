@@ -152,6 +152,30 @@ export const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column - Scoreboard & AI */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Match Format Selector */}
+            {match.status === 'in_progress' && match.completed_tasks === 0 && (
+              <Card className="border-secondary/30 bg-secondary/5">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-medium mb-1">Match Format</p>
+                      <p className="text-xs text-muted-foreground">Choose your format before starting</p>
+                    </div>
+                    <Select value={match.format} onValueChange={handleFormatChange}>
+                      <SelectTrigger className="w-[180px]" data-testid="format-selector">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="T20">T20 (20 overs, Target: 60)</SelectItem>
+                        <SelectItem value="ODI">ODI (50 overs, Target: 150)</SelectItem>
+                        <SelectItem value="Test">Test Match (Target: 100)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
             <Scoreboard match={match} />
             
             {/* Tasks Section */}
