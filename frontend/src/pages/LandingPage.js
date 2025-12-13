@@ -1,48 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { Input } from '../components/ui/input';
 import { Target, Zap, TrendingUp, Heart, Briefcase, DollarSign, Users, Brain, Plane, CheckCircle2, ArrowRight } from 'lucide-react';
-import apiClient from '../lib/api';
-import { toast } from 'sonner';
 
 const LandingPage = () => {
-  const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: ''
-  });
 
   const handleGoogleAuth = () => {
     const redirectUrl = window.location.origin + '/dashboard';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      const payload = isLogin 
-        ? { email: formData.email, password: formData.password }
-        : { email: formData.email, password: formData.password, name: formData.name };
-
-      const response = await apiClient.post(endpoint, payload);
-      
-      localStorage.setItem('auth_token', response.data.token);
-      toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!');
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Authentication failed');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const categories = [
