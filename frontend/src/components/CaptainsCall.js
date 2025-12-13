@@ -52,7 +52,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-accent" />
             <CardTitle className="text-xl font-teko uppercase tracking-tight">
-              Captain's Call
+              Captain&apos;s Call
             </CardTitle>
           </div>
           {recommendation && (
