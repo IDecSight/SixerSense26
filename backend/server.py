@@ -102,6 +102,7 @@ class Task(BaseModel):
     category: str
     run_value: int
     estimated_minutes: Optional[int] = None
+    balls_consumed: int = 1  # Number of balls this task consumes (1-6)
     status: str = "pending"  # pending, in_progress, completed, dismissed
     completed_at: Optional[datetime] = None
     created_at: datetime
