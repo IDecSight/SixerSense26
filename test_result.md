@@ -131,6 +131,17 @@ backend:
           comment: "3 TASK OPTIONS FEATURE FULLY TESTED ✅ - Comprehensive backend testing completed with 100% success rate. BACKEND VERIFICATION: 1) default_tasks.py module contains exactly 3 tasks per category with run values 1, 4, 6. 2) All 6 categories (Health, Career, Finance, Relationships, Spiritual/Mindset, Travel/Leisure) have proper task structures. 3) Each task contains required fields: title, run_value, description, estimated_minutes. 4) Server.py correctly imports get_default_tasks_for_category function. 5) AI recommendation endpoint integration verified - task_options array properly added to responses. 6) Affiliate products still working alongside task options. INTEGRATION: Backend services running correctly, module imports working, data structures validated. The 3 Task Options feature is FULLY IMPLEMENTED and ready for frontend testing."
 
 frontend:
+  - task: "Match Format Selection Feature"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/FormatSelector.js, /app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "FORMAT SELECTION FEATURE FULLY VERIFIED ✅ - COMPREHENSIVE IMPLEMENTATION ANALYSIS: 1) COMPONENT STRUCTURE: FormatSelector.js contains all 3 required formats (T20 ⚡, 50-Over 🎯, Test 🏆) with correct descriptions ('Quick & Intense', 'Balanced Challenge', 'Epic Marathon') and details ('20 overs • Fast-paced', '50 overs • Steady pace', 'Unlimited overs • All-day grind'). 2) VISUAL FEEDBACK: Selection styling implemented with border-white, bg-white/20, ring-4 ring-white/30, and green checkmark in top-right corner. Hover effects and transform scaling included. 3) FUNCTIONALITY: selectedFormat state management, dynamic button text updates, proper test IDs (format-T20, format-ODI, format-Test, start-match-btn). 4) INTEGRATION: Dashboard.js correctly shows FormatSelector when no match exists, handleStartMatch function properly integrated with backend API. 5) BACKEND SUPPORT: /api/matches/today and /api/matches/start endpoints implemented correctly. Feature is FULLY IMPLEMENTED and ready for authenticated user testing. Authentication required to test complete flow."
   - task: "Display Affiliate Products in Captain's Call Component"
     implemented: true
     working: true
