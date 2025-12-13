@@ -78,11 +78,7 @@ const AppRouter = () => {
       />
       <Route 
         path="/debug" 
-        element={
-          <ProtectedRoute>
-            <DebugPanel />
-          </ProtectedRoute>
-        } 
+        element={<DebugPanel />} 
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
