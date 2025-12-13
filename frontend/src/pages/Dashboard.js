@@ -57,6 +57,20 @@ export const Dashboard = () => {
     }
   };
 
+  const handleChangeFormat = async () => {
+    try {
+      await apiClient.delete('/matches/today');
+      toast.success('Match cleared!', {
+        description: 'Select a new format to start'
+      });
+      setMatch(null);
+      setShowFormatSelector(true);
+    } catch (error) {
+      console.error('Error changing format:', error);
+      toast.error('Failed to change format');
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -200,7 +214,7 @@ export const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column - Scoreboard & AI */}
           <div className="lg:col-span-2 space-y-6">
-            <Scoreboard match={match} />
+            <Scoreboard match={match} onChangeFormat={handleChangeFormat} />
             
             {/* Timeline View */}
             {match.tasks && match.tasks.length > 0 && (
