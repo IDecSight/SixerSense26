@@ -882,13 +882,17 @@ Return ONLY a JSON object:
             logging.error(f"JSON parse error: {str(e)}, Response: {response}")
             # Fallback recommendation from priority categories
             fallback_cat = available_cats[0] if available_cats else "Health"
-            return {
+            affiliate_product = get_random_product(fallback_cat)
+            fallback = {
                 "task": f"Quick {fallback_cat.lower()} check-in",
                 "category": fallback_cat,
                 "run_value": 1,
                 "balance_reasoning": f"{fallback_cat} needs more attention - only {balance[fallback_cat]['count']} tasks completed recently",
                 "reasoning": ["Helps maintain life balance", "Quick and impactful"]
             }
+            if affiliate_product:
+                fallback["affiliate_product"] = affiliate_product
+            return fallback
     
     except Exception as e:
         logging.error(f"AI recommendation error: {str(e)}")
