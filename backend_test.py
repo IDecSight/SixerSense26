@@ -555,6 +555,9 @@ def main():
         print("\n🤖 Testing AI Recommendations with Affiliate Products...")
         tester.test_affiliate_products_integration()
         
+        print("\n🎯 Testing NEW 3 Task Options Feature...")
+        tester.test_three_task_options_feature()
+        
         print("\n📊 Testing Affiliate Product Categories...")
         tester.test_affiliate_products_categories()
         
