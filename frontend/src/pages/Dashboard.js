@@ -9,6 +9,7 @@ import { TaskCard } from '../components/TaskCard';
 import { CaptainsCall } from '../components/CaptainsCall';
 import { AddTaskModal } from '../components/AddTaskModal';
 import { TaskTimeline } from '../components/TaskTimeline';
+import { FormatSelector } from '../components/FormatSelector';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
@@ -17,11 +18,19 @@ export const Dashboard = () => {
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddTask, setShowAddTask] = useState(false);
+  const [showFormatSelector, setShowFormatSelector] = useState(false);
+  const [startingMatch, setStartingMatch] = useState(false);
 
   const fetchMatch = async () => {
     try {
       const response = await apiClient.get('/matches/today');
-      setMatch(response.data);
+      if (response.data === null) {
+        // No match exists - show format selector
+        setShowFormatSelector(true);
+      } else {
+        setMatch(response.data);
+        setShowFormatSelector(false);
+      }
     } catch (error) {
       console.error('Error fetching match:', error);
       if (error.response?.status === 401) {
@@ -29,6 +38,23 @@ export const Dashboard = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStartMatch = async (format) => {
+    setStartingMatch(true);
+    try {
+      const response = await apiClient.post('/matches/start', { format });
+      setMatch(response.data);
+      setShowFormatSelector(false);
+      toast.success(`${format} match started!`, {
+        description: `Target: ${response.data.target_score} runs`
+      });
+    } catch (error) {
+      console.error('Error starting match:', error);
+      toast.error('Failed to start match');
+    } finally {
+      setStartingMatch(false);
     }
   };
 
@@ -95,20 +121,29 @@ export const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="text-lg font-medium">Loading your match...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto"></div>
+          <p className="text-lg font-medium text-white">Loading your match...</p>
         </div>
       </div>
     );
   }
 
+  if (showFormatSelector) {
+    return (
+      <FormatSelector 
+        onSelectFormat={handleStartMatch}
+        loading={startingMatch}
+      />
+    );
+  }
+
   if (!match) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg">Failed to load match</p>
+          <p className="text-lg text-white">Failed to load match</p>
           <Button onClick={fetchMatch} className="mt-4">Retry</Button>
         </div>
       </div>
