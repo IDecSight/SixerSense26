@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { ArrowLeft, User, Bell, Calendar } from 'lucide-react';
+import { ProfileForm } from '../components/ProfileForm';
 import apiClient from '../lib/api';
 
 export const Settings = () => {
@@ -10,20 +11,24 @@ export const Settings = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await apiClient.get('/auth/me');
-        setUser(response.data);
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUser = async () => {
+    try {
+      const response = await apiClient.get('/auth/me');
+      setUser(response.data);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUser();
   }, []);
+
+  const handleProfileUpdated = () => {
+    fetchUser();
+  };
 
   if (loading) {
     return (
@@ -51,14 +56,13 @@ export const Settings = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
-          {/* Profile */}
+          {/* Account Info */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5" />
-                Profile
+                Account Information
               </CardTitle>
-              <CardDescription>Your account information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
@@ -81,6 +85,9 @@ export const Settings = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Profile Form */}
+          <ProfileForm onProfileUpdated={handleProfileUpdated} />
 
           {/* Notifications */}
           <Card>
