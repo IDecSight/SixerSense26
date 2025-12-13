@@ -394,6 +394,15 @@ def main():
         data={"match_id": "test_match", "time_available": 30}
     )
     
+    # Test affiliate products endpoint structure (will fail without auth)
+    tester.run_test(
+        "Affiliate Products in AI (No Auth)",
+        "POST",
+        "ai/recommend",
+        401,
+        data={"match_id": "test_match", "time_available": 30}
+    )
+    
     # Print results
     print("\n" + "=" * 50)
     print("📊 TEST RESULTS")
