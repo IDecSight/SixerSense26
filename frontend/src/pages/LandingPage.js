@@ -484,10 +484,10 @@ const LandingPage = () => {
             <CardContent className="p-8">
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-white mb-2">
-                  {isLogin ? 'Welcome Back' : 'Start Your Journey'}
+                  Welcome to Sixer Sense
                 </h3>
                 <p className="text-white/70">
-                  {isLogin ? 'Log in to continue your match' : 'Create your free account'}
+                  Sign in with Google to start your first match
                 </p>
               </div>
 
@@ -504,58 +504,19 @@ const LandingPage = () => {
                 Continue with Google
               </Button>
 
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/20"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-[#1e3a8a] text-white/60">Or continue with email</span>
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {!isLogin && (
-                  <Input
-                    type="text"
-                    placeholder="Your name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required={!isLogin}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                  />
-                )}
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                />
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold"
-                >
-                  {loading ? 'Please wait...' : (isLogin ? 'Log In' : 'Create Account')}
-                </Button>
-              </form>
-
-              <div className="mt-6 text-center">
-                <button
-                  onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-green-400 hover:text-green-300"
-                >
-                  {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Log in'}
-                </button>
+              <div className="mt-6 text-center text-sm text-white/70 space-y-2 pt-4 border-t border-white/20">
+                <p className="flex items-center justify-center gap-2">
+                  <span className="text-green-400">🏆</span>
+                  Track daily productivity as cricket matches
+                </p>
+                <p className="flex items-center justify-center gap-2">
+                  <span className="text-yellow-400">⚡</span>
+                  AI-powered task recommendations
+                </p>
+                <p className="flex items-center justify-center gap-2">
+                  <span className="text-blue-400">💰</span>
+                  Premium features with wallet integration
+                </p>
               </div>
 
               <button
