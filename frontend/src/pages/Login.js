@@ -10,7 +10,7 @@ export const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{
-      background: 'linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 35%) 100%)'
+      background: 'linear-gradient(135deg, #4169e1 0%, hsl(225, 73%, 40%) 100%)'
     }}>
       <Card className="w-full max-w-md border-2 border-border backdrop-blur-sm bg-card/95 shadow-2xl" data-testid="login-card">
         <CardHeader className="text-center space-y-4">
