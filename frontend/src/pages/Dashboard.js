@@ -40,12 +40,34 @@ export const Dashboard = () => {
     fetchMatch();
   }, [navigate]);
 
+  const handleFormatChange = async (format) => {
+    try {
+      const response = await apiClient.post('/matches/update-format', {
+        match_id: match.match_id,
+        format: format
+      });
+      toast.success('Match format updated!', {
+        description: `Target set to ${response.data.target_score} runs`
+      });
+      fetchMatch();
+    } catch (error) {
+      toast.error('Failed to update format');
+    }
+  };
+
   const handleCompleteTask = async (taskId) => {
     try {
       const response = await apiClient.patch(`/tasks/${taskId}/complete`);
-      toast.success(response.data.message, {
-        description: `+${response.data.runs_earned} runs earned!`
-      });
+      
+      if (response.data.bonus_runs > 0) {
+        toast.success('🎉 Match Won!', {
+          description: `+${response.data.runs_earned} runs + ${response.data.bonus_runs} bonus runs!`
+        });
+      } else {
+        toast.success(response.data.message, {
+          description: `+${response.data.runs_earned} runs earned!`
+        });
+      }
       fetchMatch();
     } catch (error) {
       toast.error('Failed to complete task');
