@@ -158,7 +158,15 @@ export const Dashboard = () => {
       <header className="sticky top-0 z-50 border-b border-white/20 backdrop-blur-xl bg-white/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/home')}
+                className="text-white hover:text-yellow-200 hover:bg-white/10"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
               <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
                 <span className="text-white">SIXER</span>
                 <span className="text-yellow-200 ml-1">SENSE</span>
