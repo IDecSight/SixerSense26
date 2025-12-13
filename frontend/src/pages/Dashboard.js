@@ -8,6 +8,7 @@ import { Scoreboard } from '../components/Scoreboard';
 import { TaskCard } from '../components/TaskCard';
 import { CaptainsCall } from '../components/CaptainsCall';
 import { AddTaskModal } from '../components/AddTaskModal';
+import { TaskTimeline } from '../components/TaskTimeline';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
