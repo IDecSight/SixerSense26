@@ -38,7 +38,6 @@ export const Dashboard = () => {
       return;
     }
     fetchMatch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFormatChange = async (format) => {
