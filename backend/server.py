@@ -60,6 +60,8 @@ class User(BaseModel):
     is_premium: bool = False
     wallet_balance: float = 0.0
     profile: Optional[UserProfile] = None
+    country: str = DEFAULT_COUNTRY  # User's country code (e.g., "IN", "US")
+    currency: str = "INR"  # User's preferred currency
     win_streak: int = 0
     next_target: int = 60
     total_bonus_runs: int = 0
