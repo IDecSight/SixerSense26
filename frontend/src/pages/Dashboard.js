@@ -363,6 +363,13 @@ export const Dashboard = () => {
         onOpenChange={setShowAddTask}
         onTaskAdded={fetchMatch}
       />
+
+      {/* Live Commentary */}
+      <LiveCommentary
+        commentary={commentary}
+        show={showCommentary}
+        onHide={() => setShowCommentary(false)}
+      />
     </div>
   );
 };
