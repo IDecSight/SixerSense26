@@ -30,9 +30,15 @@ export const PremiumUpgradeModal = ({ open, onClose, onUpgrade, loading }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="min-h-full flex items-center justify-center py-8">
-        <Card className="w-full max-w-2xl border-yellow-200/30 bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF] shadow-2xl relative overflow-hidden my-auto">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div className="min-h-full flex items-center justify-center py-8 w-full">
+        <Card 
+          className="w-full max-w-2xl border-yellow-200/30 bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF] shadow-2xl relative overflow-hidden my-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Decorative Background */}
           <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
         
