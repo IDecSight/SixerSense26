@@ -90,8 +90,11 @@ class Match(BaseModel):
     total_wickets: int = 0
     completed_tasks: int = 0
     overs: float = 0.0
+    balls_played: int = 0  # Total balls consumed by tasks
     bonus_runs: int = 0
-    status: str = "in_progress"  # in_progress, won, lost
+    current_time_block: Optional[str] = None  # Morning, Afternoon, Evening, Night
+    available_overs: int = 0  # Overs available in current time block
+    status: str = "in_progress"  # in_progress, won, lost, expired
     created_at: datetime
 
 class Task(BaseModel):
