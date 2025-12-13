@@ -297,6 +297,14 @@ export const Wallet = () => {
           </Card>
         </div>
       </main>
+
+      {/* Premium Upgrade Modal */}
+      <PremiumUpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={handleUpgradeToPremium}
+        loading={upgrading}
+      />
     </div>
   );
 };
