@@ -71,14 +71,14 @@ code {
         --secondary: 199 89% 48%;
         --secondary-foreground: 0 0% 100%;
         
-        --muted: 221 83% 15%;
+        --muted: 225 73% 20%;
         --muted-foreground: 0 0% 75%;
         
         --accent: 45 93% 47%;
-        --accent-foreground: 221 83% 20%;
+        --accent-foreground: 225 73% 25%;
         
-        --border: 221 50% 20%;
-        --input: 221 50% 20%;
+        --border: 225 50% 25%;
+        --input: 225 50% 25%;
         --ring: 142 76% 36%;
     }
 }
