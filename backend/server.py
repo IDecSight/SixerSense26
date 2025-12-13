@@ -897,13 +897,17 @@ Return ONLY a JSON object:
     except Exception as e:
         logging.error(f"AI recommendation error: {str(e)}")
         # Return fallback
-        return {
+        affiliate_product = get_random_product("Career")
+        fallback = {
             "task": "Review your goals for the day",
             "category": "Career",
             "run_value": 1,
             "balance_reasoning": "Career focus helps maintain productivity momentum",
             "reasoning": ["Helps prioritize", "Quick planning task"]
         }
+        if affiliate_product:
+            fallback["affiliate_product"] = affiliate_product
+        return fallback
 
 @api_router.get("/ai/balance")
 async def get_category_balance_api(current_user: str = Depends(get_current_user), days: int = 7):
