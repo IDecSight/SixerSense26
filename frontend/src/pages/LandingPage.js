@@ -264,9 +264,9 @@ const LandingPage = () => {
           
           <div className="grid gap-6">
             {[
-              { step: 1, text: 'Log in and start today's match', color: 'green' },
+              { step: 1, text: 'Log in and start today\'s match', color: 'green' },
               { step: 2, text: 'Complete tasks to score runs', color: 'blue' },
-              { step: 3, text: 'Follow AI recommendations when you're unsure', color: 'purple' },
+              { step: 3, text: 'Follow AI recommendations when you\'re unsure', color: 'purple' },
               { step: 4, text: 'Beat the target and win the day', color: 'yellow' }
             ].map((item) => (
               <Card key={item.step} className="bg-white/10 backdrop-blur-sm border-white/20">
