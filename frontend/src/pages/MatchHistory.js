@@ -40,11 +40,11 @@ export const MatchHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="match-history">
-      <header className="border-b border-border/50 backdrop-blur-xl bg-background/80">
+    <div className="min-h-screen bg-primary-navy" data-testid="match-history">
+      <header className="border-b border-deep-teal/20 backdrop-blur-xl bg-calm-beige/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="text-calm-beige hover:text-soft-peach hover:bg-soft-peach/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
