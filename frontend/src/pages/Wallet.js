@@ -92,15 +92,15 @@ export const Wallet = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="wallet-page">
-      <header className="border-b border-border/50 backdrop-blur-xl bg-background/80">
+    <div className="min-h-screen bg-primary-navy" data-testid="wallet-page">
+      <header className="border-b border-deep-teal/20 backdrop-blur-xl bg-calm-beige/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="text-calm-beige hover:text-soft-peach hover:bg-soft-peach/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <h1 className="text-3xl font-teko font-bold uppercase tracking-tight">
+            <h1 className="text-3xl font-heading font-bold uppercase tracking-tight text-calm-beige">
               Wallet
             </h1>
           </div>
@@ -110,26 +110,26 @@ export const Wallet = () => {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
           {/* Balance Card */}
-          <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+          <Card className="border-soft-peach/30 bg-calm-beige">
             <CardHeader>
-              <CardDescription>Available Balance</CardDescription>
-              <CardTitle className="text-4xl font-mono-score font-bold text-primary" data-testid="wallet-balance">
+              <CardDescription className="text-deep-teal/60 font-body">Available Balance</CardDescription>
+              <CardTitle className="text-4xl font-mono-score font-bold text-soft-peach" data-testid="wallet-balance">
                 ${balance.toFixed(2)}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
                 {isPremium ? (
-                  <span className="px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-bold uppercase">
+                  <span className="px-3 py-1 rounded-full bg-soft-peach/20 text-soft-peach text-xs font-heading font-bold uppercase">
                     Premium Member
                   </span>
                 ) : (
-                  <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-bold uppercase">
+                  <span className="px-3 py-1 rounded-full bg-deep-teal/10 text-deep-teal text-xs font-heading font-bold uppercase">
                     Free Tier
                   </span>
                 )}
               </div>
-              <Button onClick={handleAddFunds} className="w-full" data-testid="add-funds-btn">
+              <Button onClick={handleAddFunds} className="w-full bg-soft-peach hover:bg-soft-peach/90 text-primary-navy font-heading" data-testid="add-funds-btn">
                 <CreditCard className="w-4 h-4 mr-2" />
                 Add Funds
               </Button>
@@ -138,13 +138,13 @@ export const Wallet = () => {
 
           {/* Buy Runs (Premium Only) */}
           {isPremium && (
-            <Card className="border-green-500/30 bg-green-900/10">
+            <Card className="border-soft-peach/30 bg-calm-beige">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-green-400" />
+                <CardTitle className="flex items-center gap-2 font-heading text-deep-teal">
+                  <Zap className="w-5 h-5 text-soft-peach" />
                   Buy Runs
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-deep-teal/60 font-body">
                   Convert your wallet balance to game runs
                 </CardDescription>
               </CardHeader>
