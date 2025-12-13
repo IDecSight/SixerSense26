@@ -114,7 +114,7 @@ export const Wallet = () => {
             <CardHeader>
               <CardDescription className="text-white/80 font-body">Available Balance</CardDescription>
               <CardTitle className="text-4xl font-mono-score font-bold text-green-200 drop-shadow-lg" data-testid="wallet-balance">
-                ${balance.toFixed(2)}
+                ₹{balance.toFixed(2)}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -151,11 +151,11 @@ export const Wallet = () => {
               <CardContent className="space-y-4">
                 <div className="p-3 rounded-lg bg-green-900/20 border border-green-500/30">
                   <p className="text-sm font-medium text-green-300 mb-1">Exchange Rate</p>
-                  <p className="text-2xl font-mono-score font-bold text-green-400">$1 = 10 runs</p>
+                  <p className="text-2xl font-mono-score font-bold text-green-400">₹1 = 10 runs</p>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Amount to Convert ($)</label>
+                  <label className="text-sm font-medium">Amount to Convert (₹)</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -201,7 +201,7 @@ export const Wallet = () => {
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-start gap-2">
                     <span className="text-accent mt-1">✓</span>
-                    <span className="text-sm">Convert wallet balance to runs ($1 = 10 runs)</span>
+                    <span className="text-sm">Convert wallet balance to runs (₹1 = 10 runs)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-accent mt-1">✓</span>
@@ -249,7 +249,7 @@ export const Wallet = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-mono-score font-bold">
-                          ${tx.amount.toFixed(2)}
+                          ₹{tx.amount.toFixed(2)}
                         </p>
                         <p className={`text-xs uppercase ${
                           tx.status === 'completed' ? 'text-primary' : 'text-muted-foreground'
