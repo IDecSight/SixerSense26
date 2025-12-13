@@ -34,7 +34,7 @@ const LandingPage = () => {
 
       const response = await apiClient.post(endpoint, payload);
       
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('auth_token', response.data.token);
       toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!');
       navigate('/dashboard');
     } catch (error) {
