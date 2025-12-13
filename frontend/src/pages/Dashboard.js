@@ -83,20 +83,47 @@ export const Dashboard = () => {
     fetchMatch();
   }, []);
 
+  const generateCommentary = async (eventType, taskData = {}) => {
+    try {
+      const response = await apiClient.post('/commentary/generate', {
+        event_type: eventType,
+        task_name: taskData.title,
+        category: taskData.category,
+        run_value: taskData.run_value,
+        current_runs: match.total_runs + (taskData.run_value || 0),
+        current_wickets: match.total_wickets,
+        match_format: match.format,
+        target_score: match.target_score
+      });
+      setCommentary(response.data.commentary);
+      setShowCommentary(true);
+    } catch (error) {
+      console.error('Failed to generate commentary:', error);
+    }
+  };
+
   const handleCompleteTask = async (taskId) => {
     try {
+      const task = match.tasks.find(t => t.task_id === taskId);
       const response = await apiClient.patch(`/tasks/${taskId}/complete`);
       
       if (response.data.bonus_runs > 0) {
         toast.success('🎉 Match Won!', {
           description: `+${response.data.runs_earned} runs + ${response.data.bonus_runs} bonus runs!`
         });
+        // Generate match won commentary
+        await generateCommentary('match_won', {});
       } else {
         toast.success(response.data.message, {
           description: `+${response.data.runs_earned} runs earned!`
         });
+        // Generate task completion commentary
+        if (task) {
+          await generateCommentary('task_completed', task);
+        }
       }
-      fetchMatch();
+      
+      await fetchMatch();
     } catch (error) {
       toast.error('Failed to complete task');
     }
