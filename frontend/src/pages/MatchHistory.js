@@ -26,9 +26,9 @@ export const MatchHistory = () => {
   }, []);
 
   const getMatchBadge = (match) => {
-    if (match.status === 'won') return { label: 'WON', color: 'bg-soft-peach text-primary-navy' };
-    if (match.status === 'lost') return { label: 'LOST', color: 'bg-dusty-rose text-primary-navy' };
-    return { label: 'IN PROGRESS', color: 'bg-deep-teal/20 text-deep-teal' };
+    if (match.status === 'won') return { label: 'WON', color: 'bg-green-500/30 text-green-200 border border-green-300/50' };
+    if (match.status === 'lost') return { label: 'LOST', color: 'bg-red-500/30 text-red-200 border border-red-300/50' };
+    return { label: 'IN PROGRESS', color: 'bg-white/20 text-white border border-white/30' };
   };
 
   if (loading) {
@@ -40,15 +40,15 @@ export const MatchHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-navy" data-testid="match-history">
-      <header className="border-b border-deep-teal/20 backdrop-blur-xl bg-calm-beige/5">
+    <div className="min-h-screen bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF]" data-testid="match-history">
+      <header className="border-b border-white/20 backdrop-blur-xl bg-white/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="text-calm-beige hover:text-soft-peach hover:bg-soft-peach/10">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="text-white hover:text-yellow-200 hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <h1 className="text-3xl font-heading font-bold uppercase tracking-tight text-calm-beige">
+            <h1 className="text-3xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-lg">
               Match History
             </h1>
           </div>
@@ -57,11 +57,11 @@ export const MatchHistory = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {matches.length === 0 ? (
-          <Card className="bg-calm-beige border-deep-teal/20">
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20 shadow-2xl">
             <CardContent className="py-12 text-center">
-              <Trophy className="w-16 h-16 mx-auto mb-4 text-soft-peach" />
-              <p className="text-lg text-deep-teal/60 font-body">No match history yet</p>
-              <Button onClick={() => navigate('/dashboard')} className="mt-4 bg-soft-peach hover:bg-soft-peach/90 text-primary-navy font-heading">
+              <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-200" />
+              <p className="text-lg text-white/90 font-body">No match history yet</p>
+              <Button onClick={() => navigate('/dashboard')} className="mt-4 bg-white hover:bg-white/90 text-[#4169E1] font-heading shadow-lg">
                 Start Your First Match
               </Button>
             </CardContent>
@@ -75,11 +75,11 @@ export const MatchHistory = () => {
                 : '0';
 
               return (
-                <Card key={match.match_id} className="hover:shadow-lg transition-shadow bg-calm-beige border-deep-teal/20">
+                <Card key={match.match_id} className="hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-lg border-white/20 shadow-xl">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-xl font-heading uppercase tracking-tight text-deep-teal">
+                        <CardTitle className="text-xl font-heading uppercase tracking-tight text-white drop-shadow-md">
                           {new Date(match.date).toLocaleDateString('en-US', { 
                             weekday: 'long', 
                             year: 'numeric', 
@@ -87,7 +87,7 @@ export const MatchHistory = () => {
                             day: 'numeric' 
                           })}
                         </CardTitle>
-                        <p className="text-sm text-deep-teal/60 mt-1 font-body">
+                        <p className="text-sm text-white/80 mt-1 font-body">
                           {match.format} Format
                         </p>
                       </div>
