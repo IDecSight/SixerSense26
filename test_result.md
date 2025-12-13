@@ -1,7 +1,3 @@
-#====================================================================================================
-# START - Testing Protocol - DO NOT EDIT OR REMOVE THIS SECTION
-#====================================================================================================
-
 # THIS SECTION CONTAINS CRITICAL TESTING INSTRUCTIONS FOR BOTH AGENTS
 # BOTH MAIN_AGENT AND TESTING_AGENT MUST PRESERVE THIS ENTIRE BLOCK
 
@@ -101,3 +97,49 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Sixer Sense - Gamified productivity app with cricket match theme. Turn daily tasks into runs, AI recommendations, wallet, and affiliate product recommendations"
+
+backend:
+  - task: "Affiliate Products Integration in AI Recommendations"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/affiliate_products.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Previous agent implemented affiliate product database (affiliate_products.py) with 6 categories (Health, Career, Finance, Relationships, Spiritual/Mindset, Travel/Leisure). Each category has 2-3 products with affiliate_link, name, description, price, run_reward, and action_tasks. Backend server.py imports get_random_product and adds affiliate_product to AI recommendation response. Code implementation is complete but NOT TESTED yet."
+
+frontend:
+  - task: "Display Affiliate Products in Captain's Call Component"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/CaptainsCall.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Previous agent updated CaptainsCall.js to display affiliate products within AI recommendations. Shows product name, description, price, run_reward, and a clickable 'View Product' link. Also displays action_tasks in a collapsible details section. UI uses green theme (bg-green-900/20 border-green-500/30) to highlight affiliate products. NOT TESTED yet."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Affiliate Products Integration in AI Recommendations"
+    - "Display Affiliate Products in Captain's Call Component"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Fork agent starting work. Previous agent implemented affiliate link feature in AI recommendations but did NOT test it. User has confirmed priority to test affiliate links first. I am delegating comprehensive end-to-end testing to testing subagent. Please test: 1) Backend /api/ai/recommend endpoint returns affiliate_product with all required fields (affiliate_link, name, description, price, run_reward, action_tasks). 2) Frontend CaptainsCall component displays affiliate product correctly with clickable link. 3) Link opens in new tab. 4) Test with multiple categories to ensure different products are returned."
