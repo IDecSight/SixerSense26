@@ -4,6 +4,7 @@ import { Toaster } from './components/ui/sonner';
 import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
 import AuthCallback from './pages/AuthCallback';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import MatchHistory from './pages/MatchHistory';
 import Wallet from './pages/Wallet';
@@ -34,6 +35,14 @@ const AppRouter = () => {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
+      <Route 
+        path="/home" 
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } 
+      />
       <Route 
         path="/dashboard" 
         element={
