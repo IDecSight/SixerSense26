@@ -14,7 +14,14 @@ from jose import JWTError, jwt
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 from collections import defaultdict
+import httpx
 from affiliate_products import get_random_product
+from affiliate_products_by_country import (
+    get_products_for_country, 
+    format_price, 
+    get_currency_for_country,
+    DEFAULT_COUNTRY
+)
 from default_tasks import get_default_tasks_for_category, DEFAULT_TASKS_BY_CATEGORY
 
 ROOT_DIR = Path(__file__).parent
