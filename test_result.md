@@ -168,8 +168,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Affiliate Products Integration in AI Recommendations"
-    - "Display Affiliate Products in Captain's Call Component"
+    - "3 Task Options Feature in AI Recommendations"
+    - "Display 3 Task Options in Captain's Call Component"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
