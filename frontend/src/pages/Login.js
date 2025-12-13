@@ -10,27 +10,27 @@ export const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{
-      background: 'linear-gradient(135deg, hsl(222, 47%, 11%) 0%, hsl(217, 33%, 17%) 100%)'
+      background: 'linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 35%) 100%)'
     }}>
-      <Card className="w-full max-w-md border-primary/20 backdrop-blur-sm bg-card/90" data-testid="login-card">
+      <Card className="w-full max-w-md border-2 border-border backdrop-blur-sm bg-card/95 shadow-2xl" data-testid="login-card">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center mb-4">
             <div className="text-6xl font-teko font-bold tracking-tight">
-              <span className="text-primary">SIXER</span>
+              <span className="runs-color">SIXER</span>
               <span className="text-accent ml-2">SENSE</span>
             </div>
           </div>
-          <CardTitle className="text-3xl font-teko uppercase tracking-tight">
+          <CardTitle className="text-3xl font-teko uppercase tracking-tight text-white">
             Turn Tasks into Runs
           </CardTitle>
-          <CardDescription className="text-base">
+          <CardDescription className="text-base text-white/80">
             Every task is a ball. Every completion scores runs. Beat your target before losing 10 wickets!
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
             onClick={handleGoogleLogin}
-            className="w-full h-12 text-lg font-medium"
+            className="w-full h-12 text-lg font-medium bg-white text-background hover:bg-white/90"
             size="lg"
             data-testid="google-login-btn"
           >
@@ -43,10 +43,19 @@ export const Login = () => {
             Continue with Google
           </Button>
           
-          <div className="text-center text-sm text-muted-foreground space-y-2 pt-4">
-            <p>🏆 Track daily productivity as cricket matches</p>
-            <p>⚡ AI-powered task recommendations</p>
-            <p>💰 Premium features with wallet integration</p>
+          <div className="text-center text-sm text-white/70 space-y-2 pt-4 border-t border-white/20">
+            <p className="flex items-center justify-center gap-2">
+              <span className="text-green-400">🏆</span>
+              Track daily productivity as cricket matches
+            </p>
+            <p className="flex items-center justify-center gap-2">
+              <span className="text-yellow-400">⚡</span>
+              AI-powered task recommendations
+            </p>
+            <p className="flex items-center justify-center gap-2">
+              <span className="text-blue-400">💰</span>
+              Premium features with wallet integration
+            </p>
           </div>
         </CardContent>
       </Card>
