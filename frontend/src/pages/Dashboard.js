@@ -61,16 +61,27 @@ export const Dashboard = () => {
   };
 
   const handleChangeFormat = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to restart today's match? Current progress will be archived."
+    );
+    
+    if (!confirmed) return;
+    
     try {
       await apiClient.delete('/matches/today');
-      toast.success('Match cleared!', {
-        description: 'Select a new format to start'
+      toast.success('Match restarted! 🔄', {
+        description: 'Select a new format to begin fresh'
       });
       setMatch(null);
       setShowFormatSelector(true);
     } catch (error) {
-      console.error('Error changing format:', error);
-      toast.error('Failed to change format');
+      console.error('Error restarting match:', error);
+      if (error.response?.status === 404) {
+        // No match exists, just show format selector
+        setShowFormatSelector(true);
+      } else {
+        toast.error('Failed to restart match');
+      }
     }
   };
 
