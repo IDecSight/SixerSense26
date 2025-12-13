@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Sparkles, Plus, RefreshCw } from 'lucide-react';
+import { Sparkles, Plus, RefreshCw, Clock } from 'lucide-react';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
@@ -72,7 +72,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
           )}
         </div>
         <CardDescription className="text-white/80 font-body">
-          AI-powered task recommendation based on your match situation
+          AI-powered recommendations based on your available time and life balance
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -86,7 +86,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
             {loading ? (
               <>
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                Analyzing...
+                Analyzing your day...
               </>
             ) : (
               <>
@@ -127,84 +127,70 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
                 ))}
               </div>
 
-              {/* Task Options - 3 recommendations */}
+              {/* Task Options - 3 recommendations with INDIVIDUAL affiliate products */}
               {recommendation.task_options && recommendation.task_options.length > 0 && (
-                <div className="mb-4 space-y-2">
-                  <p className="text-xs font-body font-medium text-green-200 uppercase mb-2">Choose Your Task (Choose 1 of 3)</p>
+                <div className="mb-4 space-y-3">
+                  <p className="text-xs font-body font-medium text-green-200 uppercase mb-2 flex items-center gap-2">
+                    <Clock className="w-3 h-3" />
+                    Choose Your Task (1 of 3) - Each with recommended tool
+                  </p>
                   {recommendation.task_options.map((task, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedTask(task)}
-                      className={`w-full text-left p-3 rounded-lg border transition-all ${
-                        selectedTask?.run_value === task.run_value
-                          ? 'border-green-300 bg-green-500/20 ring-2 ring-green-300/30'
-                          : 'border-white/20 bg-white/5 hover:border-green-300/40'
-                      }`}
-                      data-testid={`task-option-${task.run_value}`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-heading font-semibold text-sm text-white">{task.title}</span>
-                        <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-200 text-xs font-mono-score font-bold">
-                          {task.run_value} RUNS
-                        </span>
-                      </div>
-                      <p className="text-xs text-white/70 font-body">{task.description}</p>
-                      <p className="text-xs text-green-200/60 mt-1 font-body">~{task.estimated_minutes} mins</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Affiliate Product */}
-              {recommendation.affiliate_product && (
-                <div className="mt-4 p-3 rounded-lg bg-green-500/5 border border-green-400/20">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <span className="text-lg">🎁</span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div>
-                        <p className="text-xs font-body font-medium text-green-200 uppercase mb-1">Recommended Tool</p>
-                        <h5 className="font-heading font-semibold text-sm text-white">{recommendation.affiliate_product.name}</h5>
-                        <p className="text-xs text-white/70 font-body mt-1">{recommendation.affiliate_product.description}</p>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-mono-score font-bold text-green-200">{recommendation.affiliate_product.price}</span>
-                        <span className="text-xs text-white/40">•</span>
-                        <span className="text-xs text-green-200 font-body">Earn {recommendation.affiliate_product.run_reward} bonus runs</span>
-                      </div>
-
-                      <a
-                        href={recommendation.affiliate_product.affiliate_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white hover:bg-white/90 text-[#4169E1] text-xs font-heading font-medium transition-colors shadow-lg"
-                        data-testid="affiliate-link"
+                    <div key={idx} className={`rounded-lg border transition-all ${
+                      selectedTask?.run_value === task.run_value
+                        ? 'border-green-300 bg-green-500/20 ring-2 ring-green-300/30'
+                        : 'border-white/20 bg-white/5'
+                    }`}>
+                      <button
+                        onClick={() => setSelectedTask(task)}
+                        className="w-full text-left p-3"
+                        data-testid={`task-option-${task.run_value}`}
                       >
-                        View Product
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
-
-                      {recommendation.affiliate_product.action_tasks && recommendation.affiliate_product.action_tasks.length > 0 && (
-                        <details className="mt-2">
-                          <summary className="text-xs text-green-200 cursor-pointer hover:text-green-100 font-body">
-                            Earn bonus runs after purchase ({recommendation.affiliate_product.action_tasks.length} actions)
-                          </summary>
-                          <ul className="mt-2 space-y-1 pl-4">
-                            {recommendation.affiliate_product.action_tasks.map((action, idx) => (
-                              <li key={idx} className="text-xs text-white/70 flex items-start gap-1 font-body">
-                                <span className="text-green-200 mt-0.5">✓</span>
-                                <span>{action}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </details>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-heading font-semibold text-sm text-white">{task.title}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-200 text-xs font-mono-score font-bold">
+                            {task.run_value} RUNS
+                          </span>
+                        </div>
+                        <p className="text-xs text-white/70 font-body">{task.description}</p>
+                        <p className="text-xs text-green-200/60 mt-1 font-body flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          ~{task.estimated_minutes} mins
+                        </p>
+                      </button>
+                      
+                      {/* Individual Affiliate Product for THIS specific task */}
+                      {task.affiliate_product && (
+                        <div className="px-3 pb-3 pt-2 border-t border-white/10">
+                          <div className="flex items-start gap-2">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                              <span className="text-sm">🎁</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-body font-medium text-green-200 mb-0.5">Recommended Tool</p>
+                              <p className="text-xs font-heading font-semibold text-white truncate">{task.affiliate_product.name}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs font-mono-score text-green-200">{task.affiliate_product.price}</span>
+                                <span className="text-xs text-white/40">•</span>
+                                <span className="text-xs text-green-200 font-body">+{task.affiliate_product.run_reward} bonus</span>
+                              </div>
+                              <a
+                                href={task.affiliate_product.affiliate_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-md bg-white hover:bg-white/90 text-[#4169E1] text-xs font-heading font-medium transition-colors shadow-md"
+                              >
+                                View Product
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -215,7 +201,7 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
               data-testid="add-recommendation-btn"
             >
               <Plus className="w-4 h-4 mr-2" />
-              {selectedTask ? `Add ${selectedTask.run_value}-Run Task` : 'Select a Task First'}
+              {selectedTask ? `Add ${selectedTask.run_value}-Run Task (${selectedTask.estimated_minutes}min)` : 'Select a Task First'}
             </Button>
           </div>
         )}
