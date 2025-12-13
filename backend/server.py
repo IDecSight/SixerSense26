@@ -536,6 +536,34 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
         # Return null to indicate no match exists - user needs to select format
         return None
     
+    # Check if match should auto-expire (day is over)
+    current_datetime = datetime.now(timezone.utc)
+    if should_match_end_automatically(match_doc["date"], current_datetime):
+        # Match expired - mark as lost if not won
+        if match_doc["status"] == "in_progress":
+            await db.matches.update_one(
+                {"match_id": match_doc["match_id"]},
+                {"$set": {"status": "expired"}}
+            )
+            match_doc["status"] = "expired"
+    
+    # Update time block and available overs
+    current_hour = current_datetime.hour
+    time_block_info = get_time_block_overs(current_hour)
+    
+    await db.matches.update_one(
+        {"match_id": match_doc["match_id"]},
+        {
+            "$set": {
+                "current_time_block": time_block_info["time_block"],
+                "available_overs": time_block_info["available_overs"]
+            }
+        }
+    )
+    
+    match_doc["current_time_block"] = time_block_info["time_block"]
+    match_doc["available_overs"] = time_block_info["available_overs"]
+    
     # Get tasks for this match
     tasks = await db.tasks.find(
         {"match_id": match_doc["match_id"]},
