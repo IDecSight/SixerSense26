@@ -98,15 +98,21 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
         ) : (
           <div className="space-y-4">
             <div className="p-4 rounded-lg bg-white/5 border border-white/20">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 rounded-md bg-green-500/20 text-green-200 text-xs font-body font-medium uppercase">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="px-2 py-1 rounded-md bg-green-500/20 text-green-200 text-xs font-body font-medium uppercase border border-green-400/30">
                   {recommendation.category}
                 </span>
-                <span className="px-2 py-1 rounded-full bg-green-500/30 text-green-200 text-xs font-mono-score font-bold">
+                <span className="px-2.5 py-1 rounded-full bg-green-500/30 text-green-200 text-xs font-mono-score font-bold border border-green-400/40">
                   {recommendation.run_value} RUNS
                 </span>
+                {recommendation.estimated_minutes && (
+                  <span className="px-2 py-1 rounded-md bg-white/10 text-white/90 text-xs font-body flex items-center gap-1 border border-white/20">
+                    <Clock className="w-3 h-3" />
+                    {recommendation.estimated_minutes} mins
+                  </span>
+                )}
               </div>
-              <h4 className="font-heading font-semibold text-lg mb-3 text-white drop-shadow-md" data-testid="recommendation-task">
+              <h4 className="font-heading font-semibold text-lg mb-3 text-white drop-shadow-md leading-tight" data-testid="recommendation-task">
                 {recommendation.task}
               </h4>
               
