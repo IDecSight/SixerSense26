@@ -950,24 +950,35 @@ Return ONLY a JSON object:
             if "balance_reasoning" not in recommendation:
                 recommendation["balance_reasoning"] = f"Balancing your life across all categories"
             
+            # Get user's country for localized products
+            user_country = user_doc.get("country", DEFAULT_COUNTRY)
+            user_currency = user_doc.get("currency", get_currency_for_country(user_country))
+            
             # Get category and add 3 task options with affiliate products
             category = recommendation.get("category")
             if category:
+                # Get country-specific products
+                country_products = get_products_for_country(user_country)
+                
                 # Get 3 default tasks for this category (1, 4, 6 runs)
                 default_tasks = get_default_tasks_for_category(category)
                 if default_tasks:
                     # Add affiliate product to EACH task option
-                    for task in default_tasks:
-                        affiliate_product = get_random_product(category)
-                        if affiliate_product:
-                            task["affiliate_product"] = affiliate_product
+                    category_products = country_products.get(category, [])
+                    for idx, task in enumerate(default_tasks):
+                        if category_products and idx < len(category_products):
+                            product = category_products[idx].copy()
+                            # Format price with local currency
+                            product["price"] = format_price(product["price"], product["currency"])
+                            task["affiliate_product"] = product
                     
                     recommendation["task_options"] = default_tasks
                 
                 # Also add main affiliate product for backward compatibility
-                affiliate_product = get_random_product(category)
-                if affiliate_product:
-                    recommendation["affiliate_product"] = affiliate_product
+                if category_products:
+                    product = category_products[0].copy()
+                    product["price"] = format_price(product["price"], product["currency"])
+                    recommendation["affiliate_product"] = product
             
             return recommendation
         except Exception as e:
