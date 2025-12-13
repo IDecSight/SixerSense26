@@ -178,7 +178,7 @@ export const Dashboard = () => {
           {/* Left Column - Scoreboard & AI */}
           <div className="lg:col-span-2 space-y-6">
             {/* Match Format Selector */}
-            {match.status === 'in_progress' && match.completed_tasks === 0 && (
+            {match && match.status === 'in_progress' && match.completed_tasks === 0 && (
               <Card className="border-secondary/30 bg-secondary/5">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between gap-4">
@@ -186,7 +186,14 @@ export const Dashboard = () => {
                       <p className="text-sm font-medium mb-1">Match Format</p>
                       <p className="text-xs text-muted-foreground">Choose your format before starting</p>
                     </div>
-                    <Select value={match.format} onValueChange={handleFormatChange}>
+                    <Select 
+                      value={match.format} 
+                      onValueChange={(value) => {
+                        if (value !== match.format) {
+                          handleFormatChange(value);
+                        }
+                      }}
+                    >
                       <SelectTrigger className="w-[180px]" data-testid="format-selector">
                         <SelectValue />
                       </SelectTrigger>
