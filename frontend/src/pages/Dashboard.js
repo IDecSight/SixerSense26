@@ -9,6 +9,7 @@ import { CaptainsCall } from '../components/CaptainsCall';
 import { AddTaskModal } from '../components/AddTaskModal';
 import { TaskTimeline } from '../components/TaskTimeline';
 import { FormatSelector } from '../components/FormatSelector';
+import { LiveCommentary } from '../components/LiveCommentary';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
@@ -19,6 +20,8 @@ export const Dashboard = () => {
   const [showAddTask, setShowAddTask] = useState(false);
   const [showFormatSelector, setShowFormatSelector] = useState(false);
   const [startingMatch, setStartingMatch] = useState(false);
+  const [commentary, setCommentary] = useState(null);
+  const [showCommentary, setShowCommentary] = useState(false);
 
   const fetchMatch = async () => {
     try {
