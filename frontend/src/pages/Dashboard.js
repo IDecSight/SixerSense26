@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { Plus, History, Wallet, Settings as SettingsIcon, LogOut, ArrowLeft } from 'lucide-react';
+import { Plus, History, Wallet, Settings as SettingsIcon, LogOut, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Scoreboard } from '../components/Scoreboard';
 import { TaskCard } from '../components/TaskCard';
 import { CaptainsCall } from '../components/CaptainsCall';
