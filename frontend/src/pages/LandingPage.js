@@ -32,7 +32,7 @@ const LandingPage = () => {
         <div className="flex justify-between items-center mb-16">
           <div className="flex items-center gap-2">
             <Target className="w-8 h-8 text-white" />
-            <h1 className="text-2xl font-heading font-bold text-white tracking-tight uppercase">Sixer Sense</h1>
+            <h1 className="text-2xl font-heading font-bold text-green-400 tracking-tight uppercase">Sixer Sense</h1>
           </div>
           <Button 
             onClick={handleAuthClick}
@@ -45,7 +45,7 @@ const LandingPage = () => {
         {/* Hero */}
         <div className="max-w-4xl mx-auto text-center mb-20">
           <div className="inline-block mb-6">
-            <span className="text-6xl sm:text-7xl lg:text-8xl font-heading font-black text-white tracking-tight uppercase leading-none drop-shadow-2xl">
+            <span className="text-6xl sm:text-7xl lg:text-8xl font-heading font-black text-green-400 tracking-tight uppercase leading-none drop-shadow-2xl">
               Sixer Sense
             </span>
           </div>
