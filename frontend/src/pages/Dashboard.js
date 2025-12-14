@@ -61,37 +61,45 @@ export const Dashboard = () => {
   };
 
   const handleChangeFormat = async () => {
-    const message = match 
-      ? `🔄 Restart Match?\n\nCurrent Progress:\n• Runs: ${match.total_runs}/${match.target_score}\n• Wickets: ${match.total_wickets}/10\n• Tasks: ${match.completed_tasks}\n\nThis will archive your current match and let you start fresh with a new format.\n\nContinue?`
-      : "No active match. Select a format to start!";
-    
-    const confirmed = window.confirm(message);
-    
-    if (!confirmed) return;
-    
-    setLoading(true);
     try {
-      await apiClient.delete('/matches/today');
-      toast.success('Match Restarted Successfully! 🎉', {
-        description: 'Choose your format and start fresh'
-      });
-      setMatch(null);
-      setShowFormatSelector(true);
-    } catch (error) {
-      console.error('Error restarting match:', error);
-      if (error.response?.status === 404) {
-        // No match exists, just show format selector
-        toast.info('Ready to start!', {
-          description: 'Select your format to begin'
+      const message = match 
+        ? `🔄 Restart Match?\n\nCurrent Progress:\n• Runs: ${match.total_runs || 0}/${match.target_score || 0}\n• Wickets: ${match.total_wickets || 0}/10\n• Tasks: ${match.completed_tasks || 0}\n\nThis will archive your current match and let you start fresh with a new format.\n\nContinue?`
+        : "No active match. Select a format to start!";
+      
+      const confirmed = window.confirm(message);
+      
+      if (!confirmed) return;
+      
+      setLoading(true);
+      try {
+        await apiClient.delete('/matches/today');
+        toast.success('Match Restarted Successfully! 🎉', {
+          description: 'Choose your format and start fresh'
         });
+        setMatch(null);
         setShowFormatSelector(true);
-      } else {
-        toast.error('Failed to restart match', {
-          description: 'Please try again'
-        });
+      } catch (error) {
+        console.error('Error restarting match:', error);
+        if (error.response?.status === 404) {
+          // No match exists, just show format selector
+          toast.info('Ready to start!', {
+            description: 'Select your format to begin'
+          });
+          setMatch(null);
+          setShowFormatSelector(true);
+        } else {
+          toast.error('Failed to restart match', {
+            description: 'Please try again'
+          });
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Error in handleChangeFormat:', error);
+      toast.error('Failed to restart match', {
+        description: error.message
+      });
     }
   };
 
