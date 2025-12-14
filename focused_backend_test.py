@@ -182,15 +182,15 @@ class FocusedSixerSenseTest:
         """Test user and wallet endpoints"""
         print("\n💰 Testing User & Wallet Endpoints...")
         
-        # Test user profile
+        # Test user profile (correct endpoint is /api/auth/me)
         try:
-            response = requests.get(f"{self.base_url}/api/users/me", timeout=10)
+            response = requests.get(f"{self.base_url}/api/auth/me", timeout=10)
             if response.status_code == 401:
-                self.log_result("GET /api/users/me", True, "User profile endpoint exists (correct)")
+                self.log_result("GET /api/auth/me", True, "User profile endpoint exists (correct)")
             else:
-                self.log_result("GET /api/users/me", False, f"Unexpected status: {response.status_code}")
+                self.log_result("GET /api/auth/me", False, f"Unexpected status: {response.status_code}")
         except Exception as e:
-            self.log_result("GET /api/users/me", False, f"Endpoint error: {str(e)}", True)
+            self.log_result("GET /api/auth/me", False, f"Endpoint error: {str(e)}", True)
         
         # Test location detection (should work without auth)
         try:
