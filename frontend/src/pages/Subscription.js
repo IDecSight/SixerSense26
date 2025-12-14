@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useRazorpay } from 'react-razorpay';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { ArrowLeft, Crown, Check, Sparkles, Zap, TrendingUp, Gift, Target } from 'lucide-react';
@@ -28,25 +29,74 @@ export const Subscription = () => {
     loadUserStatus();
   }, []);
 
+  const { Razorpay } = useRazorpay();
+
   const handleSubscribe = async () => {
     setSubscribing(true);
     try {
-      const amount = selectedPlan === 'monthly' ? 99 : 699;
-      
-      toast.info('Payment integration coming soon!', {
-        description: `₹${amount} ${selectedPlan} subscription will be processed via DodoPayments`
+      // Step 1: Create Razorpay order
+      const orderResponse = await apiClient.post('/payment/create-order', {
+        plan: selectedPlan
       });
-      
-      // TODO: Integrate with DodoPayments
-      // await apiClient.post('/users/me/subscribe', { plan: selectedPlan });
-      // setIsPremium(true);
-      // toast.success('🎉 Welcome to Premium!');
+
+      const { order_id, amount, currency, key_id } = orderResponse.data;
+
+      // Step 2: Open Razorpay checkout
+      const options = {
+        key: key_id,
+        amount: amount,
+        currency: currency,
+        name: "Sixer Sense",
+        description: `${selectedPlan === 'monthly' ? 'Monthly' : 'Yearly'} Subscription`,
+        order_id: order_id,
+        handler: async (response) => {
+          // Step 3: Verify payment on backend
+          try {
+            const verifyResponse = await apiClient.post('/payment/verify', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan: selectedPlan
+            });
+
+            toast.success('🎉 ' + verifyResponse.data.message, {
+              description: `Your ${selectedPlan} subscription is now active!`
+            });
+            
+            setIsPremium(true);
+            
+            // Refresh page to show premium status
+            setTimeout(() => window.location.reload(), 2000);
+            
+          } catch (verifyError) {
+            toast.error('Payment verification failed', {
+              description: verifyError.response?.data?.detail || 'Please contact support'
+            });
+          }
+        },
+        prefill: {
+          name: "User",
+          email: "user@example.com"
+        },
+        theme: {
+          color: "#4169E1"
+        },
+        modal: {
+          ondismiss: () => {
+            setSubscribing(false);
+            toast.info('Payment cancelled');
+          }
+        }
+      };
+
+      const razorpayInstance = new Razorpay(options);
+      razorpayInstance.open();
       
     } catch (error) {
-      toast.error('Subscription failed', {
+      console.error('Subscription error:', error);
+      toast.error('Failed to initiate payment', {
         description: error.response?.data?.detail || 'Please try again'
       });
-    } finally {
       setSubscribing(false);
     }
   };
