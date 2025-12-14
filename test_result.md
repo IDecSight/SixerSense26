@@ -273,6 +273,17 @@ frontend:
         - working: "NA"
           agent: "testing"
           comment: "✅ CODE ANALYSIS COMPLETED - Verified Wallet.js contains correct INR currency symbols: Line 145 shows ₹{balance.toFixed(2)}, Line 182 shows ₹1 = 10 runs exchange rate, Line 284 shows ₹{tx.amount.toFixed(2)} for transactions. All currency symbols are properly implemented as ₹ (INR) not $ (USD). Cannot test live functionality due to authentication barrier, but code implementation is correct. This task appears to be working based on code analysis. Authentication required for live verification."
+  - task: "User-Reported Critical Issues Testing"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Dashboard.js, /app/frontend/src/components/FormatSelector.js"
+    stuck_count: 2
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL USER ISSUES CANNOT BE TESTED - User reported 3 critical issues: 1) Format selection 'not working', 2) Score updates 'not updating score', 3) Manual restart 'refresh button not working'. All these features require authenticated access to dashboard/match functionality. Cannot test without real Google authentication. CODE ANALYSIS shows all features are properly implemented: FormatSelector has correct T20/ODI/Test options with visual feedback, Dashboard has score update logic, restart functionality with confirmation dialog. AUTHENTICATION BARRIER prevents live testing of user-reported issues. Need manual testing with real authentication to verify if issues exist."
 
 metadata:
   created_by: "main_agent"
