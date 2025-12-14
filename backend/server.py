@@ -542,9 +542,9 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
             {"$set": {"status": "expired"}}
         )
     
-    # Look for today's match
+    # Look for today's ACTIVE match (exclude abandoned/expired matches)
     match_doc = await db.matches.find_one(
-        {"user_id": current_user, "date": today},
+        {"user_id": current_user, "date": today, "status": "in_progress"},
         {"_id": 0}
     )
     
