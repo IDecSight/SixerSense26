@@ -622,6 +622,12 @@ async def start_today_match(
     
     # Create today's match
     match_id = f"match_{uuid.uuid4().hex[:12]}"
+    
+    # Get current time block and available overs
+    current_datetime = datetime.now(timezone.utc)
+    current_hour = current_datetime.hour
+    time_block_info = get_time_block_overs(current_hour)
+    
     match_doc = {
         "match_id": match_id,
         "user_id": current_user,
@@ -632,9 +638,12 @@ async def start_today_match(
         "total_wickets": 0,
         "completed_tasks": 0,
         "overs": 0.0,
+        "balls_played": 0,
         "bonus_runs": 0,
+        "current_time_block": time_block_info["time_block"],
+        "available_overs": time_block_info["available_overs"],
         "status": "in_progress",
-        "created_at": datetime.now(timezone.utc)
+        "created_at": current_datetime
     }
     await db.matches.insert_one(match_doc)
     match_doc.pop("_id", None)
@@ -658,7 +667,7 @@ async def start_today_match(
                 "estimated_minutes": task_template["minutes"],
                 "status": "pending",
                 "completed_at": None,
-                "created_at": datetime.now(timezone.utc)
+                "created_at": current_datetime
             }
             await db.tasks.insert_one(task_doc)
     
