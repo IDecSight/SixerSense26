@@ -277,13 +277,16 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/pages/Dashboard.js, /app/frontend/src/components/FormatSelector.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "testing"
           comment: "❌ CRITICAL USER ISSUES CANNOT BE TESTED - User reported 3 critical issues: 1) Format selection 'not working', 2) Score updates 'not updating score', 3) Manual restart 'refresh button not working'. All these features require authenticated access to dashboard/match functionality. Cannot test without real Google authentication. CODE ANALYSIS shows all features are properly implemented: FormatSelector has correct T20/ODI/Test options with visual feedback, Dashboard has score update logic, restart functionality with confirmation dialog. AUTHENTICATION BARRIER prevents live testing of user-reported issues. Need manual testing with real authentication to verify if issues exist."
+        - working: false
+          agent: "testing"
+          comment: "❌ COMPREHENSIVE RESTART FLOW TEST FAILED - AUTHENTICATION BARRIER CONFIRMED: Attempted comprehensive restart flow testing using debug panel (/debug). FINDINGS: 1) Debug panel accessible with 'Restart Today's Match' and 'Go to Dashboard' buttons. 2) Backend logs show DELETE /api/matches/today returns 401 Unauthorized - debug panel lacks proper authentication. 3) Both restart and dashboard buttons redirect to landing page instead of authenticated areas. 4) Format selector code implementation verified correct (T20⚡, ODI🎯, Test🏆 with proper visual feedback, test IDs, and start match functionality). 5) Dashboard restart button code verified correct (handleChangeFormat function with confirmation dialog and API integration). CRITICAL ISSUE: The restart functionality requires authenticated access but debug panel operations are not authenticated. User-reported restart issues cannot be verified without real Google authentication. The code implementation is correct but authentication flow prevents testing."
 
 metadata:
   created_by: "main_agent"
