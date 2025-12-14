@@ -55,12 +55,12 @@ export const Home = () => {
       emoji: "🏏"
     },
     {
-      icon: Wallet,
-      title: "Wallet",
-      description: "Manage balance & buy runs",
+      icon: Crown,
+      title: "Subscription",
+      description: "Upgrade to Premium",
       color: "from-yellow-500 to-orange-600",
-      path: "/wallet",
-      emoji: "💰"
+      path: "/subscription",
+      emoji: "👑"
     },
     {
       icon: User,
