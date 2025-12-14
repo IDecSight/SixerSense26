@@ -61,16 +61,19 @@ export const Dashboard = () => {
   };
 
   const handleChangeFormat = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to restart today's match? Current progress will be archived."
-    );
+    const message = match 
+      ? `🔄 Restart Match?\n\nCurrent Progress:\n• Runs: ${match.total_runs}/${match.target_score}\n• Wickets: ${match.total_wickets}/10\n• Tasks: ${match.completed_tasks}\n\nThis will archive your current match and let you start fresh with a new format.\n\nContinue?`
+      : "No active match. Select a format to start!";
+    
+    const confirmed = window.confirm(message);
     
     if (!confirmed) return;
     
+    setLoading(true);
     try {
       await apiClient.delete('/matches/today');
-      toast.success('Match restarted! 🔄', {
-        description: 'Select a new format to begin fresh'
+      toast.success('Match Restarted Successfully! 🎉', {
+        description: 'Choose your format and start fresh'
       });
       setMatch(null);
       setShowFormatSelector(true);
@@ -78,10 +81,17 @@ export const Dashboard = () => {
       console.error('Error restarting match:', error);
       if (error.response?.status === 404) {
         // No match exists, just show format selector
+        toast.info('Ready to start!', {
+          description: 'Select your format to begin'
+        });
         setShowFormatSelector(true);
       } else {
-        toast.error('Failed to restart match');
+        toast.error('Failed to restart match', {
+          description: 'Please try again'
+        });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
