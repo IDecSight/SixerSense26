@@ -774,6 +774,15 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
     if task_doc["status"] == "completed":
         return {"message": "Task already completed"}
     
+    # Check if the match is still active
+    match_doc = await db.matches.find_one({"match_id": task_doc["match_id"]})
+    
+    if not match_doc:
+        raise HTTPException(status_code=404, detail="Match not found")
+    
+    if match_doc["status"] != "in_progress":
+        raise HTTPException(status_code=400, detail="Cannot complete task - match is not active. Please restart the match.")
+    
     # Update task
     await db.tasks.update_one(
         {"task_id": task_id},
@@ -784,9 +793,6 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
             }
         }
     )
-    
-    # Update match
-    match_doc = await db.matches.find_one({"match_id": task_doc["match_id"]})
     
     # Calculate new totals
     balls_consumed = task_doc.get("balls_consumed", 1)
