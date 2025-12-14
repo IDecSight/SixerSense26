@@ -107,7 +107,9 @@ class Task(BaseModel):
     estimated_minutes: Optional[int] = None
     balls_consumed: int = 1  # Number of balls this task consumes (1-6)
     status: str = "pending"  # pending, in_progress, completed, dismissed
-    completed_at: Optional[datetime] = None
+    started_at: Optional[datetime] = None  # When task was started
+    completed_at: Optional[datetime] = None  # When task was completed
+    scheduled_start: Optional[datetime] = None  # Calculated start time based on previous tasks
     created_at: datetime
 
 class Transaction(BaseModel):
