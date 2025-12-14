@@ -756,9 +756,12 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
     # Update match
     match_doc = await db.matches.find_one({"match_id": task_doc["match_id"]})
     
+    # Calculate new totals
+    balls_consumed = task_doc.get("balls_consumed", 1)
     new_runs = match_doc["total_runs"] + task_doc["run_value"]
     new_completed = match_doc["completed_tasks"] + 1
-    new_overs = new_completed / 6
+    new_balls_played = match_doc.get("balls_played", 0) + balls_consumed
+    new_overs = new_balls_played / 6.0
     
     # Check if match is won
     status = match_doc["status"]
