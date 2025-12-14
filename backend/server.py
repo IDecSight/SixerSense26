@@ -767,30 +767,48 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
     estimated_minutes = task.estimated_minutes or 15  # Default 15 min
     balls_consumed = calculate_balls_for_task(estimated_minutes)
     
-    # Calculate scheduled start time based on last task (sequential timing)
+    # Calculate scheduled start time based on profile day_start_time and last task
+    user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+    profile = user_doc.get("profile", {}) if user_doc else {}
+    day_start_time_str = profile.get("day_start_time", "06:00")
+    
+    # Parse day_start_time
+    day_start_hour, day_start_minute = map(int, day_start_time_str.split(":"))
+    
+    current_time = datetime.now(timezone.utc)
+    today = current_time.date()
+    
+    # Get day start datetime
+    day_start_dt = datetime.combine(today, datetime.min.time().replace(
+        hour=day_start_hour, minute=day_start_minute
+    ))
+    day_start_dt = day_start_dt.replace(tzinfo=timezone.utc)
+    
+    # Find last task
     last_task = await db.tasks.find_one(
         {"match_id": match_doc["match_id"]},
         sort=[("completed_at", -1), ("started_at", -1), ("created_at", -1)]
     )
     
-    current_time = datetime.now(timezone.utc)
     scheduled_start = None
     
     if last_task:
-        # If last task is completed, schedule this task to start now
+        # If last task is completed, schedule with 5-min buffer
         if last_task.get("completed_at"):
-            scheduled_start = current_time
+            scheduled_start = max(last_task["completed_at"] + timedelta(minutes=5), current_time)
         # If last task is in progress, schedule after its estimated completion
         elif last_task.get("started_at"):
             last_task_duration = last_task.get("estimated_minutes", 15)
-            scheduled_start = last_task["started_at"] + timedelta(minutes=last_task_duration)
-        # If last task is pending with scheduled start, chain after it
+            scheduled_start = last_task["started_at"] + timedelta(minutes=last_task_duration + 5)
+        # If last task is pending with scheduled end, chain after it
+        elif last_task.get("scheduled_end"):
+            scheduled_start = last_task["scheduled_end"] + timedelta(minutes=5)
         elif last_task.get("scheduled_start"):
             last_task_duration = last_task.get("estimated_minutes", 15)
-            scheduled_start = last_task["scheduled_start"] + timedelta(minutes=last_task_duration)
+            scheduled_start = last_task["scheduled_start"] + timedelta(minutes=last_task_duration + 5)
     else:
-        # First task starts immediately
-        scheduled_start = current_time
+        # First task starts at user's day_start_time (if future) or now
+        scheduled_start = max(day_start_dt, current_time)
     
     task_id = f"task_{uuid.uuid4().hex[:12]}"
     task_doc = {
