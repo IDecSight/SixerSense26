@@ -128,6 +128,7 @@ class Task(BaseModel):
     started_at: Optional[datetime] = None  # When task was started
     completed_at: Optional[datetime] = None  # When task was completed
     scheduled_start: Optional[datetime] = None  # Calculated start time based on previous tasks
+    scheduled_end: Optional[datetime] = None  # Calculated end time
     created_at: datetime
 
 class Transaction(BaseModel):
