@@ -863,10 +863,6 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
         }
     )
     
-    # DYNAMIC TIMELINE: Reschedule all remaining pending tasks
-    # This ensures timeline updates in real-time based on completion
-    await reschedule_pending_tasks(task_doc["match_id"], current_user)
-    
     # Calculate new totals
     balls_consumed = task_doc.get("balls_consumed", 1)
     new_runs = match_doc["total_runs"] + task_doc["run_value"]
