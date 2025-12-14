@@ -732,12 +732,16 @@ async def update_match_format(req: UpdateFormatRequest, current_user: str = Depe
 @api_router.post("/tasks")
 async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_current_user)):
     """Create a new task"""
-    # Get today's match
+    # Get today's active match (exclude abandoned matches)
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    match_doc = await db.matches.find_one({"user_id": current_user, "date": today})
+    match_doc = await db.matches.find_one({
+        "user_id": current_user, 
+        "date": today,
+        "status": "in_progress"
+    })
     
     if not match_doc:
-        raise HTTPException(status_code=404, detail="No active match found")
+        raise HTTPException(status_code=404, detail="No active match found. Please start a match first.")
     
     # Calculate balls consumed for this task
     estimated_minutes = task.estimated_minutes or 15  # Default 15 min
