@@ -828,6 +828,77 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
     
     if not match_doc:
         raise HTTPException(status_code=404, detail="Match not found")
+
+
+async def reschedule_pending_tasks(match_id: str, user_id: str):
+    """
+    Reschedule all pending tasks based on completed tasks and current time.
+    Called after each task completion to update the timeline dynamically.
+    """
+    # Get user profile for day_start_time
+    user_doc = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    profile = user_doc.get("profile", {}) if user_doc else {}
+    day_start_time_str = profile.get("day_start_time", "06:00")
+    
+    # Parse day_start_time
+    day_start_hour, day_start_minute = map(int, day_start_time_str.split(":"))
+    
+    # Get current time
+    now = datetime.now(timezone.utc)
+    today = now.date()
+    
+    # Get all tasks for this match, sorted by creation order
+    all_tasks = await db.tasks.find(
+        {"match_id": match_id, "user_id": user_id},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(None)
+    
+    # Find the last completed or in-progress task
+    last_task_end_time = None
+    for task in all_tasks:
+        if task["status"] == "completed" and task.get("completed_at"):
+            task_end = task["completed_at"]
+            if not last_task_end_time or task_end > last_task_end_time:
+                last_task_end_time = task_end
+        elif task["status"] == "in_progress" and task.get("started_at"):
+            # Estimate end time for in-progress task
+            duration = task.get("estimated_minutes", 15)
+            estimated_end = task["started_at"] + timedelta(minutes=duration)
+            if not last_task_end_time or estimated_end > last_task_end_time:
+                last_task_end_time = estimated_end
+    
+    # Determine next task start time
+    if last_task_end_time:
+        # Start next task after last completed task, with 5-min buffer
+        next_start = max(last_task_end_time + timedelta(minutes=5), now)
+    else:
+        # No completed tasks yet - use day_start_time if we're before it, otherwise now
+        day_start_dt = datetime.combine(today, datetime.min.time().replace(
+            hour=day_start_hour, minute=day_start_minute
+        ))
+        day_start_dt = day_start_dt.replace(tzinfo=timezone.utc)
+        next_start = max(day_start_dt, now)
+    
+    # Reschedule all pending tasks sequentially
+    current_schedule_time = next_start
+    for task in all_tasks:
+        if task["status"] == "pending":
+            # Schedule this task
+            duration = task.get("estimated_minutes", 15)
+            
+            await db.tasks.update_one(
+                {"task_id": task["task_id"]},
+                {
+                    "$set": {
+                        "scheduled_start": current_schedule_time,
+                        "scheduled_end": current_schedule_time + timedelta(minutes=duration)
+                    }
+                }
+            )
+            
+            # Next task starts after this one (with 5-min buffer)
+            current_schedule_time = current_schedule_time + timedelta(minutes=duration + 5)
+
     
     if match_doc["status"] != "in_progress":
         raise HTTPException(status_code=400, detail="Cannot complete task - match is not active. Please restart the match.")
