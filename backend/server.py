@@ -592,31 +592,25 @@ async def start_today_match(
     current_user: str = Depends(get_current_user)
 ):
     """Start today's match with selected format"""
-    try:
-        body = await request.json()
-        match_format = body.get("format", "T20")
-        
-        logging.info(f"Starting match for user {current_user} with format: {match_format}")
-        
-        # Validate format
-        if match_format not in ["T20", "ODI", "Test"]:
-            logging.error(f"Invalid match format: {match_format}")
-            raise HTTPException(status_code=400, detail="Invalid match format")
-        
-        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        
-        # Check if active match already exists (exclude abandoned matches)
-        existing_match = await db.matches.find_one(
-            {"user_id": current_user, "date": today, "status": "in_progress"}
-        )
-        if existing_match:
-            logging.error(f"Active match already exists for user {current_user} on {today}")
-            raise HTTPException(status_code=400, detail="Match already exists for today")
-    except HTTPException:
-        raise
-    except Exception as e:
-        logging.error(f"Error in start_today_match: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    body = await request.json()
+    match_format = body.get("format", "T20")
+    
+    print(f"[DEBUG] Starting match for user {current_user[:8]}... with format: {match_format}")
+    
+    # Validate format
+    if match_format not in ["T20", "ODI", "Test"]:
+        print(f"[DEBUG] Invalid match format: {match_format}")
+        raise HTTPException(status_code=400, detail=f"Invalid match format: {match_format}")
+    
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Check if active match already exists (exclude abandoned matches)
+    existing_match = await db.matches.find_one(
+        {"user_id": current_user, "date": today, "status": "in_progress"}
+    )
+    if existing_match:
+        print(f"[DEBUG] Active match already exists for user on {today}")
+        raise HTTPException(status_code=400, detail="Active match already exists for today")
     
     # Get user's next target
     user_data = await db.users.find_one({"user_id": current_user})
