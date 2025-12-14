@@ -244,10 +244,8 @@ export const TaskTimeline = ({ tasks = [], match }) => {
               )}
             </div>
           ))}
-        </div>
 
-        {/* Summary at bottom */}
-        {tasks.length > 0 && (
+          {/* Summary at bottom */}
           <div className="mt-6 pt-6 border-t border-white/20">
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-3 rounded-lg bg-green-500/10 border border-green-300/30">
@@ -264,7 +262,6 @@ export const TaskTimeline = ({ tasks = [], match }) => {
               </div>
             </div>
           </div>
-        )}
         </div>
         )}
       </CardContent>
