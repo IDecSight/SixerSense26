@@ -7,7 +7,7 @@ import AuthCallback from './pages/AuthCallback';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import MatchHistory from './pages/MatchHistory';
-import Subscription from './pages/Subscription';
+import { Subscription } from './pages/Subscription';
 import Settings from './pages/Settings';
 import DebugPanel from './pages/DebugPanel';
 import './App.css';
