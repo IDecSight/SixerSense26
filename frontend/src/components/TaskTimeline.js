@@ -55,12 +55,30 @@ export const TaskTimeline = ({ tasks, match }) => {
   }, [tasks]);
 
   const getTaskTime = (task) => {
-    const time = task.completed_at || task.created_at || new Date();
-    return new Date(time).toLocaleTimeString('en-US', { 
+    let time;
+    let prefix = '';
+    
+    if (task.status === 'completed' && task.completed_at) {
+      time = task.completed_at;
+      prefix = '✓ ';
+    } else if (task.started_at) {
+      time = task.started_at;
+      prefix = '▶ ';
+    } else if (task.scheduled_start) {
+      time = task.scheduled_start;
+      prefix = '⏰ ';
+    } else {
+      time = task.created_at;
+      prefix = '';
+    }
+    
+    const timeStr = new Date(time).toLocaleTimeString('en-US', { 
       hour: 'numeric', 
       minute: '2-digit',
       hour12: true 
     });
+    
+    return prefix + timeStr;
   };
 
   const getStatusColor = (status) => {
