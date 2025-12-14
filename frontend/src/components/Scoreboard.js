@@ -25,22 +25,17 @@ export const Scoreboard = ({ match, onChangeFormat }) => {
                 {match.format} Format
               </h2>
             </div>
-            {onChangeFormat && (
-              <div className="flex gap-2">
-                {canRestart && (
-                  <Button
-                    onClick={onChangeFormat}
-                    size="sm"
-                    variant="ghost"
-                    className="text-yellow-300 hover:text-yellow-200 hover:bg-yellow-500/10 text-xs border border-yellow-400/30"
-                    title="Restart match with new format"
-                    data-testid="restart-match-btn"
-                  >
-                    <RefreshCw className="w-3 h-3 mr-1" />
-                    Restart Match
-                  </Button>
-                )}
-              </div>
+            {onChangeFormat && canRestart && (
+              <Button
+                onClick={onChangeFormat}
+                size="sm"
+                className="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 hover:text-yellow-100 text-xs border border-yellow-400/40 font-heading font-semibold"
+                title="Restart match - Start fresh with new format"
+                data-testid="restart-match-btn"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Restart Match
+              </Button>
             )}
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-md bg-green-500/20 border-2 border-green-300/40">
