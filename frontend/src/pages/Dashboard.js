@@ -46,7 +46,9 @@ export const Dashboard = () => {
   const handleStartMatch = async (format) => {
     setStartingMatch(true);
     try {
+      console.log('Starting match with format:', format);
       const response = await apiClient.post('/matches/start', { format });
+      console.log('Match started successfully:', response.data);
       setMatch(response.data);
       setShowFormatSelector(false);
       toast.success(`${format} match started!`, {
@@ -54,7 +56,11 @@ export const Dashboard = () => {
       });
     } catch (error) {
       console.error('Error starting match:', error);
-      toast.error('Failed to start match');
+      console.error('Error response:', error.response?.data);
+      const errorMsg = error.response?.data?.detail || error.message || 'Unknown error';
+      toast.error('Failed to start match', {
+        description: errorMsg
+      });
     } finally {
       setStartingMatch(false);
     }
