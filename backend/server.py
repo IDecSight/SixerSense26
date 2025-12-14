@@ -601,9 +601,9 @@ async def start_today_match(
     
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
-    # Check if match already exists
+    # Check if active match already exists (exclude abandoned matches)
     existing_match = await db.matches.find_one(
-        {"user_id": current_user, "date": today}
+        {"user_id": current_user, "date": today, "status": "in_progress"}
     )
     if existing_match:
         raise HTTPException(status_code=400, detail="Match already exists for today")
