@@ -73,17 +73,21 @@ export const TaskTimeline = ({ tasks = [], match }) => {
       time = task.scheduled_start;
       prefix = '⏰ ';
     } else {
-      time = task.created_at;
+      time = task.created_at || new Date();
       prefix = '';
     }
     
-    const timeStr = new Date(time).toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
-    
-    return prefix + timeStr;
+    try {
+      const timeStr = new Date(time).toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+      return prefix + timeStr;
+    } catch (error) {
+      console.error('Error formatting task time:', error, task);
+      return 'Time N/A';
+    }
   };
 
   const getStatusColor = (status) => {
