@@ -1348,6 +1348,214 @@ async def upgrade_to_premium(current_user: str = Depends(get_current_user)):
     await db.transactions.insert_one(transaction)
     
     return {
+
+
+# ==================== RAZORPAY PAYMENT ROUTES ====================
+
+class CreateOrderRequest(BaseModel):
+    plan: str  # "monthly" or "yearly"
+    
+class VerifyPaymentRequest(BaseModel):
+    razorpay_order_id: str
+    razorpay_payment_id: str
+    razorpay_signature: str
+    plan: str
+
+@api_router.post("/payment/create-order")
+async def create_payment_order(
+    request: CreateOrderRequest,
+    current_user: str = Depends(get_current_user)
+):
+    """Create Razorpay order for subscription"""
+    if not razorpay_client:
+        raise HTTPException(
+            status_code=503, 
+            detail="Payment service not configured. Please contact support."
+        )
+    
+    # Define plan amounts (in paise - multiply by 100)
+    plan_amounts = {
+        "monthly": 9900,  # ₹99
+        "yearly": 69900   # ₹699
+    }
+    
+    if request.plan not in plan_amounts:
+        raise HTTPException(status_code=400, detail="Invalid plan selected")
+    
+    amount = plan_amounts[request.plan]
+    
+    try:
+        # Create Razorpay order
+        order_data = {
+            "amount": amount,
+            "currency": "INR",
+            "receipt": f"sub_{request.plan}_{current_user}_{uuid.uuid4().hex[:8]}",
+            "notes": {
+                "user_id": current_user,
+                "plan": request.plan,
+                "description": f"Sixer Sense {request.plan.capitalize()} Subscription"
+            }
+        }
+        
+        razorpay_order = razorpay_client.order.create(data=order_data)
+        
+        # Store order in database
+        order_doc = {
+            "order_id": razorpay_order["id"],
+            "user_id": current_user,
+            "plan": request.plan,
+            "amount": amount,
+            "currency": "INR",
+            "status": "created",
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.payment_orders.insert_one(order_doc)
+        
+        logging.info(f"Razorpay order created: {razorpay_order['id']} for user {current_user}")
+        
+        return {
+            "order_id": razorpay_order["id"],
+            "amount": amount,
+            "currency": "INR",
+            "key_id": RAZORPAY_KEY_ID,
+            "plan": request.plan
+        }
+        
+    except Exception as e:
+        logging.error(f"Error creating Razorpay order: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create payment order")
+
+@api_router.post("/payment/verify")
+async def verify_payment(
+    request: VerifyPaymentRequest,
+    current_user: str = Depends(get_current_user)
+):
+    """Verify Razorpay payment and activate premium subscription"""
+    if not razorpay_client:
+        raise HTTPException(status_code=503, detail="Payment service not configured")
+    
+    try:
+        # Verify payment signature
+        params_dict = {
+            'razorpay_order_id': request.razorpay_order_id,
+            'razorpay_payment_id': request.razorpay_payment_id,
+            'razorpay_signature': request.razorpay_signature
+        }
+        
+        razorpay_client.utility.verify_payment_signature(params_dict)
+        
+        # Payment verified successfully - Update user to premium
+        subscription_duration = 30 if request.plan == "monthly" else 365  # days
+        premium_expires_at = datetime.now(timezone.utc) + timedelta(days=subscription_duration)
+        
+        await db.users.update_one(
+            {"user_id": current_user},
+            {
+                "$set": {
+                    "is_premium": True,
+                    "premium_plan": request.plan,
+                    "premium_since": datetime.now(timezone.utc),
+                    "premium_expires_at": premium_expires_at,
+                    "wallet_balance": 100.0  # Welcome bonus
+                }
+            }
+        )
+        
+        # Update order status
+        await db.payment_orders.update_one(
+            {"order_id": request.razorpay_order_id},
+            {
+                "$set": {
+                    "payment_id": request.razorpay_payment_id,
+                    "status": "paid",
+                    "paid_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        # Create transaction record
+        transaction = {
+            "transaction_id": f"txn_{uuid.uuid4().hex[:12]}",
+            "user_id": current_user,
+            "type": "subscription",
+            "amount": 9900 if request.plan == "monthly" else 69900,
+            "currency": "INR",
+            "plan": request.plan,
+            "payment_id": request.razorpay_payment_id,
+            "order_id": request.razorpay_order_id,
+            "status": "success",
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.transactions.insert_one(transaction)
+        
+        logging.info(f"Payment verified and premium activated for user {current_user}")
+        
+        return {
+            "success": True,
+            "message": "Payment successful! Welcome to Premium 🎉",
+            "plan": request.plan,
+            "expires_at": premium_expires_at.isoformat()
+        }
+        
+    except razorpay.errors.SignatureVerificationError:
+        logging.error(f"Payment signature verification failed for user {current_user}")
+        raise HTTPException(status_code=400, detail="Invalid payment signature")
+    except Exception as e:
+        logging.error(f"Error verifying payment: {str(e)}")
+        raise HTTPException(status_code=500, detail="Payment verification failed")
+
+@api_router.post("/payment/webhook")
+async def handle_payment_webhook(request: Request):
+    """Handle Razorpay webhook events"""
+    if not RAZORPAY_WEBHOOK_SECRET:
+        logging.warning("Webhook received but RAZORPAY_WEBHOOK_SECRET not configured")
+        return {"status": "ignored"}
+    
+    try:
+        # Get webhook signature
+        webhook_signature = request.headers.get('X-Razorpay-Signature', '')
+        webhook_body = await request.body()
+        
+        # Verify webhook signature
+        expected_signature = hmac.new(
+            RAZORPAY_WEBHOOK_SECRET.encode('utf-8'),
+            webhook_body,
+            hashlib.sha256
+        ).hexdigest()
+        
+        if webhook_signature != expected_signature:
+            logging.error("Invalid webhook signature")
+            raise HTTPException(status_code=400, detail="Invalid signature")
+        
+        # Parse webhook data
+        import json
+        webhook_data = json.loads(webhook_body.decode('utf-8'))
+        event = webhook_data.get('event')
+        
+        logging.info(f"Webhook received: {event}")
+        
+        # Handle different webhook events
+        if event == 'payment.captured':
+            payment = webhook_data['payload']['payment']['entity']
+            order_id = payment.get('order_id')
+            
+            # Update order status in database
+            await db.payment_orders.update_one(
+                {"order_id": order_id},
+                {
+                    "$set": {
+                        "webhook_status": "captured",
+                        "webhook_received_at": datetime.now(timezone.utc)
+                    }
+                }
+            )
+            
+        return {"status": "processed"}
+        
+    except Exception as e:
+        logging.error(f"Webhook processing error: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
         "message": "Successfully upgraded to Premium!",
         "is_premium": True,
         "welcome_bonus": welcome_bonus,
