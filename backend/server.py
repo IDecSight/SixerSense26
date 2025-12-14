@@ -1560,12 +1560,6 @@ async def handle_payment_webhook(request: Request):
         logging.error(f"Webhook processing error: {str(e)}")
         return {"status": "error", "message": str(e)}
 
-        "message": "Successfully upgraded to Premium!",
-        "is_premium": True,
-        "welcome_bonus": welcome_bonus,
-        "new_balance": new_balance
-    }
-
 @api_router.delete("/matches/today")
 async def delete_today_match(current_user: str = Depends(get_current_user)):
     """Delete today's match to restart fresh - can be done anytime"""
