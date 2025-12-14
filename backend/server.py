@@ -824,6 +824,7 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
         "started_at": None,
         "completed_at": None,
         "scheduled_start": scheduled_start,
+        "scheduled_end": scheduled_start + timedelta(minutes=estimated_minutes) if scheduled_start else None,
         "created_at": current_time
     }
     
