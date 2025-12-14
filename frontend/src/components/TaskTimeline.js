@@ -133,7 +133,14 @@ export const TaskTimeline = ({ tasks = [], match }) => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
+        {tasks.length === 0 ? (
+          <div className="text-center py-12">
+            <Clock className="w-16 h-16 mx-auto text-white/30 mb-4" />
+            <p className="text-white/60 font-body text-lg">No tasks yet</p>
+            <p className="text-white/40 font-body text-sm mt-2">Add tasks to see your timeline</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
           {timeSlots.map((slot, slotIndex) => (
             <div key={slot.name} className="relative">
               {/* Time Slot Header */}
@@ -257,6 +264,8 @@ export const TaskTimeline = ({ tasks = [], match }) => {
               </div>
             </div>
           </div>
+        )}
+        </div>
         )}
       </CardContent>
     </Card>
