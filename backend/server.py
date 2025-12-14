@@ -1299,16 +1299,20 @@ async def delete_today_match(current_user: str = Depends(get_current_user)):
     
     logging.warning(f"[MATCH DELETE] Updated {result.modified_count} matches to abandoned")
     
-    # Mark all tasks as dismissed for ALL today's matches
-    for match in matches:
-        await db.tasks.update_many(
-            {"match_id": match["match_id"], "status": "pending"},
-            {"$set": {"status": "dismissed"}}
-        )
+    # Mark ALL tasks (pending, in_progress, completed) from today's matches as dismissed
+    # This ensures a completely fresh start
+    task_result = await db.tasks.update_many(
+        {"user_id": current_user, "match_id": {"$in": [m["match_id"] for m in matches]}},
+        {"$set": {"status": "dismissed", "dismissed_at": datetime.now(timezone.utc)}}
+    )
+    
+    logging.warning(f"[MATCH DELETE] Dismissed {task_result.modified_count} tasks from abandoned matches")
     
     return {
         "message": "Match restarted successfully. Select a new format to begin fresh!",
-        "can_restart": True
+        "can_restart": True,
+        "matches_abandoned": result.modified_count,
+        "tasks_dismissed": task_result.modified_count
     }
 
 @api_router.get("/users/location")
