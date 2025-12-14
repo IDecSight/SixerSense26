@@ -299,10 +299,8 @@ export const Dashboard = () => {
           <div className="lg:col-span-2 space-y-6">
             <Scoreboard match={match} onChangeFormat={handleChangeFormat} />
             
-            {/* Timeline View */}
-            {match.tasks && match.tasks.length > 0 && (
-              <TaskTimeline tasks={match.tasks} match={match} />
-            )}
+            {/* Timeline View - Always show */}
+            <TaskTimeline tasks={match.tasks || []} match={match} />
             
             {/* Tasks Section */}
             <div className="space-y-4">
