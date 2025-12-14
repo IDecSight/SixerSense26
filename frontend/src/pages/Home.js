@@ -216,7 +216,7 @@ export const Home = () => {
         </Card>
 
         {/* CTA */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-8 space-y-3">
           <Button
             onClick={() => navigate('/dashboard')}
             size="lg"
@@ -225,6 +225,31 @@ export const Home = () => {
             <Trophy className="w-5 h-5 mr-2" />
             {hasMatchToday ? "Continue Today's Match" : "Start Today's Match"}
           </Button>
+          
+          {hasMatchToday && (
+            <div>
+              <Button
+                onClick={async () => {
+                  const confirmed = window.confirm("Restart today's match? Current progress will be archived.");
+                  if (confirmed) {
+                    try {
+                      await apiClient.delete('/matches/today');
+                      toast.success('Match restarted!', { description: 'Navigate to dashboard to select format' });
+                      navigate('/dashboard');
+                    } catch (error) {
+                      toast.error('Failed to restart match');
+                    }
+                  }
+                }}
+                variant="outline"
+                size="sm"
+                className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-body"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Or Restart Match
+              </Button>
+            </div>
+          )}
         </div>
       </main>
     </div>
