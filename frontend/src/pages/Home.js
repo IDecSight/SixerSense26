@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Trophy, Wallet, User, History, Target, LogOut, Zap, Crown } from 'lucide-react';
+import { Trophy, Wallet, User, History, Target, LogOut, Zap, Crown, RefreshCw } from 'lucide-react';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
