@@ -578,9 +578,9 @@ async def get_today_match(current_user: str = Depends(get_current_user)):
     match_doc["current_time_block"] = time_block_info["time_block"]
     match_doc["available_overs"] = time_block_info["available_overs"]
     
-    # Get tasks for this match
+    # Get tasks for this match (exclude dismissed tasks for clean display)
     tasks = await db.tasks.find(
-        {"match_id": match_doc["match_id"]},
+        {"match_id": match_doc["match_id"], "status": {"$ne": "dismissed"}},
         {"_id": 0}
     ).sort("created_at", 1).to_list(None)
     
@@ -694,9 +694,9 @@ async def start_today_match(
             }
             await db.tasks.insert_one(task_doc)
     
-    # Get tasks for this match
+    # Get tasks for this match (exclude dismissed tasks for clean display)
     tasks = await db.tasks.find(
-        {"match_id": match_doc["match_id"]},
+        {"match_id": match_doc["match_id"], "status": {"$ne": "dismissed"}},
         {"_id": 0}
     ).sort("created_at", 1).to_list(None)
     
