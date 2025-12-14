@@ -1348,7 +1348,11 @@ async def upgrade_to_premium(current_user: str = Depends(get_current_user)):
     await db.transactions.insert_one(transaction)
     
     return {
-
+        "message": "Successfully upgraded to Premium!",
+        "is_premium": True,
+        "welcome_bonus": welcome_bonus,
+        "new_balance": new_balance
+    }
 
 # ==================== RAZORPAY PAYMENT ROUTES ====================
 
