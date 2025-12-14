@@ -102,12 +102,27 @@ export const PremiumUpgradeModal = ({ open, onClose, onUpgrade, loading }) => {
           </div>
 
           {/* Pricing */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
-            <p className="text-sm font-body text-white/80 mb-2">One-Time Upgrade</p>
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="text-4xl font-heading font-bold text-white drop-shadow-lg">FREE</span>
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 space-y-3">
+            <div className="text-center pb-3 border-b border-white/20">
+              <p className="text-sm font-body text-white/80 mb-2">Choose Your Plan</p>
             </div>
-            <p className="text-xs text-green-200 font-body">Limited time offer • Lifetime access</p>
+            
+            <div className="flex gap-3">
+              <div className="flex-1 bg-white/5 rounded-lg p-4 border border-white/20 text-center">
+                <p className="text-xs text-white/60 mb-1">Monthly</p>
+                <p className="text-3xl font-heading font-bold text-white">₹99</p>
+                <p className="text-xs text-white/60 mt-1">per month</p>
+              </div>
+              
+              <div className="flex-1 bg-gradient-to-br from-yellow-400/20 to-green-400/20 rounded-lg p-4 border-2 border-yellow-200/40 text-center relative">
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-green-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  SAVE 41%
+                </div>
+                <p className="text-xs text-white/80 mb-1">Yearly</p>
+                <p className="text-3xl font-heading font-bold text-white">₹699</p>
+                <p className="text-xs text-green-200 mt-1">₹58/month</p>
+              </div>
+            </div>
           </div>
 
           {/* CTA Buttons */}
@@ -142,7 +157,7 @@ export const PremiumUpgradeModal = ({ open, onClose, onUpgrade, loading }) => {
 
           {/* Footer Note */}
           <p className="text-xs text-center text-white/60 font-body">
-            No payment required • Instant activation • Cancel anytime
+            Secure payment via DodoPayments • Cancel anytime
           </p>
         </CardContent>
         </Card>
