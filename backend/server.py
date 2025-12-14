@@ -789,16 +789,40 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
     if match_doc["status"] != "in_progress":
         raise HTTPException(status_code=400, detail="Cannot complete task - match is not active. Please restart the match.")
     
-    # Update task
+    # Update task with completion time
+    completion_time = datetime.now(timezone.utc)
     await db.tasks.update_one(
         {"task_id": task_id},
         {
             "$set": {
                 "status": "completed",
-                "completed_at": datetime.now(timezone.utc)
+                "completed_at": completion_time,
+                "started_at": task_doc.get("started_at") or completion_time  # Set start if not set
             }
         }
     )
+    
+    # Calculate scheduled start time for next pending task
+    # Next task should start after this task's estimated duration
+    if task_doc.get("estimated_minutes"):
+        next_task_start = completion_time
+        
+        # Find next pending task and update its scheduled start
+        next_task = await db.tasks.find_one({
+            "match_id": task_doc["match_id"],
+            "status": "pending"
+        }, sort=[("created_at", 1)])
+        
+        if next_task:
+            await db.tasks.update_one(
+                {"task_id": next_task["task_id"]},
+                {
+                    "$set": {
+                        "scheduled_start": next_task_start,
+                        "started_at": next_task_start  # Auto-start next task
+                    }
+                }
+            )
     
     # Calculate new totals
     balls_consumed = task_doc.get("balls_consumed", 1)
