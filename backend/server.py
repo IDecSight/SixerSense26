@@ -526,6 +526,7 @@ async def get_profile(current_user: str = Depends(get_current_user)):
 @api_router.get("/matches/today")
 async def get_today_match(current_user: str = Depends(get_current_user)):
     """Get today's match - auto-creates fresh match for new day"""
+    print(f"[DEBUG TEST] GET /matches/today called for user {current_user[:8]}")
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     current_datetime = datetime.now(timezone.utc)
     
