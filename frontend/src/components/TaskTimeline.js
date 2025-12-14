@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Clock, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 
-export const TaskTimeline = ({ tasks, match }) => {
+export const TaskTimeline = ({ tasks = [], match }) => {
   // Organize tasks by time periods based on actual timing
   const timeSlots = useMemo(() => {
     const now = new Date();
@@ -15,6 +15,11 @@ export const TaskTimeline = ({ tasks, match }) => {
       { name: 'Evening', range: '5 PM - 9 PM', hours: [17, 18, 19, 20], icon: '🌆', tasks: [] },
       { name: 'Night', range: '9 PM - 12 AM', hours: [21, 22, 23], icon: '🌙', tasks: [] }
     ];
+    
+    // Safety check for tasks array
+    if (!tasks || tasks.length === 0) {
+      return slots;
+    }
 
     // Sort tasks by their actual/scheduled start time (sequential order)
     const sortedTasks = [...tasks].sort((a, b) => {
