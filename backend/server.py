@@ -73,8 +73,6 @@ class UserProfile(BaseModel):
     life_stage: str = "Working Professional"  # Student, Working Professional, Entrepreneur
     daily_availability: str = "Medium"  # Low, Medium, High
     preferred_focus_areas: List[str] = ["Career", "Health"]  # 2-3 from six categories
-    day_start_time: str = "06:00"  # User's day start time (HH:MM format, 24-hour)
-    sleep_time: str = "23:00"  # User's sleep time (HH:MM format, 24-hour)
 
 class User(BaseModel):
     user_id: str
@@ -128,7 +126,6 @@ class Task(BaseModel):
     started_at: Optional[datetime] = None  # When task was started
     completed_at: Optional[datetime] = None  # When task was completed
     scheduled_start: Optional[datetime] = None  # Calculated start time based on previous tasks
-    scheduled_end: Optional[datetime] = None  # Calculated end time
     created_at: datetime
 
 class Transaction(BaseModel):
