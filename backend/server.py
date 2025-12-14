@@ -799,7 +799,12 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
     new_runs = match_doc["total_runs"] + task_doc["run_value"]
     new_completed = match_doc["completed_tasks"] + 1
     new_balls_played = match_doc.get("balls_played", 0) + balls_consumed
-    new_overs = new_balls_played / 6.0
+    
+    # Calculate overs in cricket notation (overs.balls format)
+    # Example: 7 balls = 1.1 overs (1 over + 1 ball), not 1.166...
+    complete_overs = new_balls_played // 6
+    remaining_balls = new_balls_played % 6
+    new_overs = complete_overs + (remaining_balls / 10.0)
     
     # Check if match is won
     status = match_doc["status"]
