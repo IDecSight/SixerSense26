@@ -4,7 +4,7 @@ import { Clock, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export const TaskTimeline = ({ tasks, match }) => {
-  // Organize tasks by time periods
+  // Organize tasks by time periods based on actual timing
   const timeSlots = useMemo(() => {
     const now = new Date();
     const currentHour = now.getHours();
@@ -16,16 +16,28 @@ export const TaskTimeline = ({ tasks, match }) => {
       { name: 'Night', range: '9 PM - 12 AM', hours: [21, 22, 23], icon: '🌙', tasks: [] }
     ];
 
-    // Sort tasks by creation time or estimated completion
+    // Sort tasks by their actual/scheduled start time (sequential order)
     const sortedTasks = [...tasks].sort((a, b) => {
-      const timeA = a.completed_at || a.created_at || new Date();
-      const timeB = b.completed_at || b.created_at || new Date();
+      // Priority: completed_at > started_at > scheduled_start > created_at
+      const timeA = a.completed_at || a.started_at || a.scheduled_start || a.created_at || new Date();
+      const timeB = b.completed_at || b.started_at || b.scheduled_start || b.created_at || new Date();
       return new Date(timeA) - new Date(timeB);
     });
 
-    // Distribute tasks across time slots
+    // Distribute tasks across time slots based on their timing
     sortedTasks.forEach((task, index) => {
-      const taskTime = task.completed_at || task.created_at || new Date();
+      // Use the most relevant time for placing the task
+      let taskTime;
+      if (task.status === 'completed' && task.completed_at) {
+        taskTime = task.completed_at; // Completed tasks use completion time
+      } else if (task.started_at) {
+        taskTime = task.started_at; // Started tasks use start time
+      } else if (task.scheduled_start) {
+        taskTime = task.scheduled_start; // Pending tasks use scheduled time
+      } else {
+        taskTime = task.created_at; // Fallback to creation time
+      }
+      
       const taskHour = new Date(taskTime).getHours();
       
       // Find appropriate slot
