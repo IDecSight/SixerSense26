@@ -217,20 +217,12 @@ export const Dashboard = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={fetchMatch}
-                title="Refresh Match"
-                className="text-white hover:text-green-400 hover:bg-white/10"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
                 onClick={handleChangeFormat}
-                title="Restart Match"
-                className="text-white hover:text-yellow-400 hover:bg-white/10"
+                title="Restart Match - Start Fresh"
+                className="text-yellow-300 hover:text-yellow-200 hover:bg-yellow-500/10 border border-yellow-400/30"
               >
-                <span className="text-xs font-body">Restart</span>
+                <RefreshCw className="w-4 h-4 mr-1" />
+                <span className="text-xs font-body">Restart Match</span>
               </Button>
               <Button
                 variant="ghost"
