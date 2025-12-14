@@ -918,27 +918,9 @@ async def reschedule_pending_tasks(match_id: str, user_id: str):
         }
     )
     
-    # Calculate scheduled start time for next pending task
-    # Next task should start after this task's estimated duration
-    if task_doc.get("estimated_minutes"):
-        next_task_start = completion_time
-        
-        # Find next pending task and update its scheduled start
-        next_task = await db.tasks.find_one({
-            "match_id": task_doc["match_id"],
-            "status": "pending"
-        }, sort=[("created_at", 1)])
-        
-        if next_task:
-            await db.tasks.update_one(
-                {"task_id": next_task["task_id"]},
-                {
-                    "$set": {
-                        "scheduled_start": next_task_start,
-                        "started_at": next_task_start  # Auto-start next task
-                    }
-                }
-            )
+    # DYNAMIC TIMELINE: Reschedule all remaining pending tasks
+    # This ensures timeline updates in real-time based on completion
+    await reschedule_pending_tasks(task_doc["match_id"], current_user)
     
     # Calculate new totals
     balls_consumed = task_doc.get("balls_consumed", 1)
