@@ -293,12 +293,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Match Format Selection Feature"
-    - "Dashboard Today's Tasks Heading"
-    - "Wallet INR Currency Symbol"
+    - "User-Reported Critical Issues Testing"
   stuck_tasks:
-    - "Dashboard Today's Tasks Heading"
-    - "Wallet INR Currency Symbol"
+    - "User-Reported Critical Issues Testing"
   test_all: false
   test_priority: "high_first"
 
