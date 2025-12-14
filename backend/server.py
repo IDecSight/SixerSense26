@@ -592,25 +592,35 @@ async def start_today_match(
     current_user: str = Depends(get_current_user)
 ):
     """Start today's match with selected format"""
-    body = await request.json()
-    match_format = body.get("format", "T20")
+    print(f"[DEBUG] Endpoint hit - User: {current_user[:8] if current_user else 'None'}")
     
-    print(f"[DEBUG] Starting match for user {current_user[:8]}... with format: {match_format}")
+    try:
+        body = await request.json()
+        print(f"[DEBUG] Request body parsed: {body}")
+    except Exception as e:
+        print(f"[DEBUG] Failed to parse request body: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Invalid JSON in request body: {str(e)}")
+    
+    match_format = body.get("format", "T20")
+    print(f"[DEBUG] Format from body: {match_format}")
     
     # Validate format
     if match_format not in ["T20", "ODI", "Test"]:
-        print(f"[DEBUG] Invalid match format: {match_format}")
-        raise HTTPException(status_code=400, detail=f"Invalid match format: {match_format}")
+        print(f"[DEBUG] Invalid format validation failed: {match_format}")
+        raise HTTPException(status_code=400, detail=f"Invalid match format: {match_format}. Must be T20, ODI, or Test")
     
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    print(f"[DEBUG] Checking for existing match on {today}")
     
     # Check if active match already exists (exclude abandoned matches)
     existing_match = await db.matches.find_one(
         {"user_id": current_user, "date": today, "status": "in_progress"}
     )
     if existing_match:
-        print(f"[DEBUG] Active match already exists for user on {today}")
+        print(f"[DEBUG] Found existing active match: {existing_match.get('match_id')}")
         raise HTTPException(status_code=400, detail="Active match already exists for today")
+    
+    print(f"[DEBUG] No existing match found, proceeding to create new match")
     
     # Get user's next target
     user_data = await db.users.find_one({"user_id": current_user})
