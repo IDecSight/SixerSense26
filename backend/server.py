@@ -749,6 +749,31 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
     estimated_minutes = task.estimated_minutes or 15  # Default 15 min
     balls_consumed = calculate_balls_for_task(estimated_minutes)
     
+    # Calculate scheduled start time based on last task (sequential timing)
+    last_task = await db.tasks.find_one(
+        {"match_id": match_doc["match_id"]},
+        sort=[("completed_at", -1), ("started_at", -1), ("created_at", -1)]
+    )
+    
+    current_time = datetime.now(timezone.utc)
+    scheduled_start = None
+    
+    if last_task:
+        # If last task is completed, schedule this task to start now
+        if last_task.get("completed_at"):
+            scheduled_start = current_time
+        # If last task is in progress, schedule after its estimated completion
+        elif last_task.get("started_at"):
+            last_task_duration = last_task.get("estimated_minutes", 15)
+            scheduled_start = last_task["started_at"] + timedelta(minutes=last_task_duration)
+        # If last task is pending with scheduled start, chain after it
+        elif last_task.get("scheduled_start"):
+            last_task_duration = last_task.get("estimated_minutes", 15)
+            scheduled_start = last_task["scheduled_start"] + timedelta(minutes=last_task_duration)
+    else:
+        # First task starts immediately
+        scheduled_start = current_time
+    
     task_id = f"task_{uuid.uuid4().hex[:12]}"
     task_doc = {
         "task_id": task_id,
@@ -760,8 +785,10 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
         "estimated_minutes": estimated_minutes,
         "balls_consumed": balls_consumed,
         "status": "pending",
+        "started_at": None,
         "completed_at": None,
-        "created_at": datetime.now(timezone.utc)
+        "scheduled_start": scheduled_start,
+        "created_at": current_time
     }
     
     await db.tasks.insert_one(task_doc)
