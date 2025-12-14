@@ -261,12 +261,12 @@ export const Dashboard = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/wallet')}
-                data-testid="wallet-btn"
-                className="text-white hover:text-green-400 hover:bg-white/10"
+                onClick={() => navigate('/subscription')}
+                data-testid="subscription-btn"
+                className="text-white hover:text-yellow-200 hover:bg-white/10"
               >
-                <Wallet className="w-4 h-4 md:mr-2" />
-                <span className="hidden md:inline font-body">Wallet</span>
+                <Crown className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline font-body">Premium</span>
               </Button>
               <Button
                 variant="ghost"
