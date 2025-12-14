@@ -613,6 +613,14 @@ async def start_today_match(
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     logging.warning(f"[MATCH START] Checking existing match for {today}")
     
+    # First check all matches for today
+    all_todays_matches = await db.matches.find(
+        {"user_id": current_user, "date": today}
+    ).to_list(10)
+    logging.warning(f"[MATCH START] Total matches today: {len(all_todays_matches)}")
+    for m in all_todays_matches:
+        logging.warning(f"[MATCH START] - Match {m.get('match_id')}: status={m.get('status')}")
+    
     # Check if active match already exists (exclude abandoned matches)
     existing_match = await db.matches.find_one(
         {"user_id": current_user, "date": today, "status": "in_progress"}
