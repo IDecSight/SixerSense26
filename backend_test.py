@@ -4,6 +4,8 @@ import json
 from datetime import datetime
 import asyncio
 import aiohttp
+import os
+import importlib.util
 
 class SixerSenseAPITester:
     def __init__(self, base_url="https://crickettasks.preview.emergentagent.com"):
@@ -16,6 +18,7 @@ class SixerSenseAPITester:
         self.tests_passed = 0
         self.failed_tests = []
         self.session_id = "test_session_123"  # Mock session for testing
+        self.backend_modules_tested = False
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
