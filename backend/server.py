@@ -15,6 +15,9 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 from collections import defaultdict
 import httpx
+import razorpay
+import hmac
+import hashlib
 from affiliate_products import get_random_product
 from affiliate_products_by_country import (
     get_products_for_country, 
@@ -42,6 +45,19 @@ db = client[os.environ['DB_NAME']]
 SECRET_KEY = os.environ.get('SECRET_KEY')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES', 10080))
+
+# Razorpay Configuration
+RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET")
+RAZORPAY_WEBHOOK_SECRET = os.environ.get("RAZORPAY_WEBHOOK_SECRET")
+
+# Initialize Razorpay client
+razorpay_client = None
+if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET:
+    razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+    logging.info("Razorpay client initialized successfully")
+else:
+    logging.warning("Razorpay credentials not found - payment features will be disabled")
 
 # Create the main app without a prefix
 app = FastAPI(title="Sixer Sense API")
