@@ -1275,25 +1275,30 @@ async def delete_today_match(current_user: str = Depends(get_current_user)):
     """Delete today's match to restart fresh - can be done anytime"""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
-    # Find today's match
-    match_doc = await db.matches.find_one(
+    # Find ALL today's matches (in case there are duplicates)
+    matches = await db.matches.find(
         {"user_id": current_user, "date": today}
-    )
+    ).to_list(100)
     
-    if not match_doc:
+    if not matches:
         raise HTTPException(status_code=404, detail="No match found for today")
     
-    # Archive the match instead of deleting (for history)
-    await db.matches.update_one(
-        {"match_id": match_doc["match_id"]},
+    logging.warning(f"[MATCH DELETE] Found {len(matches)} matches to abandon")
+    
+    # Archive ALL matches for today instead of deleting (for history)
+    result = await db.matches.update_many(
+        {"user_id": current_user, "date": today},
         {"$set": {"status": "abandoned", "abandoned_at": datetime.now(timezone.utc)}}
     )
     
-    # Mark all tasks as dismissed
-    await db.tasks.update_many(
-        {"match_id": match_doc["match_id"], "status": "pending"},
-        {"$set": {"status": "dismissed"}}
-    )
+    logging.warning(f"[MATCH DELETE] Updated {result.modified_count} matches to abandoned")
+    
+    # Mark all tasks as dismissed for ALL today's matches
+    for match in matches:
+        await db.tasks.update_many(
+            {"match_id": match["match_id"], "status": "pending"},
+            {"$set": {"status": "dismissed"}}
+        )
     
     return {
         "message": "Match restarted successfully. Select a new format to begin fresh!",
