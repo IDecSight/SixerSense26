@@ -1,52 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, Wallet as WalletIcon, CreditCard, TrendingUp, Zap } from 'lucide-react';
-import { PremiumUpgradeModal } from '../components/PremiumUpgradeModal';
+import { ArrowLeft, Crown, Check, Sparkles, Zap, TrendingUp, Gift } from 'lucide-react';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
 export const Wallet = () => {
   const navigate = useNavigate();
-  const [balance, setBalance] = useState(0);
   const [isPremium, setIsPremium] = useState(false);
-  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState('monthly'); // 'monthly' or 'yearly'
   const [upgrading, setUpgrading] = useState(false);
 
   useEffect(() => {
-    const loadWalletData = async () => {
-      await fetchWalletData();
+    const loadSubscriptionData = async () => {
+      await fetchUserStatus();
       setLoading(false);
     };
-    loadWalletData();
+    loadSubscriptionData();
   }, []);
 
-  const [buyAmount, setBuyAmount] = useState('');
-  const [buyingRuns, setBuyingRuns] = useState(false);
-
-  const fetchWalletData = async () => {
+  const fetchUserStatus = async () => {
     try {
-      const [balanceRes, transactionsRes] = await Promise.all([
-        apiClient.get('/wallet/balance'),
-        apiClient.get('/wallet/transactions')
-      ]);
-      setBalance(balanceRes.data.balance);
-      setIsPremium(balanceRes.data.is_premium);
-      setTransactions(transactionsRes.data);
+      const response = await apiClient.get('/users/me');
+      setIsPremium(response.data.is_premium);
     } catch (error) {
-      console.error('Error fetching wallet data:', error);
-      toast.error('Failed to load wallet data');
+      console.error('Error fetching user data:', error);
+      toast.error('Failed to load subscription status');
     }
-  };
-
-  const handleAddFunds = () => {
-    toast.info('Payment integration coming soon!', {
-      description: 'Dodo Payments will be integrated shortly'
-    });
   };
 
   const handleUpgradeToPremium = async () => {
