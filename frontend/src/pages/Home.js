@@ -71,14 +71,6 @@ export const Home = () => {
       emoji: "📈"
     },
     {
-      icon: MapPin,
-      title: "Cricket Ground",
-      description: "6-zone visual analytics",
-      color: "from-teal-500 to-green-600",
-      path: "/cricket-ground",
-      emoji: "🏟️"
-    },
-    {
       icon: Crown,
       title: "Subscription",
       description: "Upgrade to Premium",
