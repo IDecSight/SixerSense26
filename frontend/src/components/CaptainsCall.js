@@ -31,6 +31,12 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
   }, []);
 
   const getRecommendation = async () => {
+    // Check if user is premium first
+    if (!isPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await apiClient.post('/ai/recommend', {
@@ -40,7 +46,15 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
       setRecommendation(response.data);
       setSelectedTask(null);
     } catch (error) {
-      toast.error('Failed to get recommendation');
+      if (error.response?.status === 403) {
+        // Premium required
+        toast.error('Premium Feature', {
+          description: 'Upgrade to unlock AI recommendations'
+        });
+        setShowUpgradeModal(true);
+      } else {
+        toast.error('Failed to get recommendation');
+      }
     } finally {
       setLoading(false);
     }
