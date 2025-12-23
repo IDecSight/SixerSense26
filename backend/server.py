@@ -369,6 +369,30 @@ async def get_least_focused_categories(balance: Dict[str, Dict], limit: int = 3)
     sorted_cats = sorted(balance.items(), key=lambda x: (x[1]["count"], x[1]["runs"]))
     return [cat for cat, _ in sorted_cats[:limit]]
 
+async def update_user_category_strengths(user_id: str):
+    """Calculate and update strongest/weakest categories for user (Phase 7)"""
+    balance = await calculate_category_balance(user_id, days=30)  # Last 30 days
+    
+    # Sort by runs (primary indicator of strength)
+    sorted_by_runs = sorted(balance.items(), key=lambda x: x[1]["runs"], reverse=True)
+    
+    # Filter out categories with 0 runs
+    active_categories = [cat for cat, data in sorted_by_runs if data["runs"] > 0]
+    
+    strongest = active_categories[0] if active_categories else None
+    weakest = active_categories[-1] if len(active_categories) > 1 else None
+    
+    await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {
+            "strongest_category": strongest,
+            "weakest_category": weakest
+        }}
+    )
+    
+    return strongest, weakest
+
+
 async def get_recent_recommendation_categories(user_id: str, limit: int = 3) -> List[str]:
     """Get last N recommendation categories to avoid repetition"""
     # This would track AI recommendations in a separate collection
