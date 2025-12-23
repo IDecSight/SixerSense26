@@ -1183,6 +1183,9 @@ async def complete_task(task_id: str, current_user: str = Depends(get_current_us
         }
     )
     
+    # Update user's strongest/weakest categories (Phase 7)
+    await update_user_category_strengths(current_user)
+    
     return {
         "message": "Task completed",
         "runs_earned": task_doc["run_value"],
