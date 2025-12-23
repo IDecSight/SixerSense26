@@ -122,14 +122,24 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
         {!recommendation ? (
           <Button
             onClick={getRecommendation}
-            disabled={loading}
+            disabled={loading || checkingPremium}
             className="w-full h-12 bg-white hover:bg-white/90 text-[#4169E1] font-heading font-medium shadow-lg"
             data-testid="get-recommendation-btn"
           >
-            {loading ? (
+            {checkingPremium ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Loading...
+              </>
+            ) : loading ? (
               <>
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                 Analyzing your day...
+              </>
+            ) : !isPremium ? (
+              <>
+                <Lock className="w-4 h-4 mr-2" />
+                Unlock Captain's Call
               </>
             ) : (
               <>
