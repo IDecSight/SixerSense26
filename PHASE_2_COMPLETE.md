@@ -21,7 +21,7 @@ Implement Google Calendar integration (Premium-only) to sync tasks as calendar e
    ```
    GOOGLE_CLIENT_ID=your_google_client_id_here
    GOOGLE_CLIENT_SECRET=your_google_client_secret_here
-   GOOGLE_REDIRECT_URI=https://cricketodo.preview.emergentagent.com/api/auth/google/calendar/callback
+   GOOGLE_REDIRECT_URI=https://sixer-sense-1.preview.emergentagent.com/api/auth/google/calendar/callback
    ```
 
 3. **Task Schema Updates**
@@ -160,7 +160,7 @@ event = {
 3. **Create OAuth Credentials**
    - Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID"
    - Application type: Web application
-   - Authorized redirect URIs: `https://cricketodo.preview.emergentagent.com/api/auth/google/calendar/callback`
+   - Authorized redirect URIs: `https://sixer-sense-1.preview.emergentagent.com/api/auth/google/calendar/callback`
    - Copy Client ID and Client Secret
 
 4. **Update Backend .env**

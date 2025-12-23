@@ -161,7 +161,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=10080
 
 ### Frontend (.env)
 ```
-REACT_APP_BACKEND_URL=https://cricketodo.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://sixer-sense-1.preview.emergentagent.com
 ```
 
 ## 📊 Game Mechanics

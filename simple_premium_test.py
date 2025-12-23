@@ -14,7 +14,7 @@ def test_premium_enforcement():
     print("🔐 Testing Free vs Premium Enforcement")
     print("=" * 50)
     
-    base_url = "https://cricketodo.preview.emergentagent.com"
+    base_url = "https://sixer-sense-1.preview.emergentagent.com"
     
     # MongoDB connection
     mongo_client = MongoClient("mongodb://localhost:27017")

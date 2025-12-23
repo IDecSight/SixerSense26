@@ -56,7 +56,7 @@ To resolve the 401 error, users must:
    ```
    GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
    GOOGLE_CLIENT_SECRET=xxxxx
-   GOOGLE_REDIRECT_URI=https://cricketodo.preview.emergentagent.com/api/auth/google/calendar/callback
+   GOOGLE_REDIRECT_URI=https://sixer-sense-1.preview.emergentagent.com/api/auth/google/calendar/callback
    ```
 
 3. **Restart Backend:**
@@ -318,14 +318,14 @@ All these actions now refresh Playing XI and Cricket Ground:
 1. **Set up Google Cloud OAuth:**
    - Create Web Application client
    - Enable Google Calendar API
-   - Add authorized redirect URI: `https://cricketodo.preview.emergentagent.com/api/auth/google/calendar/callback`
+   - Add authorized redirect URI: `https://sixer-sense-1.preview.emergentagent.com/api/auth/google/calendar/callback`
 
 2. **Add credentials to backend:**
    ```bash
    # Edit /app/backend/.env
    GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
    GOOGLE_CLIENT_SECRET=your_client_secret
-   GOOGLE_REDIRECT_URI=https://cricketodo.preview.emergentagent.com/api/auth/google/calendar/callback
+   GOOGLE_REDIRECT_URI=https://sixer-sense-1.preview.emergentagent.com/api/auth/google/calendar/callback
    ```
 
 3. **Restart backend:**

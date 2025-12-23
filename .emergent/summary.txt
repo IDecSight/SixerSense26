@@ -1,141 +1,132 @@
 <analysis>**original_problem_statement:**
 The user wants to build a mobile-first, AI-powered gamified productivity app called **Sixer Sense**.
 
-**PRODUCT REQUIREMENTS:**
+**PRODUCT REQUIREMENTS (Summary of all user requests):**
 
-*   **Vision:** Turn daily productivity into a cricket match where tasks are balls, completing them scores runs, and distractions cause wickets. The AI acts as a captain, opponent, and coach.
+*   **Vision:** Turn daily productivity into a cricket match. Tasks are balls, completing them scores runs, and distractions cause wickets.
 *   **Core Gameplay:**
-    *   **Match Formats:** T20 (20 overs), ODI (50 overs), Test Match (unlimited overs).
-    *   **AI Opponent:** Sets a target score that increases with user wins/level-ups.
-    *   **Task Logic:** Tasks are categorized (Health, Career, Finance, etc.) and have run values (1, 4, 6). 6 tasks = 1 over. 10 wickets per match. A match must complete within one calendar day.
-    *   **Balls vs. Tasks:** Balls are units of effort (5-15 mins), not a 1:1 task count. A large task can consume multiple balls.
-*   **Player Model:** Each user has a virtual team of 11 players representing life categories, which influences task generation.
-*   **User Tiers:**
-    *   **Free:** Play with virtual runs only.
-    *   **Premium:** Can add money, convert to runs, and unlock features. Upgrade should be via a real payment gateway (DodoPayments).
-*   **Authentication:** Google Sign-In and Email/Password.
-*   **Core Screens:** Login/Landing, Home, Dashboard (Today's Match), Add Task, AI Recommendations, Post-Match Summary, Match History, Settings, Wallet.
-*   **AI Features:** The AI should recommend tasks, affiliate products (localized by country/currency), and provide live cricket-style commentary on user actions.
+    *   **Match:** One match per day, max 11 tasks (Playing XI). 6 tasks = 1 over.
+    *   **Task Categories:** Health, Career, Finance, Relationships, Spiritual, Travel.
+*   **User Tiers & Monetization:**
+    *   **Free:** Basic gameplay.
+    *   **Premium:** Unlocks advanced features via a subscription (₹99/monthly, ₹699/yearly) handled by Razorpay.
+    *   **Premium Features:** Google Calendar sync, automated health tracking (Google Fit), advanced AI commentary, and an Insights section.
+*   **Core Features:**
+    *   **Authentication:** Google Sign-In and Email/Password.
+    *   **Goal Setting:** A natural language prompt on the Home Page allows users to set short, medium, and long-term goals. The AI parses these goals, updates the user's profile, and generates a Playing XI (task list) for the day.
+    *   **Today's Match (Dashboard):** Main gameplay screen showing the Scoreboard, Captain's Call (AI recommendations), the Playing XI (task list), and Match Summary.
+    *   **Analytics:**
+        *   **Cricket Ground:** A visual representation of productivity across the 6 life categories.
+        *   **Insights Tab:** Analytics on focus distribution, over/underplayed life areas, and AI-driven plans.
+    *   **Profile:** Extended to include playing style and auto-calculated strongest/weakest life categories.
+*   **AI Captain:** Provides cricket-style commentary, recommends tasks, and helps with goal setting.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The Sixer Sense MVP is built with a React frontend, FastAPI backend, and MongoDB. The application has a glossy royal blue gradient theme with green and white text accents.
+The Sixer Sense MVP is built with a React frontend, FastAPI backend, and MongoDB. The core application structure is in place, including Google authentication, a landing page, a home page, and a dashboard for the daily match.
 
-Key implemented features include:
-- Google Sign-In and a comprehensive landing page.
-- A central Home page that navigates to the Dashboard, Wallet, and Profile.
-- Core gameplay loop: Users can select a match format (T20, ODI, Test), receive tasks, complete them to score runs, and see their score update on a scoreboard.
-- Daily match mechanics: Matches automatically refresh daily, and users can manually restart a match.
-- Advanced game mechanics (backend): A Player Model (11 players per user), the concept of balls as units of effort, and dynamic over distribution throughout the day.
-- AI-driven features:
-    - Task recommendations with affiliate links localized by country.
-    - Live, cricket-style commentary that appears based on user actions (e.g., completing a task).
-- A functional wallet system where users can upgrade to a Premium plan (mocked, payment integration pending) and see transaction history.
-- Currency is set to INR (₹) across the application.
-- A  page exists to help test match states.
+Key features implemented include:
+- **Free vs. Premium Gating:** Backend and frontend logic is in place to protect premium features. Free users are shown upgrade modals.
+- **Initial Feature MVPs:** Pages and basic backend logic for , , and  have been created.
+- **User Goal Prompt:** A new feature allowing users to set goals via natural language has been implemented. The entry point for this feature was just moved from the Dashboard to the Home page.
+- **Google Calendar Integration:** Backend endpoints and frontend UI for syncing tasks to Google Calendar are implemented but are non-functional due to a 401 invalid_client error, which requires user-provided OAuth credentials to be configured in the  file.
 
 **Last working item**:
-*   **Last item agent was working:** The user requested a full verification of all implemented features (Check all are working) after reporting several issues with features the agent had previously marked as complete. The agent was beginning a systematic check.
+*   **Last item agent was working:** Moving the User Goal Prompt feature's entry point from the Dashboard to the Home page. The agent added a prominent Set Your Game Plan card on the  page that opens the .
 *   **Status:** IN PROGRESS
 *   **Agent Testing Done:** N
-*   **Which testing method agent to use?** both (frontend and backend testing agents are required for a full E2E verification).
+*   **Which testing method agent to use?** both (A full end-to-end test is required: from clicking the button on the Home page, submitting goals in the modal, to verifying task generation on the Dashboard).
 *   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-*   **Issue 1 (P0): Full Feature Verification.** The user has repeatedly reported that core features like match refresh, format selection, and score updates are not working even after the agent implemented fixes. This is the highest priority task. The agent needs to perform a thorough, end-to-end test from a fresh user's perspective to ensure all features work together as expected.
-*   **Issue 2 (P1): DodoPayments Integration.** The agent initiated the integration for premium upgrades by asking the user for an API key but was interrupted by other requests. This task is blocked pending user input for the API key.
+*   **Issue 1 (P0): Google Calendar Sync Blocked - Authorization Error.** The user is getting a 401: invalid_client error. This is because the Google OAuth credentials in  are placeholder values. The feature is unusable until the user provides their  and .
 
 *   **Issues Detail:**
-    *   **Issue 1: Full Feature Verification**
-        *   **Attempted fixes:** The agent has fixed the score update, match refresh, and format selection features multiple times in isolated commits. However, user reports suggest systemic issues remain.
+    *   **Issue 1: Google Calendar Sync Blocked - Authorization Error**
+        *   **Attempted fixes:** The agent correctly diagnosed the issue is due to missing credentials in  and provided the user with detailed, step-by-step instructions on how to generate the necessary OAuth client ID and secret from the Google Cloud Console.
         *   **Next debug checklist:**
-            1.  Start as a brand-new user via the Google Sign-In flow.
-            2.  Verify the Home page appears after login.
-            3.  Go to the Dashboard and verify the match format selector appears.
-            4.  Select a format and start a match.
-            5.  Add and complete a task. Verify the score, balls, and overs update correctly on the scoreboard in real-time.
-            6.  Use the Restart Match button and confirm it works, showing the format selector again after confirmation.
-            7.  Use the  panel to simulate a new day and ensure the daily refresh logic triggers correctly.
-            8.  Verify all UI elements (colors, text, alignment) on all pages are consistent.
-        *   **Why fix this issue and what will be achieved with the fix?** To ensure the application is stable and functions as the user expects, resolving the recurring it is not working feedback.
-        *   **Status:** IN PROGRESS
+            1.  Receive the  and  from the user.
+            2.  Use the  tool to update these values in .
+            3.  Restart the backend service using backend: stopped
+backend: started.
+            4.  Ask the user to test the Connect Google Calendar functionality from the Settings page again.
+        *   **Why fix this issue and what will be achieved with the fix?** This will enable the premium Google Calendar sync feature, a key product requirement.
+        *   **Status:** BLOCKED (on user providing credentials).
         *   **Is recurring issue?** Y
         *   **Should Test frontend/backend/both after fix?** both
-        *   **Blocked on other issue:** None
-
-    *   **Issue 2: DodoPayments Integration**
-        *   **Attempted fixes:** The agent called the  and asked the user for the API key.
-        *   **Next debug checklist:**
-            1.  Re-engage the user to get the DodoPayments API key.
-            2.  Follow the playbook to add the key to the environment.
-            3.  Implement the backend logic for creating a payment session.
-            4.  Update the  to trigger the payment flow.
-            5.  Implement a webhook or callback to confirm payment and update the user's  status in the database.
-        *   **Why fix this issue and what will be achieved with the fix?** To activate the core monetization feature of the application.
-        *   **Status:** BLOCKED
-        *   **Is recurring issue?** N
-        *   **Should Test frontend/backend/both after fix?** both
-        *   **Blocked on other issue:** User input (API Key).
+        *   **Blocked on other issue:** None.
 
 **In progress Task List**:
-*   **Task 1 (P0): System-wide Feature Verification**
-    *   **Where to resume:** Start with the debug checklist outlined in Issue 1 above. The agent must simulate the complete user journey.
-    *   **What will be achieved with this?** A stable, verified application that meets all user requirements implemented to date.
+*   **Task 1 (P0): Test End-to-End User Goal Prompt Flow from Home Page**
+    *   **Where to resume:** The UI entry point is on the Home page. The full flow needs verification.
+        1.  Start the application and navigate to the Home page.
+        2.  Click the Set Goals button to open the .
+        3.  Enter a natural language goal statement (e.g., I want to exercise more and read a book on finance).
+        4.  Click Set Game Plan.
+        5.  **Verify:** The modal closes, a success toast appears, and the user is navigated to the Dashboard.
+        6.  **Verify:** On the Dashboard, the Playing XI section is populated with new tasks generated based on the goals.
+        7.  **Verify:** The user's profile in the database now contains the parsed goals.
+    *   **What will be achieved with this?** This will complete the implementation of the core goal-setting feature, a major user-facing enhancement.
     *   **Status:** IN PROGRESS
     *   **Should Test frontend/backend/both after fix?** both
     *   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   **P1: Implement Free vs. Premium Selection UI:** While an upgrade modal exists, a proper plan selection/comparison UI is still needed, as per the original handoff. (File: A new  page or enhanced Wallet page).
+    *   **P1: Implement Health Auto-Tracking:** Integrate with Google Fit to automatically track steps, workouts, and sleep, converting them into runs as per the product requirements. This is a premium feature.
+    *   **P2: Enhance Category-Specific Tracking:** Implement the non-MVP versions of category tracking, such as linking external courses (Udemy, YouTube) for the Career category.
+    *   **P3: Finalize and Test Razorpay Integration:** This is blocked on user credentials, similar to the Google Calendar issue. The code is in place but untested.
+
 *   **Future Tasks:**
     *   Multiplayer matches
     *   Team leagues
     *   Corporate dashboards
     *   Leaderboards
-    *   Coaching insights
+    *   Advanced coaching insights
 
 **Completed work in this session**
--   **Authentication Flow:** Fixed double Google login and updated button text on the landing page.
--   **Centralized Navigation:** Created a new  page as the main hub post-login, updating all navigation links to point to it.
--   **Currency Localization:** Changed all currency displays from USD ($) to INR (₹) in the Wallet and for affiliate product recommendations.
--   **Match Format Selection:** Implemented a flow for users to choose between T20, 50-over, and Test matches at the start of their day.
--   **Daily & Manual Refresh:** Implemented logic for matches to refresh daily and added a Restart Match button with a confirmation dialog.
--   **Premium Upgrade Flow:** Created a  and a backend endpoint () for the upgrade process (payment gateway integration is pending).
--   **Advanced Game Mechanics (Backend):**
-    -   Implemented a  to create a virtual playing XI for each user.
-    -   Integrated the concept of balls (effort units) into tasks and match progression.
-    -   Models updated to support daily match completion rules.
--   **AI-Powered Features:**
-    -   Implemented a  component and backend endpoint () to display cricket-style feedback.
-    -   Implemented location-based affiliate links using  and an IP-based location service.
--   **UI/UX Enhancements:**
-    -   Updated landing page copy and changed Sixer Sense text to green.
-    -   Aligned the UI of the Home, Dashboard, and Match History pages with the green and white on blue gradient theme.
-    -   Fixed alignment and added time estimates to AI recommendations.
-    -   Made the premium upgrade modal scrollable.
--   **Bug Fixes:** Resolved an issue where the score was not updating correctly upon task completion.
--   **Testing:** Created a  page to assist in testing match states.
+- **Free vs. Premium Enforcement (Phase 1):** Successfully implemented and verified backend and frontend logic to restrict premium features to subscribed users.
+- **Google Calendar Integration (Phase 2):** Implemented all backend endpoints, frontend UI toggles, and settings page logic. The feature is complete but blocked by missing user credentials.
+- **MVP Feature Implementation (Phases 3-9):**
+    - Created new pages and routes for , , and .
+    - Extended backend models (, ) to support new categories and profile attributes.
+    - Implemented UI changes on the Dashboard to replace the Task List with a Playing XI view.
+    - Added refresh buttons to all analytics pages (, , ) to ensure data is up-to-date.
+    - Removed all legacy Timeline components and logic from the application.
+- **User Goal Prompt Feature (Phase 10):**
+    - Created backend endpoints (, ) to process natural language goals and create tasks.
+    - Built the  React component for user input.
+    - Integrated the feature's entry point onto the Home page.
+- **Bug Fixes:**
+    - Resolved a Javascript hoisting error in .
+    - Re-arranged the Dashboard layout to correctly position components as requested by the user.
+
+**Earlier issues found/mentioned but not fixed**
+*   **Issue 1: Finalize and Test Razorpay Integration.** The initial handoff marked this as blocked. The agent has not worked on it, and it remains blocked on the user providing test  and .
+
+**Known issue recurrence from previous fork**
+- **Issue recurrence in previous fork:** Core match logic (restart, score updates) being fragile.
+- **Recurrence count:** 3+
+- **Status:** RESOLVED (The QA audit prompt in message #370 included a regression check for this, which the agent's audit in #392 passed. No further issues were reported by the user on this topic.)
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-*   **Frontend:** React, TailwindCSS,  for toasts.
-*   **Backend:** FastAPI, Pydantic.
-*   **Database:** MongoDB.
-*   **Authentication:** Emergent-managed Google Auth.
-*   **AI:** LLM integration via Emergent LLM Key.
-*   **3rd Party Libs:**  (for location detection).
+*   **Frontend:** React, TailwindCSS, 
+*   **Backend:** FastAPI, Pydantic
+*   **Database:** MongoDB
+*   **Authentication:** Emergent-managed Google Auth
+*   **AI:** Emergent LLM Key for AI features (parsing, recommendations)
+*   **Integrations:** Google Calendar API, Razorpay
 
 **key DB schema**
-*   **users:** , , , , , 
-*   **matches:** , , Sun Dec 14 02:43:46 UTC 2025, , , , , , , 
-*   **tasks:** , , , , , 
+*   **users:** , , ,  (contains , , ),  (new nested object for short/medium/long term goals per category).
+*   **tasks:** , , , , ,  (new),  (new),  (new),  (new),  (new).
 
 **changes in tech stack**
-*    library was added to the backend for making external API calls to a location service.
+*   **Added:** ,  for Google Calendar integration.
 
 **All files of reference**
 *   **New Files:**
@@ -146,69 +137,79 @@ Key implemented features include:
     *   
     *   
     *   
-    *   
-    *   
 *   **Heavily Modified Files:**
-    *   : Major updates for player model, match mechanics, commentary, premium upgrade, location services, and daily refresh logic.
-    *   : Complex state management for match data, format selection, commentary, and refresh logic.
-    *   : UI text and color updates.
-    *   : Added new routes for Home and Debug pages.
-    *   : Integrated premium upgrade modal.
-    *   : UI alignment fixes.
+    *   : Added premium checks, Google Calendar logic, goal parsing endpoints, and updated User/Task models.
+    *   : Integrated Goal Prompt modal, updated layout to use Playing XI and Cricket Ground components, and removed timeline logic.
+    *   : Added the Set Your Game Plan card to trigger the goal-setting flow.
+    *   : Added routes for all the new pages.
+    *   : Added Google Calendar sync toggle.
+    *   : Added premium gating logic.
+    *   : Added  field.
 
 **Areas that need refactoring**:
-*   **Frontend State Management:** The repeated bug reports for the  page suggest its state logic is brittle. It fetches match data, handles format selection, task completion, and refresh logic, making it prone to race conditions or stale state. A review or refactor using a more robust state management pattern could improve stability.
-*   **Authentication & Routing:** The agent had to create a  page to test authenticated routes. The underlying issue preventing direct testing of the  should be investigated and fixed to simplify future development and testing.
+*   The analytics pages (, , ) use a manual refresh button and a  interval for live updates. This is inefficient. A better approach would be to refactor the state management so that completing a task or starting a match automatically triggers a data re-fetch for these components, perhaps using a shared context or a state management library.
 
 **key api endpoints**
 *   , 
-*   , 
-*   , 
-*   , 
-*   
-*   
-*   
+*    (GET/DELETE)
+*    (POST),  (PATCH)
+*    (Premium)
+*    (POST) - **NEW**
+*    (POST) - **NEW**
+*   ,  (Untested)
+*    (PATCH) (Premium)
 
 **Critical Info for New Agent**
-*   **User Trust in Done:** The user has repeatedly found that features the previous agent marked as fixed or complete are not working correctly in the live app. DO NOT assume a feature works after a code change. The highest priority is to perform a full, end-to-end test of the entire user journey to regain user confidence.
-*   **Blocked on DodoPayments:** The premium upgrade feature is incomplete and blocked. You will need to get the API key from the user to proceed with this task.
-*   **Test with a Fresh State:** When testing, always try to clear the database or use a new user account to properly test first-time experiences like the match format selection. The  panel can help manipulate match states for testing daily refresh and restart functionality.
+*   **Google Calendar is BLOCKED:** The integration is complete but requires the user to provide their Google Cloud OAuth  and . Do not attempt to debug the 401 error further; instead, prompt the user for the credentials.
+*   **Goal Prompt Feature needs E2E Testing:** The entry point for this new feature was just moved to the Home page. The entire flow (Home -> Modal -> Backend -> Task Generation -> Dashboard) has not been tested and must be the first priority.
+*   **Advanced Tracking is MVP:** Features like Google Fit integration and linking to external learning platforms are not yet implemented. The current implementation relies on manual task creation and completion for all categories.
 
-**documents created in this job**
-None.
+**documents and test_reports created in this job**
+*   
+*   
+*   
+*   
+*   
+*   
+*   
 
-**Last 10 User Messages and any pending user messages**
-1.  **Request:** Implement daily refresh and manual match restart. (COMPLETED)
-2.  **User Feedback:** Can you fix it it is not working the above to restart fresh... (IN PROGRESS - led to fixes)
-3.  **User Feedback:** Matches is not refreshed please fix, when I click on refresh button it should start new match with confirmation to exit (IN PROGRESS - led to fixes)
-4.  **User Feedback:** Not updating the score please fix itv (COMPLETED - backend logic fixed)
-5.  **Request:** Give me all the prompts given from beginning to end (COMPLETED)
-6.  **Pending Request:** Check all are working (IN PROGRESS - This is the current, overarching task).
-7.  **User Feedback:** Fix restart functionality. (COMPLETED)
-8.  **User Feedback:** Refresh button fix request. (COMPLETED)
-9.  **User Feedback:** Score update issue. (COMPLETED)
-10. **Request:** Request for all prompts. (COMPLETED)
+**Last 10 User Messages and any pending HUMAN messages**
+1.   (New feature: Goal Prompt)
+2.  
+3.  (User provides detailed requirements for Goal Prompt from Home Page)
+4.  
+5.   (New req: Goal Prompt from Home Page)
+6.   (Agent's audit start)
+7.  (User provides QA Audit prompt)
+8.   (Finish after UI updates)
+9.  (User provides requirements for UI updates: remove ground from home, replace tasks with Playing XI)
+10.  (Bug report)
 
 **Project Health Check:**
-*   **Working:** Individual UI components and most backend endpoints in isolation. The overall theme and branding are applied.
-*   **Broken / Unverified:** The end-to-end user flow is highly suspect. Core gameplay features (match refresh, format selection, score updates) have been repeatedly reported as faulty by the user, indicating potential integration or state management issues between the frontend and backend.
-*   **Mocked:** The Upgrade to Premium feature is present in the UI but does not process real payments.
+*   **Working:** Core match logic, authentication, premium feature gating, AI task recommendations, manual task management, MVP analytics pages (with manual refresh).
+*   **Broken:**
+    *   **Google Calendar Sync:** Non-functional due to a  error. Blocked on user providing OAuth credentials.
+*   **Unverified:**
+    *   **Razorpay Payment Flow:** Code is implemented but completely untested. Blocked on user providing API keys.
+    *   **User Goal Prompt (from Home):** The full end-to-end flow from the new entry point is untested.
 
 **3rd Party Integrations**
-*   **OpenAI/Claude/Gemini (via Emergent LLM Key):** Used for AI task recommendations and live commentary. (Active)
-*   **Google Auth (via Emergent-managed Google Auth):** Used for user login. (Active)
-*   **DodoPayments:** Intended for premium subscriptions. (Pending - Blocked on user API key)
+*   **Emergent LLM Key:** Used for AI commentary and goal parsing. (Active)
+*   **Emergent-managed Google Auth:** Used for user login. (Active)
+*   **Google Calendar API:** Integrated but **inactive** due to missing credentials.
+*   **Razorpay:** Integrated but **inactive** due to missing credentials.
 
 **Testing status**
-*   **Testing agent used after significant changes:** NO (Agent used screenshots and manual curl/grep checks for recent fixes, which proved insufficient).
+*   **Testing agent used after significant changes:** YES, after implementing Phase 1 (Premium Gating).
 *   **Troubleshoot agent used after agent stuck in loop:** NO
 *   **Test files created:** None.
-*   **Known regressions:** The core gameplay loop on the dashboard is unreliable from the user's perspective.
+*   **Known regressions:** None in this session.
 
 **Credentials to test flow:**
-*   Use the Google Login flow.
-*   The  route is available and does not require authentication, allowing for manipulation of match data for testing purposes.
+*   Use the Google Login flow for general application testing.
+*   To test **Google Calendar**, you MUST ask the user for their Google Cloud **** and ****.
+*   To test the **Razorpay payment system**, you MUST ask the user for their Test **** and ****.
 
 **What agent forgot to execute**
-*   The task to implement a Free vs. Premium selection UI (e.g., a pricing page) from the original handoff has not been started.
-*   The DodoPayments integration was started but left incomplete and blocked. The agent got distracted by other user requests.</analysis>
+*   The agent successfully identified that the MVP for health tracking was manual-only. However, the original requirement to use Google Fit for automated tracking remains an upcoming task.
+*   The agent has not re-addressed the Razorpay integration, which was blocked in the initial handoff and remains blocked.</analysis>

@@ -11,7 +11,7 @@ from datetime import datetime
 
 class FocusedSixerSenseTest:
     def __init__(self):
-        self.base_url = "https://cricketodo.preview.emergentagent.com"
+        self.base_url = "https://sixer-sense-1.preview.emergentagent.com"
         self.tests_run = 0
         self.tests_passed = 0
         self.critical_issues = []
