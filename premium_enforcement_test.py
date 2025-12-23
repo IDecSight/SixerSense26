@@ -281,7 +281,7 @@ class PremiumEnforcementTester:
             data=profile_data
         )
         
-        if response and response.status_code == 403:
+        if response is not None and response.status_code == 403:
             try:
                 error_data = response.json()
                 if "Premium membership" in error_data.get("detail", ""):
@@ -411,7 +411,7 @@ class PremiumEnforcementTester:
         )
         
         expected_message = "This feature requires Premium membership"
-        if response and response.status_code == 403:
+        if response is not None and response.status_code == 403:
             try:
                 error_data = response.json()
                 detail = error_data.get("detail", "")
@@ -440,7 +440,7 @@ class PremiumEnforcementTester:
             data={"primary_goal": "Health"}
         )
         
-        if response and response.status_code == 403:
+        if response is not None and response.status_code == 403:
             try:
                 error_data = response.json()
                 detail = error_data.get("detail", "")
