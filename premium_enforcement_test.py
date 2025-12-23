@@ -501,6 +501,23 @@ class PremiumEnforcementTester:
         except Exception as e:
             print(f"⚠️  Failed to cleanup user {user_id[:8]}: {str(e)}")
 
+    def cleanup_test_user(self, user_id):
+        """Clean up test user and related data"""
+        try:
+            # Delete user's matches
+            self.db.matches.delete_many({"user_id": user_id})
+            
+            # Delete user's tasks
+            self.db.tasks.delete_many({"user_id": user_id})
+            
+            # Delete user
+            self.db.users.delete_one({"user_id": user_id})
+            
+            print(f"✅ Cleaned up test user: {user_id[:8]}")
+            
+        except Exception as e:
+            print(f"⚠️  Failed to cleanup user {user_id[:8]}: {str(e)}")
+
     def run_all_tests(self):
         """Run all premium enforcement tests"""
         print("🔐 Starting Premium Enforcement Testing...")
