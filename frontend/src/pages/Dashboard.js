@@ -338,11 +338,11 @@ export const Dashboard = () => {
                     </div>
                   )}
 
-                  {/* Completed Tasks */}
+                  {/* Completed Players */}
                   {completedTasks.length > 0 && (
                     <details className="group" open={completedTasks.length < 5}>
                       <summary className="cursor-pointer text-sm font-heading font-medium text-white/80 hover:text-white transition-colors p-2">
-                        Completed Tasks ({completedTasks.length})
+                        Runs Scored ({completedTasks.length} players)
                       </summary>
                       <div className="space-y-3 mt-2">
                         {completedTasks.map((task) => (
@@ -357,11 +357,11 @@ export const Dashboard = () => {
                     </details>
                   )}
 
-                  {/* Dismissed Tasks */}
+                  {/* Dismissed Players */}
                   {dismissedTasks.length > 0 && (
                     <details className="group">
                       <summary className="cursor-pointer text-sm font-heading font-medium text-white/80 hover:text-white transition-colors p-2">
-                        Dismissed Tasks ({dismissedTasks.length})
+                        Wickets Lost ({dismissedTasks.length} players)
                       </summary>
                       <div className="space-y-3 mt-2">
                         {dismissedTasks.map((task) => (
