@@ -1668,26 +1668,47 @@ async def generate_tasks_from_goals(current_user: str = Depends(get_current_user
         # Use LLM to generate tasks
         llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
         
-        prompt = f"""You are an AI captain creating today's game plan (Playing XI) for a cricket-themed productivity app.
+        prompt = f"""You are the SixerSense Goal Architect AI creating today's Playing XI (daily game plan) for the user.
 
 User's Goals:
 {chr(10).join(goal_summary)}
 
-Generate exactly 11 actionable tasks for today that align with these goals.
+Generate exactly 11 actionable daily tasks following this FIXED BATTING ORDER:
 
-RULES:
-- Exactly 11 tasks (Playing XI)
-- Prioritize short-term goals
-- Break down long-term goals into small daily actions
-- Each task should be completable today (5-60 minutes)
-- Assign run values: 1 (small), 4 (meaningful), 6 (high-impact)
-- Balance across categories when possible
-- Be specific and actionable
+Player 1 (Opener 1) – Health & Energy
+Player 2 (Opener 2) – Mindset / Spiritual
+Player 3 (No.3) – Career Impact
+Player 4 (No.4) – Thought Leadership / Learning
+Player 5 (No.5) – Product / Skill / IP Building
+Player 6 (No.6) – Wealth / Finance
+Player 7 (No.7) – Relationships
+Player 8 (No.8) – Learning / Upskilling
+Player 9 (No.9) – Systems / Automation
+Player 10 (No.10) – Recovery / Self-Care
+Player 11 (No.11) – Reflection / Scorecard
 
-Return ONLY valid JSON array in this format:
+CRITICAL RULES:
+- Tasks must be SMALL and executable in one day
+- Tasks must be PERSONAL and aligned to user's specific goals
+- Use cricket language subtly (runs, overs, innings)
+- If a category has no explicit goal, generate a maintenance task
+- Tasks must be dynamic and feel fresh, not generic
+- Assign run values: 1 (small maintenance), 4 (meaningful progress), 6 (high-impact breakthrough)
+- Each task: 5-60 minutes
+
+Map categories:
+- Health = Health & Energy, Recovery
+- Spiritual = Mindset / Spiritual, Reflection
+- Career = Career Impact, Thought Leadership, Product/Skill, Systems
+- Finance = Wealth / Finance
+- Relationships = Relationships
+- Travel = Learning / Upskilling (when applicable)
+
+Return ONLY valid JSON array in this EXACT format:
 [
-  {{"title": "30-min workout", "category": "Health", "run_value": 4, "estimated_minutes": 30}},
-  ...exactly 11 tasks...
+  {{"title": "30 min strength or mobility workout", "category": "Health", "run_value": 4, "estimated_minutes": 30}},
+  {{"title": "5 min silence + gratitude", "category": "Spiritual", "run_value": 1, "estimated_minutes": 5}},
+  ...exactly 11 tasks in batting order...
 ]"""
 
         messages = [UserMessage(content=prompt)]
