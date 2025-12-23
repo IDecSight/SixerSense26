@@ -1757,13 +1757,7 @@ Return ONLY valid JSON array in this EXACT format:
             created_tasks.append(task_doc)
         
         # Generate captain's response
-        categories_used = list(set([t["category"] for t in created_tasks]))
-        captain_msg = f"Captain's plan is ready! We'll open with {categories_used[0]}"
-        if len(categories_used) > 1:
-            captain_msg += f" and {categories_used[1]}"
-        if len(categories_used) > 2:
-            captain_msg += f", steady {categories_used[2]} in the middle overs"
-        captain_msg += ". Your Playing XI is set for today's match!"
+        captain_msg = "🏏 Your Game Plan is Ready\nYour goals are locked. Today's Playing XI has been created based on your ambitions.\nPlay today well — championships are won daily."
         
         logging.info(f"Generated {len(created_tasks)} tasks for user {current_user}")
         
