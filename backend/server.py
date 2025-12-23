@@ -151,6 +151,7 @@ class TaskCreateRequest(BaseModel):
     category: str
     run_value: int
     estimated_minutes: Optional[int] = None
+    sync_to_calendar: bool = False  # Premium-only: sync task to Google Calendar
 
 class TaskUpdateRequest(BaseModel):
     status: str
