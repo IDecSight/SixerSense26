@@ -2,20 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin, RefreshCw } from 'lucide-react';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
 export const CricketGround = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [groundData, setGroundData] = useState({});
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     fetchGroundData();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchGroundData(true);
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchGroundData = async () => {
+  const fetchGroundData = async (silent = false) => {
+    if (!silent) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
+    
     try {
       const response = await apiClient.get('/ai/balance?days=7');
       
@@ -30,12 +45,24 @@ export const CricketGround = () => {
       };
       
       setGroundData(zones);
+      setLastUpdated(new Date());
+      
+      if (silent) {
+        toast.success('Cricket Ground updated', { duration: 2000 });
+      }
     } catch (error) {
       console.error('Error fetching ground data:', error);
-      toast.error('Failed to load cricket ground');
+      if (!silent) {
+        toast.error('Failed to load cricket ground');
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleManualRefresh = () => {
+    fetchGroundData(true);
   };
 
   const getIntensityColor = (runs) => {
