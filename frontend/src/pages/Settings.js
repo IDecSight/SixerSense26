@@ -166,19 +166,127 @@ export const Settings = () => {
           {/* Calendar Sync */}
           <Card className="bg-white/10 backdrop-blur-lg border-white/20 shadow-xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-heading text-white">
-                <Calendar className="w-5 h-5 text-yellow-200" />
-                Google Calendar Sync
-              </CardTitle>
-              <CardDescription className="text-white/80 font-body">Sync your tasks with Google Calendar</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 font-heading text-white">
+                    <Calendar className="w-5 h-5 text-yellow-200" />
+                    Google Calendar Sync
+                  </CardTitle>
+                  <CardDescription className="text-white/80 font-body mt-1">
+                    Sync your tasks with Google Calendar automatically
+                  </CardDescription>
+                </div>
+                {!calendarStatus.is_premium && (
+                  <span className="px-3 py-1 text-xs font-bold bg-yellow-400/90 text-[#4169E1] rounded-full">
+                    PREMIUM ONLY
+                  </span>
+                )}
+              </div>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-white/70 mb-4 font-body">Calendar sync coming soon</p>
-              <Button variant="secondary" disabled className="bg-white/10 text-white font-heading border-white/20">
-                Connect Calendar
-              </Button>
+            <CardContent className="space-y-4">
+              {/* Connection Status */}
+              <div className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
+                <div className="flex items-center gap-3">
+                  {calendarStatus.connected ? (
+                    <>
+                      <CheckCircle className="w-6 h-6 text-green-400" />
+                      <div>
+                        <p className="font-heading font-bold text-white">Connected</p>
+                        <p className="text-sm text-white/70 font-body">Your calendar is synced</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-6 h-6 text-white/40" />
+                      <div>
+                        <p className="font-heading font-bold text-white">Not Connected</p>
+                        <p className="text-sm text-white/70 font-body">
+                          {calendarStatus.is_premium 
+                            ? 'Connect to sync tasks automatically' 
+                            : 'Upgrade to Premium to connect'}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {calendarStatus.connected ? (
+                  <Button
+                    onClick={handleDisconnectCalendar}
+                    variant="outline"
+                    className="bg-red-500/20 border-red-400/30 text-red-200 hover:bg-red-500/30 font-heading"
+                  >
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleConnectCalendar}
+                    disabled={connectingCalendar || !calendarStatus.is_premium}
+                    className="bg-white hover:bg-white/90 text-[#4169E1] font-heading font-bold shadow-lg"
+                  >
+                    {connectingCalendar ? (
+                      'Connecting...'
+                    ) : (
+                      <>
+                        <LinkIcon className="w-4 h-4 mr-2" />
+                        Connect Calendar
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+
+              {/* How it works */}
+              {!calendarStatus.connected && (
+                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                  <p className="text-sm font-heading font-bold text-white mb-2">How it works:</p>
+                  <ul className="space-y-2 text-sm text-white/80 font-body">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">•</span>
+                      <span>When creating a task, toggle "Add to Google Calendar"</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">•</span>
+                      <span>Task appears in your Google Calendar with cricket emoji 🏏</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">•</span>
+                      <span>Dismissing a task removes it from your calendar</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400 mt-0.5">•</span>
+                      <span>Note: One-way sync only (app → calendar)</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* Premium Upgrade CTA (if not premium) */}
+          {!user?.is_premium && (
+            <Card className="border-yellow-200/30 bg-gradient-to-br from-yellow-400/10 to-green-400/10 backdrop-blur-lg shadow-2xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-heading font-bold text-white mb-2">
+                      Unlock Premium Features
+                    </h3>
+                    <p className="text-white/80 font-body">
+                      Get Google Calendar sync, AI recommendations, and more!
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => navigate('/subscription')}
+                    className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-[#4169E1] font-heading font-bold shadow-2xl"
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Upgrade Now
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>
