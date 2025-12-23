@@ -17,8 +17,12 @@ export const Settings = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await apiClient.get('/auth/me');
-      setUser(response.data);
+      const [userRes, calendarRes] = await Promise.all([
+        apiClient.get('/auth/me'),
+        apiClient.get('/auth/google/calendar/status')
+      ]);
+      setUser(userRes.data);
+      setCalendarStatus(calendarRes.data);
     } catch (error) {
       console.error('Error fetching user:', error);
     } finally {
@@ -28,7 +32,16 @@ export const Settings = () => {
 
   useEffect(() => {
     fetchUser();
-  }, []);
+    
+    // Check for calendar connection callback
+    if (searchParams.get('calendar_connected') === 'true') {
+      toast.success('Google Calendar connected successfully! 🎉');
+      navigate('/settings', { replace: true });
+    } else if (searchParams.get('calendar_error') === 'true') {
+      toast.error('Failed to connect Google Calendar. Please try again.');
+      navigate('/settings', { replace: true });
+    }
+  }, [searchParams]);
 
   const handleProfileUpdated = () => {
     // Prevent infinite loops by not re-fetching immediately
