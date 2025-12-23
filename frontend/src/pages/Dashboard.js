@@ -6,8 +6,6 @@ import { Plus, History, Crown, Settings as SettingsIcon, LogOut, ArrowLeft, Refr
 import { Scoreboard } from '../components/Scoreboard';
 import { TaskCard } from '../components/TaskCard';
 import { CaptainsCall } from '../components/CaptainsCall';
-import { PlayingXISection } from '../components/PlayingXISection';
-import { CricketGroundSection } from '../components/CricketGroundSection';
 import { AddTaskModal } from '../components/AddTaskModal';
 import { TaskTimeline } from '../components/TaskTimeline';
 import { FormatSelector } from '../components/FormatSelector';
