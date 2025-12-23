@@ -55,6 +55,30 @@ export const Home = () => {
       emoji: "🏏"
     },
     {
+      icon: Users,
+      title: "Playing XI",
+      description: "View your 11-player lineup",
+      color: "from-blue-500 to-cyan-600",
+      path: "/playing-xi",
+      emoji: "👥"
+    },
+    {
+      icon: TrendingUp,
+      title: "Insights",
+      description: "Analyze your performance",
+      color: "from-purple-500 to-pink-600",
+      path: "/insights",
+      emoji: "📈"
+    },
+    {
+      icon: MapPin,
+      title: "Cricket Ground",
+      description: "6-zone visual analytics",
+      color: "from-teal-500 to-green-600",
+      path: "/cricket-ground",
+      emoji: "🏟️"
+    },
+    {
       icon: Crown,
       title: "Subscription",
       description: "Upgrade to Premium",
@@ -64,17 +88,17 @@ export const Home = () => {
     },
     {
       icon: User,
-      title: "Profile",
-      description: "Update goals & preferences",
-      color: "from-blue-500 to-cyan-600",
+      title: "Settings",
+      description: "Profile & calendar sync",
+      color: "from-indigo-500 to-blue-600",
       path: "/settings",
-      emoji: "👤"
+      emoji: "⚙️"
     },
     {
       icon: History,
       title: "Match History",
       description: "View past matches & stats",
-      color: "from-purple-500 to-pink-600",
+      color: "from-pink-500 to-rose-600",
       path: "/history",
       emoji: "📊"
     }
