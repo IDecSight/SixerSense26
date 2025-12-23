@@ -70,12 +70,12 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
           <div className="flex items-center gap-3 mb-2">
             <Target className="w-8 h-8 text-yellow-200" />
             <DialogTitle className="text-2xl font-heading font-bold text-white">
-              Tell Your Captain Your Goals
+              🏏 Set Your Goals – Create Your Game Plan
             </DialogTitle>
           </div>
           <DialogDescription className="text-white/90 font-body text-base">
-            Describe what you want to achieve in health, career, money, relationships, mindset, and travel. 
-            Your captain will create today's game plan.
+            Describe your goals freely. You can write short, medium, and long-term goals across life areas (Health, Career, Finance, Relationships, Spiritual, Travel).
+            No format required. Just write honestly.
           </DialogDescription>
         </DialogHeader>
 
