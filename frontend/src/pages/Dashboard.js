@@ -298,14 +298,11 @@ export const Dashboard = () => {
           <div className="lg:col-span-2 space-y-6">
             <Scoreboard match={match} onChangeFormat={handleChangeFormat} />
             
-            {/* Timeline View - Always show */}
-            <TaskTimeline tasks={match.tasks || []} match={match} />
-            
-            {/* Tasks Section */}
+            {/* Playing XI Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-md">
-                  Today's Tasks
+                  Playing XI
                 </h2>
                 <Button
                   onClick={() => setShowAddTask(true)}
@@ -313,16 +310,16 @@ export const Dashboard = () => {
                   data-testid="add-task-btn"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Task
+                  Add Player
                 </Button>
               </div>
 
               {match.tasks?.length === 0 ? (
                 <div className="text-center py-12 border-2 border-dashed border-white/20 rounded-xl bg-white/5">
-                  <p className="text-white/80 mb-4 font-body">No tasks yet. Start your innings!</p>
+                  <p className="text-white/80 mb-4 font-body">No players yet. Build your Playing XI!</p>
                   <Button onClick={() => setShowAddTask(true)} className="bg-white hover:bg-white/90 text-[#4169E1] font-heading shadow-lg">
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Your First Task
+                    Add Your First Player
                   </Button>
                 </div>
               ) : (
