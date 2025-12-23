@@ -32,8 +32,6 @@ export const Dashboard = () => {
       } else {
         setMatch(response.data);
         setShowFormatSelector(false);
-        // Trigger refresh for Playing XI and Cricket Ground
-        setRefreshTrigger(prev => prev + 1);
       }
     } catch (error) {
       console.error('Error fetching match:', error);
