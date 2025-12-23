@@ -1,14 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Sparkles, Plus, RefreshCw, Clock } from 'lucide-react';
+import { Sparkles, Plus, RefreshCw, Clock, Lock } from 'lucide-react';
+import { PremiumUpgradeModal } from './PremiumUpgradeModal';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
 export const CaptainsCall = ({ matchId, onTaskCreated }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [recommendation, setRecommendation] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [checkingPremium, setCheckingPremium] = useState(true);
+
+  useEffect(() => {
+    const checkUserPremiumStatus = async () => {
+      try {
+        const response = await apiClient.get('/auth/me');
+        setIsPremium(response.data.is_premium || false);
+      } catch (error) {
+        console.error('Error fetching user status:', error);
+      } finally {
+        setCheckingPremium(false);
+      }
+    };
+    checkUserPremiumStatus();
+  }, []);
 
   const getRecommendation = async () => {
     setLoading(true);
