@@ -231,7 +231,7 @@ class PremiumEnforcementTester:
             data={"match_id": match_id, "time_available": 30}
         )
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             try:
                 ai_data = response.json()
                 if "task" in ai_data and "category" in ai_data:
