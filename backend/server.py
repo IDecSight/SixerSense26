@@ -991,8 +991,8 @@ async def mark_distraction(task_id: str, current_user: str = Depends(get_current
 # ==================== AI ROUTES ====================
 
 @api_router.post("/ai/recommend")
-async def get_ai_recommendation(req: AIRecommendRequest, current_user: str = Depends(get_current_user)):
-    """Get AI task recommendation with life balance logic"""
+async def get_ai_recommendation(req: AIRecommendRequest, current_user: str = Depends(require_premium)):
+    """Get AI task recommendation with life balance logic (PREMIUM ONLY)"""
     try:
         # Get user profile
         user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
