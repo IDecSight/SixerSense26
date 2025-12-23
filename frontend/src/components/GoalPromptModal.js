@@ -130,7 +130,7 @@ I want to become a director in my career, build an AI product, stay fit, spend q
               ) : (
                 <>
                   <Target className="w-4 h-4 mr-2" />
-                  Set My Game Plan
+                  🎯 Set My Game Plan
                 </>
               )}
             </Button>
