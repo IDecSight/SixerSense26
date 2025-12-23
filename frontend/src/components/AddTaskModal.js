@@ -154,6 +154,49 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
             </div>
           </div>
 
+          {/* Google Calendar Toggle (Premium Only) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-white" />
+                <Label className="text-white font-body cursor-pointer">
+                  Add to Google Calendar
+                </Label>
+                {!isPremium && (
+                  <span className="px-2 py-0.5 text-[9px] font-bold bg-yellow-400/90 text-[#4169E1] rounded-full">
+                    PREMIUM
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleCalendarToggle}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  formData.sync_to_calendar && isPremium && calendarConnected
+                    ? 'bg-green-500'
+                    : 'bg-white/20'
+                }`}
+                disabled={!isPremium || !calendarConnected}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    formData.sync_to_calendar && isPremium && calendarConnected
+                      ? 'translate-x-6'
+                      : 'translate-x-1'
+                  }`}
+                />
+                {!isPremium && (
+                  <Lock className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-white" />
+                )}
+              </button>
+            </div>
+            {!calendarConnected && isPremium && (
+              <p className="text-xs text-yellow-200 font-body">
+                Connect Google Calendar in Settings to enable this feature
+              </p>
+            )}
+          </div>
+
           <DialogFooter>
             <Button
               type="button"
@@ -170,6 +213,17 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
           </DialogFooter>
         </form>
       </DialogContent>
+
+      {/* Premium Upgrade Modal */}
+      <PremiumUpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={() => {
+          setShowUpgradeModal(false);
+          navigate('/subscription');
+        }}
+        loading={false}
+      />
     </Dialog>
   );
 };
