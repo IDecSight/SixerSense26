@@ -18,6 +18,7 @@ export const Dashboard = () => {
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddTask, setShowAddTask] = useState(false);
+  const [showGoalPrompt, setShowGoalPrompt] = useState(false);
   const [showFormatSelector, setShowFormatSelector] = useState(false);
   const [startingMatch, setStartingMatch] = useState(false);
   const [commentary, setCommentary] = useState(null);
