@@ -201,6 +201,20 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+async def require_premium(current_user: str = Depends(get_current_user)):
+    """Dependency to check if user has premium access"""
+    user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not user_doc.get("is_premium", False):
+        raise HTTPException(
+            status_code=403, 
+            detail="This feature requires Premium membership. Upgrade to unlock!"
+        )
+    
+    return current_user
+
 # ==================== HELPER FUNCTIONS ====================
 
 async def calculate_category_balance(user_id: str, days: int = 7) -> Dict[str, Dict]:
