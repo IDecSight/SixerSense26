@@ -139,6 +139,9 @@ class Task(BaseModel):
     scheduled_start: Optional[datetime] = None  # Calculated start time based on previous tasks
     sync_to_calendar: bool = False  # Whether to sync this task to Google Calendar (Premium only)
     calendar_event_id: Optional[str] = None  # Google Calendar event ID for synced tasks
+    tracking_type: Optional[str] = None  # manual, auto, link-based
+    external_link: Optional[str] = None  # For career tracking (course links)
+    tracking_data: Optional[Dict] = None  # Additional tracking metadata
     created_at: datetime
 
 class Transaction(BaseModel):
