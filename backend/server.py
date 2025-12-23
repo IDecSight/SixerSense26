@@ -126,6 +126,8 @@ class Task(BaseModel):
     started_at: Optional[datetime] = None  # When task was started
     completed_at: Optional[datetime] = None  # When task was completed
     scheduled_start: Optional[datetime] = None  # Calculated start time based on previous tasks
+    sync_to_calendar: bool = False  # Whether to sync this task to Google Calendar (Premium only)
+    calendar_event_id: Optional[str] = None  # Google Calendar event ID for synced tasks
     created_at: datetime
 
 class Transaction(BaseModel):
