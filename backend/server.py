@@ -1029,6 +1029,17 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
         scheduled_start = max(day_start_dt, current_time)
     
     task_id = f"task_{uuid.uuid4().hex[:12]}"
+    
+    # Calendar sync (Premium only)
+    calendar_event_id = None
+    if task.sync_to_calendar and user_doc.get("is_premium", False):
+        calendar_event_id = await create_calendar_event(
+            current_user,
+            task.title,
+            scheduled_start,
+            estimated_minutes
+        )
+    
     task_doc = {
         "task_id": task_id,
         "user_id": current_user,
@@ -1043,6 +1054,8 @@ async def create_task(task: TaskCreateRequest, current_user: str = Depends(get_c
         "completed_at": None,
         "scheduled_start": scheduled_start,
         "scheduled_end": scheduled_start + timedelta(minutes=estimated_minutes) if scheduled_start else None,
+        "sync_to_calendar": task.sync_to_calendar,
+        "calendar_event_id": calendar_event_id,
         "created_at": current_time
     }
     
