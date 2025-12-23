@@ -634,6 +634,109 @@ async def logout(current_user: str = Depends(get_current_user)):
     await db.user_sessions.delete_one({"user_id": current_user})
     return {"message": "Logged out successfully"}
 
+# ==================== GOOGLE CALENDAR AUTH ROUTES ====================
+
+@api_router.get("/auth/google/calendar/connect")
+async def connect_google_calendar(current_user: str = Depends(require_premium)):
+    """Initiate Google Calendar OAuth flow (PREMIUM ONLY)"""
+    if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
+        raise HTTPException(status_code=503, detail="Google Calendar integration not configured")
+    
+    # Create OAuth flow
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token"
+            }
+        },
+        scopes=GOOGLE_CALENDAR_SCOPES,
+        redirect_uri=GOOGLE_REDIRECT_URI
+    )
+    
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        prompt='consent',
+        include_granted_scopes='true'
+    )
+    
+    # Store state for verification
+    await db.users.update_one(
+        {"user_id": current_user},
+        {"$set": {"google_calendar_oauth_state": state}}
+    )
+    
+    return {"authorization_url": authorization_url}
+
+@api_router.get("/auth/google/calendar/callback")
+async def google_calendar_callback(code: str, state: str):
+    """Handle Google Calendar OAuth callback"""
+    try:
+        # Exchange code for tokens using direct HTTP request (avoids scope mismatch issues)
+        token_response = httpx.post('https://oauth2.googleapis.com/token', data={
+            'code': code,
+            'client_id': GOOGLE_CLIENT_ID,
+            'client_secret': GOOGLE_CLIENT_SECRET,
+            'redirect_uri': GOOGLE_REDIRECT_URI,
+            'grant_type': 'authorization_code'
+        })
+        
+        if token_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to exchange authorization code")
+        
+        tokens = token_response.json()
+        
+        # Get user email from token
+        user_info_response = httpx.get(
+            'https://www.googleapis.com/oauth2/v2/userinfo',
+            headers={'Authorization': f'Bearer {tokens["access_token"]}'}
+        )
+        
+        if user_info_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to get user info")
+        
+        user_info = user_info_response.json()
+        user_email = user_info.get('email')
+        
+        # Find user by email and save tokens
+        result = await db.users.update_one(
+            {"email": user_email},
+            {"$set": {"google_calendar_tokens": tokens, "calendar_connected": True}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Redirect back to frontend
+        return RedirectResponse(url=f"{os.environ.get('RETURN_URL')}settings?calendar_connected=true")
+        
+    except Exception as e:
+        logging.error(f"Calendar OAuth callback error: {str(e)}")
+        return RedirectResponse(url=f"{os.environ.get('RETURN_URL')}settings?calendar_error=true")
+
+@api_router.get("/auth/google/calendar/status")
+async def get_calendar_connection_status(current_user: str = Depends(get_current_user)):
+    """Check if user has connected Google Calendar"""
+    user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "connected": user_doc.get("calendar_connected", False),
+        "is_premium": user_doc.get("is_premium", False)
+    }
+
+@api_router.delete("/auth/google/calendar/disconnect")
+async def disconnect_google_calendar(current_user: str = Depends(get_current_user)):
+    """Disconnect Google Calendar"""
+    await db.users.update_one(
+        {"user_id": current_user},
+        {"$unset": {"google_calendar_tokens": "", "calendar_connected": ""}}
+    )
+    return {"message": "Calendar disconnected successfully"}
+
 # ==================== PROFILE ROUTES ====================
 
 @api_router.patch("/profile")
