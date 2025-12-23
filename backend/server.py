@@ -84,6 +84,7 @@ class UserProfile(BaseModel):
     life_stage: str = "Working Professional"  # Student, Working Professional, Entrepreneur
     daily_availability: str = "Medium"  # Low, Medium, High
     preferred_focus_areas: List[str] = ["Career", "Health"]  # 2-3 from six categories
+    playing_style: str = "Balanced"  # Aggressive, Balanced, Defensive (Phase 7)
 
 class User(BaseModel):
     user_id: str
@@ -95,7 +96,9 @@ class User(BaseModel):
     profile: Optional[UserProfile] = None
     country: str = DEFAULT_COUNTRY  # User's country code (e.g., "IN", "US")
     currency: str = "INR"  # User's preferred currency
-    playing_xi: Optional[List[Dict]] = None  # 11 players representing life roles
+    playing_xi: Optional[List[Dict]] = None  # 11 players representing life roles (Phase 4)
+    strongest_category: Optional[str] = None  # Auto-calculated (Phase 7)
+    weakest_category: Optional[str] = None  # Auto-calculated (Phase 7)
     win_streak: int = 0
     next_target: int = 60
     total_bonus_runs: int = 0
