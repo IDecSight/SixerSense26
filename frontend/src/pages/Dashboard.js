@@ -326,12 +326,21 @@ export const Dashboard = () => {
               </div>
 
               {match.tasks?.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-white/20 rounded-xl bg-white/5">
+                <div className="text-center py-12 border-2 border-dashed border-white/20 rounded-xl bg-white/5 space-y-4">
                   <p className="text-white/80 mb-4 font-body">No players yet. Build your Playing XI!</p>
-                  <Button onClick={() => setShowAddTask(true)} className="bg-white hover:bg-white/90 text-[#4169E1] font-heading shadow-lg">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Your First Player
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button onClick={() => setShowAddTask(true)} className="bg-white hover:bg-white/90 text-[#4169E1] font-heading shadow-lg">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Player Manually
+                    </Button>
+                    <Button 
+                      onClick={() => setShowGoalPrompt(true)} 
+                      className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-[#4169E1] font-heading font-bold shadow-lg"
+                    >
+                      <Target className="w-4 h-4 mr-2" />
+                      Set Goals & Auto-Generate
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-3">
