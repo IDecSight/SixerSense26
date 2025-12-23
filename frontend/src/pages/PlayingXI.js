@@ -2,21 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, Users, CheckCircle, Circle, XCircle } from 'lucide-react';
+import { ArrowLeft, Users, CheckCircle, Circle, XCircle, RefreshCw } from 'lucide-react';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
 export const PlayingXI = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [match, setMatch] = useState(null);
   const [playingXI, setPlayingXI] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     fetchMatchData();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchMatchData(true);
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchMatchData = async () => {
+  const fetchMatchData = async (silent = false) => {
+    if (!silent) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
+    
     try {
       const response = await apiClient.get('/matches/today');
       setMatch(response.data);
@@ -34,12 +49,25 @@ export const PlayingXI = () => {
         }));
         setPlayingXI(xi);
       }
+      
+      setLastUpdated(new Date());
+      
+      if (silent) {
+        toast.success('Playing XI updated', { duration: 2000 });
+      }
     } catch (error) {
       console.error('Error fetching match:', error);
-      toast.error('Failed to load Playing XI');
+      if (!silent) {
+        toast.error('Failed to load Playing XI');
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleManualRefresh = () => {
+    fetchMatchData(true);
   };
 
   const getRoleForCategory = (category) => {
