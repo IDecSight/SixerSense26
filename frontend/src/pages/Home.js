@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Trophy, Wallet, User, History, Target, LogOut, Zap, Crown, RefreshCw, TrendingUp, Users } from 'lucide-react';
+import { GoalPromptModal } from '../components/GoalPromptModal';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
