@@ -15,7 +15,8 @@ export const ProfileForm = ({ onProfileUpdated }) => {
     profession: '',
     life_stage: 'Working Professional',
     daily_availability: 'Medium',
-    preferred_focus_areas: ['Career', 'Health']
+    preferred_focus_areas: ['Career', 'Health'],
+    playing_style: 'Balanced'
   });
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
