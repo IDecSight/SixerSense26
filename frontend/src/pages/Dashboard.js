@@ -406,6 +406,12 @@ export const Dashboard = () => {
         onTaskAdded={fetchMatch}
       />
 
+      {/* Goal Prompt Modal */}
+      <GoalPromptModal
+        open={showGoalPrompt}
+        onOpenChange={setShowGoalPrompt}
+      />
+
       {/* Live Commentary */}
       <LiveCommentary
         commentary={commentary}
