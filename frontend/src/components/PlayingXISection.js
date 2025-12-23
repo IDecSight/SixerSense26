@@ -2,6 +2,30 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Users, CheckCircle, Circle, XCircle } from 'lucide-react';
 
+// Helper function - defined outside component
+const getRoleForCategory = (category) => {
+  const roles = {
+    'Career': 'Batsman',
+    'Finance': 'Batsman',
+    'Travel/Leisure': 'Batsman',
+    'Health': 'All-Rounder',
+    'Relationships': 'All-Rounder',
+    'Spiritual/Mindset': 'Bowler'
+  };
+  return roles[category] || 'All-Rounder';
+};
+
+const getStatusIcon = (status) => {
+  switch (status) {
+    case 'completed':
+      return <CheckCircle className="w-5 h-5 text-green-400" />;
+    case 'dismissed':
+      return <XCircle className="w-5 h-5 text-red-400" />;
+    default:
+      return <Circle className="w-5 h-5 text-white/40" />;
+  }
+};
+
 export const PlayingXISection = ({ match }) => {
   if (!match || !match.tasks) {
     return null;
@@ -17,18 +41,6 @@ export const PlayingXISection = ({ match }) => {
     status: task.status,
     balls_consumed: task.balls_consumed || 1
   }));
-
-  const getRoleForCategory = (category) => {
-    const roles = {
-      'Career': 'Batsman',
-      'Finance': 'Batsman',
-      'Travel/Leisure': 'Batsman',
-      'Health': 'All-Rounder',
-      'Relationships': 'All-Rounder',
-      'Spiritual/Mindset': 'Bowler'
-    };
-    return roles[category] || 'All-Rounder';
-  };
 
   const getStatusIcon = (status) => {
     switch (status) {
