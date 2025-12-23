@@ -86,6 +86,19 @@ class UserProfile(BaseModel):
     preferred_focus_areas: List[str] = ["Career", "Health"]  # 2-3 from six categories
     playing_style: str = "Balanced"  # Aggressive, Balanced, Defensive (Phase 7)
 
+class GoalStructure(BaseModel):
+    short: List[str] = []  # 0-30 days
+    medium: List[str] = []  # 1-6 months
+    long: List[str] = []  # 6+ months
+
+class UserGoals(BaseModel):
+    Health: GoalStructure = GoalStructure()
+    Career: GoalStructure = GoalStructure()
+    Finance: GoalStructure = GoalStructure()
+    Relationships: GoalStructure = GoalStructure()
+    Spiritual: GoalStructure = GoalStructure()
+    Travel: GoalStructure = GoalStructure()
+
 class User(BaseModel):
     user_id: str
     email: str
@@ -99,6 +112,7 @@ class User(BaseModel):
     playing_xi: Optional[List[Dict]] = None  # 11 players representing life roles (Phase 4)
     strongest_category: Optional[str] = None  # Auto-calculated (Phase 7)
     weakest_category: Optional[str] = None  # Auto-calculated (Phase 7)
+    goals: Optional[UserGoals] = None  # User's parsed goals from prompt
     win_streak: int = 0
     next_target: int = 60
     total_bonus_runs: int = 0
