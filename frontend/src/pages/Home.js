@@ -12,6 +12,7 @@ export const Home = () => {
   const [user, setUser] = useState(null);
   const [hasMatchToday, setHasMatchToday] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showGoalPrompt, setShowGoalPrompt] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
