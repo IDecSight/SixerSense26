@@ -147,6 +147,12 @@ class PremiumEnforcementTester:
         if token:
             headers['Authorization'] = f'Bearer {token}'
         
+        print(f"🔍 Making {method} request to: {url}")
+        if token:
+            print(f"   Using token: {token[:20]}...")
+        if data:
+            print(f"   Data: {data}")
+        
         try:
             if method == 'GET':
                 response = requests.get(url, headers=headers, timeout=30)
@@ -157,10 +163,17 @@ class PremiumEnforcementTester:
             elif method == 'DELETE':
                 response = requests.delete(url, headers=headers, timeout=30)
             
+            print(f"   Response: {response.status_code}")
+            if response.text:
+                print(f"   Body: {response.text[:200]}...")
+            
             return response
             
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             print(f"❌ API request failed: {str(e)}")
+            return None
+        except Exception as e:
+            print(f"❌ Unexpected error: {str(e)}")
             return None
 
     def test_ai_recommendation_premium_enforcement(self):
