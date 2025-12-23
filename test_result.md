@@ -342,7 +342,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Comprehensive E2E Frontend Testing Complete"
+    - "Free vs Premium Enforcement Testing Complete"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
