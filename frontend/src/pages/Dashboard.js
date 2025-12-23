@@ -409,7 +409,8 @@ export const Dashboard = () => {
       {/* Goal Prompt Modal */}
       <GoalPromptModal
         open={showGoalPrompt}
-        onOpenChange={setShowGoalPrompt}
+        onClose={() => setShowGoalPrompt(false)}
+        onGoalsSet={fetchMatch}
       />
 
       {/* Live Commentary */}
