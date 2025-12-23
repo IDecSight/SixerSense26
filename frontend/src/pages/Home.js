@@ -174,6 +174,37 @@ export const Home = () => {
           )}
         </div>
 
+        {/* Set Your Game Plan - Prominent Section */}
+        <Card className="mb-8 border-2 border-yellow-400/40 bg-gradient-to-br from-yellow-400/10 via-green-400/10 to-blue-400/10 backdrop-blur-lg shadow-2xl hover:shadow-yellow-400/20 transition-all">
+          <CardHeader className="text-center pb-4">
+            <div className="flex justify-center mb-3">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg">
+                <Target className="w-8 h-8 text-[#4169E1]" />
+              </div>
+            </div>
+            <CardTitle className="text-3xl font-heading font-bold text-white mb-2 flex items-center justify-center gap-2">
+              🎯 Set Your Game Plan
+            </CardTitle>
+            <CardDescription className="text-white/90 font-body text-base max-w-2xl mx-auto">
+              Tell your captain what you want to achieve across <strong className="text-white">health, career, money, relationships, mindset, and travel</strong>. 
+              Your AI captain will create today's Playing XI tailored to your goals.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center pb-6">
+            <Button
+              onClick={() => setShowGoalPrompt(true)}
+              size="lg"
+              className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-[#4169E1] font-heading font-bold text-lg px-8 py-6 h-auto shadow-2xl hover:shadow-yellow-400/50 transition-all hover:scale-105"
+            >
+              <Target className="w-6 h-6 mr-3" />
+              Set Goals
+            </Button>
+            <p className="text-white/70 text-sm font-body mt-4">
+              💡 Takes 2 minutes • Get 11 personalized tasks instantly
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Menu Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {menuItems.map((item, idx) => (
