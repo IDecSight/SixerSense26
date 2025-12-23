@@ -83,32 +83,41 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
   };
 
   return (
-    <Card className="border-white/20 bg-white/10 backdrop-blur-lg shadow-2xl" data-testid="captains-call">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-yellow-200" />
-            <CardTitle className="text-xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-md">
-              Captain's Call
-            </CardTitle>
+    <>
+      <Card className="border-white/20 bg-white/10 backdrop-blur-lg shadow-2xl" data-testid="captains-call">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {!isPremium && <Lock className="w-4 h-4 text-yellow-200" />}
+              <Sparkles className="w-5 h-5 text-yellow-200" />
+              <CardTitle className="text-xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-md">
+                Captain's Call
+              </CardTitle>
+              {!isPremium && (
+                <span className="ml-2 px-2 py-0.5 text-[10px] font-bold bg-yellow-400/90 text-[#4169E1] rounded-full">
+                  PREMIUM
+                </span>
+              )}
+            </div>
+            {recommendation && isPremium && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={getRecommendation}
+                disabled={loading}
+                data-testid="recalculate-btn"
+                className="text-white hover:text-yellow-200"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
+            )}
           </div>
-          {recommendation && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={getRecommendation}
-              disabled={loading}
-              data-testid="recalculate-btn"
-              className="text-white hover:text-yellow-200"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            </Button>
-          )}
-        </div>
-        <CardDescription className="text-white/80 font-body">
-          AI-powered recommendations based on your available time and life balance
-        </CardDescription>
-      </CardHeader>
+          <CardDescription className="text-white/80 font-body">
+            {isPremium 
+              ? "AI-powered recommendations based on your available time and life balance"
+              : "Unlock AI-powered task recommendations with Premium"}
+          </CardDescription>
+        </CardHeader>
       <CardContent className="space-y-4">
         {!recommendation ? (
           <Button
