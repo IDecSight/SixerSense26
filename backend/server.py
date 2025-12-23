@@ -64,6 +64,12 @@ if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET:
 else:
     logging.warning("Razorpay credentials not found - payment features will be disabled")
 
+# Google Calendar Configuration
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI")
+GOOGLE_CALENDAR_SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
+
 # Create the main app without a prefix
 app = FastAPI(title="Sixer Sense API")
 
