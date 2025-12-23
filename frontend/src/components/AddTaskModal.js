@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Calendar, Lock } from 'lucide-react';
+import { PremiumUpgradeModal } from './PremiumUpgradeModal';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
 export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     category: 'Career',
     run_value: 1,
-    estimated_minutes: 30
+    estimated_minutes: 30,
+    sync_to_calendar: false
   });
   const [loading, setLoading] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [calendarConnected, setCalendarConnected] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const categories = [
     'Health',
