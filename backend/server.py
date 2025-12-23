@@ -229,6 +229,95 @@ async def require_premium(current_user: str = Depends(get_current_user)):
     
     return current_user
 
+# ==================== GOOGLE CALENDAR HELPERS ====================
+
+async def get_google_calendar_credentials(user_id: str):
+    """Get and refresh Google Calendar credentials for a user"""
+    user_doc = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    if not user_doc or "google_calendar_tokens" not in user_doc:
+        return None
+    
+    tokens = user_doc["google_calendar_tokens"]
+    creds = Credentials(
+        token=tokens.get('access_token'),
+        refresh_token=tokens.get('refresh_token'),
+        token_uri='https://oauth2.googleapis.com/token',
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        scopes=GOOGLE_CALENDAR_SCOPES
+    )
+    
+    # Refresh token if expired
+    if creds.expired and creds.refresh_token:
+        try:
+            creds.refresh(GoogleRequest())
+            # Update tokens in database
+            await db.users.update_one(
+                {"user_id": user_id},
+                {"$set": {"google_calendar_tokens.access_token": creds.token}}
+            )
+        except Exception as e:
+            logging.error(f"Failed to refresh calendar token: {str(e)}")
+            return None
+    
+    return creds
+
+async def create_calendar_event(user_id: str, task_title: str, scheduled_start: datetime, estimated_minutes: int):
+    """Create a Google Calendar event for a task"""
+    try:
+        creds = await get_google_calendar_credentials(user_id)
+        if not creds:
+            logging.warning(f"No calendar credentials for user {user_id}")
+            return None
+        
+        service = build('calendar', 'v3', credentials=creds)
+        
+        # Calculate end time
+        end_time = scheduled_start + timedelta(minutes=estimated_minutes)
+        
+        event = {
+            'summary': f"🏏 {task_title}",
+            'description': "Created by Sixer Sense - Your productivity cricket match!",
+            'start': {
+                'dateTime': scheduled_start.isoformat(),
+                'timeZone': 'UTC',
+            },
+            'end': {
+                'dateTime': end_time.isoformat(),
+                'timeZone': 'UTC',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+        
+        created_event = service.events().insert(calendarId='primary', body=event).execute()
+        logging.info(f"Created calendar event: {created_event['id']}")
+        return created_event['id']
+        
+    except Exception as e:
+        logging.error(f"Failed to create calendar event: {str(e)}")
+        return None
+
+async def delete_calendar_event(user_id: str, event_id: str):
+    """Delete a Google Calendar event"""
+    try:
+        creds = await get_google_calendar_credentials(user_id)
+        if not creds:
+            return False
+        
+        service = build('calendar', 'v3', credentials=creds)
+        service.events().delete(calendarId='primary', eventId=event_id).execute()
+        logging.info(f"Deleted calendar event: {event_id}")
+        return True
+        
+    except Exception as e:
+        logging.error(f"Failed to delete calendar event: {str(e)}")
+        return False
+
 # ==================== HELPER FUNCTIONS ====================
 
 async def calculate_category_balance(user_id: str, days: int = 7) -> Dict[str, Dict]:
