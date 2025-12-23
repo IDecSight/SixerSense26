@@ -1169,6 +1169,10 @@ async def mark_distraction(task_id: str, current_user: str = Depends(get_current
     if not task_doc:
         raise HTTPException(status_code=404, detail="Task not found")
     
+    # Delete calendar event if exists
+    if task_doc.get("calendar_event_id"):
+        await delete_calendar_event(current_user, task_doc["calendar_event_id"])
+    
     # Update task
     await db.tasks.update_one(
         {"task_id": task_id},
