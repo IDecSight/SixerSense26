@@ -724,7 +724,15 @@ async def connect_google_calendar(current_user: str = Depends(require_premium)):
 async def google_calendar_callback(code: str, state: str):
     """Handle Google Calendar OAuth callback"""
     try:
-        # Exchange code for tokens using direct HTTP request (avoids scope mismatch issues)
+        # Validate credentials exist
+        if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
+            logging.error("Calendar OAuth callback: Missing credentials")
+            return RedirectResponse(
+                url=f"{os.environ.get('RETURN_URL')}settings?calendar_error=missing_credentials"
+            )
+        
+        # Exchange code for tokens using direct HTTP request
+        logging.info("Exchanging OAuth code for tokens")
         token_response = httpx.post('https://oauth2.googleapis.com/token', data={
             'code': code,
             'client_id': GOOGLE_CLIENT_ID,
@@ -734,7 +742,24 @@ async def google_calendar_callback(code: str, state: str):
         })
         
         if token_response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to exchange authorization code")
+            error_data = token_response.json() if token_response.text else {}
+            error_msg = error_data.get('error', 'unknown')
+            error_desc = error_data.get('error_description', 'Token exchange failed')
+            logging.error(f"Calendar OAuth token exchange failed: {error_msg} - {error_desc}")
+            
+            # User-friendly error messages
+            if error_msg == 'invalid_client':
+                return RedirectResponse(
+                    url=f"{os.environ.get('RETURN_URL')}settings?calendar_error=invalid_client"
+                )
+            elif error_msg == 'redirect_uri_mismatch':
+                return RedirectResponse(
+                    url=f"{os.environ.get('RETURN_URL')}settings?calendar_error=redirect_mismatch"
+                )
+            else:
+                return RedirectResponse(
+                    url=f"{os.environ.get('RETURN_URL')}settings?calendar_error=token_exchange"
+                )
         
         tokens = token_response.json()
         
@@ -745,7 +770,10 @@ async def google_calendar_callback(code: str, state: str):
         )
         
         if user_info_response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to get user info")
+            logging.error("Failed to get user info from token")
+            return RedirectResponse(
+                url=f"{os.environ.get('RETURN_URL')}settings?calendar_error=user_info"
+            )
         
         user_info = user_info_response.json()
         user_email = user_info.get('email')
@@ -757,8 +785,12 @@ async def google_calendar_callback(code: str, state: str):
         )
         
         if result.matched_count == 0:
-            raise HTTPException(status_code=404, detail="User not found")
+            logging.error(f"User not found with email: {user_email}")
+            return RedirectResponse(
+                url=f"{os.environ.get('RETURN_URL')}settings?calendar_error=user_not_found"
+            )
         
+        logging.info(f"Calendar connected successfully for user: {user_email}")
         # Redirect back to frontend
         return RedirectResponse(url=f"{os.environ.get('RETURN_URL')}settings?calendar_connected=true")
         
