@@ -84,7 +84,8 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
             <Textarea
               value={goalText}
               onChange={(e) => setGoalText(e.target.value)}
-              placeholder="Example: I want to get fitter, grow my career in AI, invest regularly, improve family relationships, meditate daily, and plan a trip to Europe..."
+              placeholder="Example:
+I want to become a director in my career, build an AI product, stay fit, spend quality time with my son, become financially free, and travel more…"
               className="min-h-[200px] bg-white/10 border-white/20 text-white placeholder:text-white/50 font-body focus:border-yellow-200 resize-none"
               disabled={loading}
             />
