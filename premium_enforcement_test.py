@@ -312,7 +312,7 @@ class PremiumEnforcementTester:
             data=profile_data
         )
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             try:
                 update_data = response.json()
                 if "message" in update_data and "profile" in update_data:
@@ -349,7 +349,7 @@ class PremiumEnforcementTester:
         # Test that premium user can access premium endpoints
         response = self.make_api_request('GET', 'profile', token=premium_token)
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             self.log_test("Premium User Access - Profile Endpoint", True, 
                         "Premium user can access profile endpoint")
         else:
@@ -361,7 +361,7 @@ class PremiumEnforcementTester:
         # Test non-premium endpoints still work for premium users
         response = self.make_api_request('GET', 'wallet/balance', token=premium_token)
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             try:
                 wallet_data = response.json()
                 is_premium = wallet_data.get('is_premium', False)
@@ -472,7 +472,7 @@ class PremiumEnforcementTester:
         # Test the location endpoint which doesn't require auth
         response = self.make_api_request('GET', 'users/location')
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             try:
                 data = response.json()
                 self.log_test("Backend Connectivity", True, 
