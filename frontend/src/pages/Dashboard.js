@@ -22,7 +22,6 @@ export const Dashboard = () => {
   const [startingMatch, setStartingMatch] = useState(false);
   const [commentary, setCommentary] = useState(null);
   const [showCommentary, setShowCommentary] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // For triggering refreshes
 
   const fetchMatch = async () => {
     try {
