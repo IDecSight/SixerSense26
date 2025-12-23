@@ -465,7 +465,26 @@ class PremiumEnforcementTester:
         self.cleanup_test_user(free_user_id)
         return True
 
-    def cleanup_test_user(self, user_id):
+    def test_connectivity(self):
+        """Test basic connectivity to the backend"""
+        print("\n🌐 Testing Backend Connectivity...")
+        
+        # Test the location endpoint which doesn't require auth
+        response = self.make_api_request('GET', 'users/location')
+        
+        if response and response.status_code == 200:
+            try:
+                data = response.json()
+                self.log_test("Backend Connectivity", True, 
+                            f"Connected successfully. Detected country: {data.get('country')}")
+                return True
+            except:
+                self.log_test("Backend Connectivity", False, "Got 200 but invalid JSON")
+                return False
+        else:
+            status = response.status_code if response else "No response"
+            self.log_test("Backend Connectivity", False, f"Got status: {status}")
+            return False
         """Clean up test user and related data"""
         try:
             # Delete user's matches
