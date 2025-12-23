@@ -187,6 +187,27 @@ export const ProfileForm = ({ onProfileUpdated }) => {
             </Select>
           </div>
 
+          {/* Playing Style (Phase 7) */}
+          <div className="space-y-2">
+            <Label htmlFor="playing_style" className="flex items-center gap-2 text-white font-body">
+              <Target className="w-4 h-4 text-green-200" />
+              Playing Style
+            </Label>
+            <Select
+              value={profile.playing_style}
+              onValueChange={(value) => setProfile({ ...profile, playing_style: value })}
+            >
+              <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-[#4169E1] border-white/20 text-white">
+                <SelectItem value="Aggressive" className="text-white hover:bg-white/10">Aggressive (High risk, high reward)</SelectItem>
+                <SelectItem value="Balanced" className="text-white hover:bg-white/10">Balanced (Steady progress)</SelectItem>
+                <SelectItem value="Defensive" className="text-white hover:bg-white/10">Defensive (Safe and consistent)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Focus Areas */}
           <div className="space-y-3">
             <Label className="text-white font-body">Preferred Focus Areas (Choose 2-3)</Label>
