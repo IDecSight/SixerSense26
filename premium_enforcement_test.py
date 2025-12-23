@@ -200,7 +200,7 @@ class PremiumEnforcementTester:
             data={"match_id": match_id, "time_available": 30}
         )
         
-        if response and response.status_code == 403:
+        if response is not None and response.status_code == 403:
             try:
                 error_data = response.json()
                 if "Premium membership" in error_data.get("detail", ""):
