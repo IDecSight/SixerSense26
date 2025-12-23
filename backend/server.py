@@ -1563,6 +1563,202 @@ async def get_category_balance_api(current_user: str = Depends(get_current_user)
     balance = await calculate_category_balance(current_user, days)
     return balance
 
+# ==================== GOAL PROMPT ROUTES ====================
+
+@api_router.post("/goals/parse")
+async def parse_user_goals(req: GoalPromptRequest, current_user: str = Depends(get_current_user)):
+    """Parse natural language goals and extract structured data"""
+    try:
+        # Use LLM to parse goals
+        llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+        
+        prompt = f"""You are an AI assistant helping parse user goals for a productivity app.
+
+The user has entered the following goal description:
+"{req.goal_text}"
+
+Please extract and classify goals into 6 categories: Health, Career, Finance, Relationships, Spiritual, Travel.
+
+For each category, classify goals as:
+- short_term: Daily/weekly goals (0-30 days)
+- medium_term: Monthly/quarterly goals (1-6 months)
+- long_term: Yearly or life goals (6+ months)
+
+IMPORTANT RULES:
+- Only extract goals that are explicitly mentioned
+- Do NOT hallucinate or invent goals
+- If a category is not mentioned, leave it empty
+- Be specific and actionable
+
+Return ONLY valid JSON in this exact format:
+{{
+  "Health": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Career": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Finance": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Relationships": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Spiritual": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Travel": {{"short_term": [], "medium_term": [], "long_term": []}}
+}}"""
+
+        messages = [UserMessage(content=prompt)]
+        response = await llm.run_async(messages=messages)
+        
+        # Parse JSON response
+        import json
+        goals_data = json.loads(response.content)
+        
+        # Update user's goals in database
+        goals_update = {}
+        for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+            if category in goals_data:
+                goals_update[f"goals.{category}.short"] = goals_data[category].get("short_term", [])
+                goals_update[f"goals.{category}.medium"] = goals_data[category].get("medium_term", [])
+                goals_update[f"goals.{category}.long"] = goals_data[category].get("long_term", [])
+        
+        await db.users.update_one(
+            {"user_id": current_user},
+            {"$set": goals_update}
+        )
+        
+        logging.info(f"Goals parsed and saved for user {current_user}")
+        return {"goals": goals_data, "message": "Goals parsed successfully"}
+        
+    except json.JSONDecodeError as e:
+        logging.error(f"Failed to parse LLM response: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to parse goals. Please try rephrasing.")
+    except Exception as e:
+        logging.error(f"Goal parsing error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to parse goals: {str(e)}")
+
+@api_router.post("/goals/generate-tasks")
+async def generate_tasks_from_goals(current_user: str = Depends(get_current_user)):
+    """Generate today's tasks from user's parsed goals"""
+    try:
+        # Get user and their goals
+        user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+        if not user_doc:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user_goals = user_doc.get("goals")
+        if not user_goals:
+            raise HTTPException(status_code=400, detail="No goals set. Please set your goals first.")
+        
+        # Get today's match
+        match_doc = await db.matches.find_one({
+            "user_id": current_user,
+            "date": datetime.now(timezone.utc).date().isoformat(),
+            "status": {"$in": ["in_progress", "not_started"]}
+        })
+        
+        if not match_doc:
+            raise HTTPException(status_code=404, detail="No active match found for today")
+        
+        # Build goal context for LLM
+        goal_summary = []
+        for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+            cat_goals = user_goals.get(category, {})
+            short = cat_goals.get("short", [])
+            medium = cat_goals.get("medium", [])
+            if short or medium:
+                goal_summary.append(f"{category}: {', '.join(short + medium)}")
+        
+        if not goal_summary:
+            raise HTTPException(status_code=400, detail="No active goals found")
+        
+        # Use LLM to generate tasks
+        llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+        
+        prompt = f"""You are an AI captain creating today's game plan (Playing XI) for a cricket-themed productivity app.
+
+User's Goals:
+{chr(10).join(goal_summary)}
+
+Generate exactly 11 actionable tasks for today that align with these goals.
+
+RULES:
+- Exactly 11 tasks (Playing XI)
+- Prioritize short-term goals
+- Break down long-term goals into small daily actions
+- Each task should be completable today (5-60 minutes)
+- Assign run values: 1 (small), 4 (meaningful), 6 (high-impact)
+- Balance across categories when possible
+- Be specific and actionable
+
+Return ONLY valid JSON array in this format:
+[
+  {{"title": "30-min workout", "category": "Health", "run_value": 4, "estimated_minutes": 30}},
+  ...exactly 11 tasks...
+]"""
+
+        messages = [UserMessage(content=prompt)]
+        response = await llm.run_async(messages=messages)
+        
+        # Parse JSON response
+        import json
+        tasks_data = json.loads(response.content)
+        
+        # Validate and limit to 11 tasks
+        if len(tasks_data) > 11:
+            tasks_data = tasks_data[:11]
+        
+        # Create tasks in database
+        created_tasks = []
+        for task_data in tasks_data:
+            task_id = f"task_{uuid.uuid4().hex[:12]}"
+            
+            # Calculate balls consumed (1 ball per 15 mins, max 6)
+            estimated_minutes = task_data.get("estimated_minutes", 30)
+            balls_consumed = min(6, max(1, estimated_minutes // 15))
+            
+            task_doc = {
+                "task_id": task_id,
+                "user_id": current_user,
+                "match_id": match_doc["match_id"],
+                "title": task_data["title"],
+                "category": task_data["category"],
+                "run_value": task_data["run_value"],
+                "estimated_minutes": estimated_minutes,
+                "balls_consumed": balls_consumed,
+                "status": "pending",
+                "started_at": None,
+                "completed_at": None,
+                "scheduled_start": None,
+                "sync_to_calendar": False,
+                "calendar_event_id": None,
+                "tracking_type": "goal_generated",
+                "external_link": None,
+                "tracking_data": {"source": "goal_prompt"},
+                "created_at": datetime.now(timezone.utc)
+            }
+            
+            await db.tasks.insert_one(task_doc)
+            task_doc.pop("_id", None)
+            created_tasks.append(task_doc)
+        
+        # Generate captain's response
+        categories_used = list(set([t["category"] for t in created_tasks]))
+        captain_msg = f"Captain's plan is ready! We'll open with {categories_used[0]}"
+        if len(categories_used) > 1:
+            captain_msg += f" and {categories_used[1]}"
+        if len(categories_used) > 2:
+            captain_msg += f", steady {categories_used[2]} in the middle overs"
+        captain_msg += ". Your Playing XI is set for today's match!"
+        
+        logging.info(f"Generated {len(created_tasks)} tasks for user {current_user}")
+        
+        return {
+            "tasks": created_tasks,
+            "captain_message": captain_msg,
+            "message": f"Generated {len(created_tasks)} tasks from your goals"
+        }
+        
+    except json.JSONDecodeError as e:
+        logging.error(f"Failed to parse task generation response: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to generate tasks. Please try again.")
+    except Exception as e:
+        logging.error(f"Task generation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate tasks: {str(e)}")
+
 # ==================== WALLET ROUTES ====================
 
 @api_router.get("/wallet/balance")
