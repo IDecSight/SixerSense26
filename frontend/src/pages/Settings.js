@@ -34,11 +34,28 @@ export const Settings = () => {
     fetchUser();
     
     // Check for calendar connection callback
-    if (searchParams.get('calendar_connected') === 'true') {
+    const calendarConnected = searchParams.get('calendar_connected');
+    const calendarError = searchParams.get('calendar_error');
+    
+    if (calendarConnected === 'true') {
       toast.success('Google Calendar connected successfully! 🎉');
       navigate('/settings', { replace: true });
-    } else if (searchParams.get('calendar_error') === 'true') {
-      toast.error('Failed to connect Google Calendar. Please try again.');
+    } else if (calendarError) {
+      // Show specific error messages
+      const errorMessages = {
+        'invalid_client': 'OAuth configuration error: Invalid Client ID or Secret. Please contact support.',
+        'redirect_mismatch': 'OAuth configuration error: Redirect URI mismatch. Please contact support.',
+        'missing_credentials': 'Google Calendar not configured. Please contact support to set up OAuth credentials.',
+        'token_exchange': 'Failed to exchange authorization code. Please try again.',
+        'user_info': 'Failed to retrieve user information. Please try again.',
+        'user_not_found': 'User account not found. Please try logging in again.'
+      };
+      
+      const errorMsg = errorMessages[calendarError] || 'Failed to connect Google Calendar. Please try again.';
+      toast.error('Calendar Connection Failed', {
+        description: errorMsg,
+        duration: 6000
+      });
       navigate('/settings', { replace: true });
     }
   }, [searchParams]);
