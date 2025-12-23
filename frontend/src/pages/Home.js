@@ -47,6 +47,14 @@ export const Home = () => {
     navigate('/');
   };
 
+  const handleGoalsSet = () => {
+    // Refresh user data and navigate to dashboard
+    toast.success('Goals saved! Redirecting to your match...');
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 1500);
+  };
+
   const menuItems = [
     {
       icon: Trophy,
