@@ -42,17 +42,6 @@ export const PlayingXISection = ({ match }) => {
     balls_consumed: task.balls_consumed || 1
   }));
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-400" />;
-      case 'dismissed':
-        return <XCircle className="w-5 h-5 text-red-400" />;
-      default:
-        return <Circle className="w-5 h-5 text-white/40" />;
-    }
-  };
-
   if (playingXI.length === 0) {
     return null;
   }
