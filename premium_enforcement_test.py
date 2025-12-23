@@ -506,6 +506,11 @@ class PremiumEnforcementTester:
         print("🔐 Starting Premium Enforcement Testing...")
         print("=" * 60)
         
+        # Test 0: Basic connectivity
+        if not self.test_connectivity():
+            print("❌ Backend connectivity failed. Aborting tests.")
+            return False
+        
         all_tests_passed = True
         
         # Test 1: AI Recommendation Premium Enforcement
