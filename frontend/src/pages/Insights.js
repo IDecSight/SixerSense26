@@ -2,21 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, TrendingUp, TrendingDown, Target, AlertCircle } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Target, AlertCircle, RefreshCw } from 'lucide-react';
 import apiClient from '../lib/api';
 import { toast } from 'sonner';
 
 export const Insights = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [categoryBalance, setCategoryBalance] = useState({});
   const [user, setUser] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     fetchInsights();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchInsights(true);
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchInsights = async () => {
+  const fetchInsights = async (silent = false) => {
+    if (!silent) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
+    
     try {
       const [balanceRes, userRes] = await Promise.all([
         apiClient.get('/ai/balance?days=7'),
@@ -24,12 +39,24 @@ export const Insights = () => {
       ]);
       setCategoryBalance(balanceRes.data);
       setUser(userRes.data);
+      setLastUpdated(new Date());
+      
+      if (silent) {
+        toast.success('Insights updated', { duration: 2000 });
+      }
     } catch (error) {
       console.error('Error fetching insights:', error);
-      toast.error('Failed to load insights');
+      if (!silent) {
+        toast.error('Failed to load insights');
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleManualRefresh = () => {
+    fetchInsights(true);
   };
 
   const calculatePercentage = (category) => {
