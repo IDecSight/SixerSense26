@@ -360,7 +360,7 @@ export const Subscription = () => {
                 )}
               </Button>
               <p className="text-xs text-white/60 font-body">
-                Secure payment via DodoPayments • Cancel anytime
+                Secure payment via Razorpay • Cancel anytime
               </p>
             </div>
           </div>
