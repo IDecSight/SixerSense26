@@ -46,14 +46,16 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
         title: formData.title,
         category: formData.category,
         run_value: parseInt(formData.run_value),
-        estimated_minutes: parseInt(formData.estimated_minutes)
+        estimated_minutes: parseInt(formData.estimated_minutes),
+        sync_to_calendar: formData.sync_to_calendar
       });
       toast.success('Task added successfully!');
       setFormData({
         title: '',
         category: 'Career',
         run_value: 1,
-        estimated_minutes: 30
+        estimated_minutes: 30,
+        sync_to_calendar: false
       });
       onTaskAdded();
       onOpenChange(false);
@@ -62,6 +64,18 @@ export const AddTaskModal = ({ open, onOpenChange, onTaskAdded }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCalendarToggle = () => {
+    if (!isPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    if (!calendarConnected) {
+      toast.info('Please connect Google Calendar in Settings first');
+      return;
+    }
+    setFormData({ ...formData, sync_to_calendar: !formData.sync_to_calendar });
   };
 
   return (
