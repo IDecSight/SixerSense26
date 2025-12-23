@@ -50,6 +50,46 @@ export const Settings = () => {
     }, 100);
   };
 
+  const handleConnectCalendar = async () => {
+    if (!calendarStatus.is_premium) {
+      toast.error('Premium membership required', {
+        description: 'Upgrade to Premium to connect Google Calendar'
+      });
+      navigate('/subscription');
+      return;
+    }
+
+    setConnectingCalendar(true);
+    try {
+      const response = await apiClient.get('/auth/google/calendar/connect');
+      window.location.href = response.data.authorization_url;
+    } catch (error) {
+      console.error('Calendar connection error:', error);
+      if (error.response?.status === 503) {
+        toast.error('Calendar integration not configured', {
+          description: 'Please add Google OAuth credentials'
+        });
+      } else {
+        toast.error('Failed to connect calendar');
+      }
+      setConnectingCalendar(false);
+    }
+  };
+
+  const handleDisconnectCalendar = async () => {
+    if (!window.confirm('Are you sure you want to disconnect Google Calendar?')) {
+      return;
+    }
+
+    try {
+      await apiClient.delete('/auth/google/calendar/disconnect');
+      toast.success('Google Calendar disconnected');
+      setCalendarStatus({ ...calendarStatus, connected: false });
+    } catch (error) {
+      toast.error('Failed to disconnect calendar');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
