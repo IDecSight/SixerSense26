@@ -384,16 +384,10 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          {/* Right Column - Captain's Call, Playing XI, Cricket Ground */}
+          {/* Right Column - Captain's Call */}
           <div className="space-y-6">
             {/* Captain's Call */}
             <CaptainsCall matchId={match.match_id} onTaskCreated={fetchMatch} />
-            
-            {/* Playing XI Section */}
-            <PlayingXISection match={match} />
-            
-            {/* Cricket Ground Analytics */}
-            <CricketGroundSection match={match} refreshTrigger={refreshTrigger} />
           </div>
         </div>
       </main>
