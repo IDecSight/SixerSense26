@@ -364,7 +364,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phases 3-7 MVP Comprehensive Testing Complete"
+    - "Goal Prompt Feature E2E Testing Complete"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
