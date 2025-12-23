@@ -100,8 +100,7 @@ I want to become a director in my career, build an AI product, stay fit, spend q
               <div className="flex items-start gap-3">
                 <Sparkles className="w-5 h-5 text-green-200 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-heading font-bold text-white mb-1">Captain's Message:</p>
-                  <p className="text-white/90 font-body text-sm">{captainMessage}</p>
+                  <p className="text-white/90 font-body text-sm whitespace-pre-line">{captainMessage}</p>
                 </div>
               </div>
             </div>
