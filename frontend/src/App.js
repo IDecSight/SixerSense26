@@ -80,6 +80,30 @@ const AppRouter = () => {
         } 
       />
       <Route 
+        path="/insights" 
+        element={
+          <ProtectedRoute>
+            <Insights />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/playing-xi" 
+        element={
+          <ProtectedRoute>
+            <PlayingXI />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/cricket-ground" 
+        element={
+          <ProtectedRoute>
+            <CricketGround />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
         path="/debug" 
         element={<DebugPanel />} 
       />
