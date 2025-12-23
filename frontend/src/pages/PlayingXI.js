@@ -105,14 +105,32 @@ export const PlayingXI = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#4169E1] via-[#5B7FE8] to-[#7494EF]">
       <header className="border-b border-white/20 backdrop-blur-xl bg-white/5">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/home')} className="text-white hover:text-yellow-200 hover:bg-white/10">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <h1 className="text-3xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-lg">
-              Playing XI
-            </h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/home')} className="text-white hover:text-yellow-200 hover:bg-white/10">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <h1 className="text-3xl font-heading font-bold uppercase tracking-tight text-white drop-shadow-lg">
+                Playing XI
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              {lastUpdated && (
+                <span className="text-xs text-white/60 font-body">
+                  Updated: {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleManualRefresh}
+                disabled={refreshing}
+                className="text-white hover:text-yellow-200 hover:bg-white/10"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
