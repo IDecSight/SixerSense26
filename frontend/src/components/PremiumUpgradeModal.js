@@ -157,7 +157,7 @@ export const PremiumUpgradeModal = ({ open, onClose, onUpgrade, loading }) => {
 
           {/* Footer Note */}
           <p className="text-xs text-center text-white/60 font-body">
-            Secure payment via DodoPayments • Cancel anytime
+            Secure payment via Razorpay • Cancel anytime
           </p>
         </CardContent>
         </Card>
