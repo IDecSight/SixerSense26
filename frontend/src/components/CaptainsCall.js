@@ -285,5 +285,17 @@ export const CaptainsCall = ({ matchId, onTaskCreated }) => {
         )}
       </CardContent>
     </Card>
+
+    {/* Premium Upgrade Modal */}
+    <PremiumUpgradeModal
+      open={showUpgradeModal}
+      onClose={() => setShowUpgradeModal(false)}
+      onUpgrade={() => {
+        setShowUpgradeModal(false);
+        navigate('/subscription');
+      }}
+      loading={false}
+    />
+    </>
   );
 };
