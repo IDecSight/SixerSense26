@@ -534,8 +534,8 @@ async def logout(current_user: str = Depends(get_current_user)):
 # ==================== PROFILE ROUTES ====================
 
 @api_router.patch("/profile")
-async def update_profile(profile_data: ProfileUpdateRequest, current_user: str = Depends(get_current_user)):
-    """Update user profile"""
+async def update_profile(profile_data: ProfileUpdateRequest, current_user: str = Depends(require_premium)):
+    """Update user profile (PREMIUM ONLY)"""
     profile_dict = profile_data.model_dump()
     
     await db.users.update_one(
