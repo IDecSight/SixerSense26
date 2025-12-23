@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, User, Bell, Calendar } from 'lucide-react';
+import { ArrowLeft, User, Bell, Calendar, CheckCircle, XCircle, Crown, Link as LinkIcon } from 'lucide-react';
 import { ProfileForm } from '../components/ProfileForm';
 import apiClient from '../lib/api';
+import { toast } from 'sonner';
 
 export const Settings = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [calendarStatus, setCalendarStatus] = useState({ connected: false, is_premium: false });
+  const [connectingCalendar, setConnectingCalendar] = useState(false);
 
   const fetchUser = async () => {
     try {
