@@ -670,35 +670,55 @@ async def logout(current_user: str = Depends(get_current_user)):
 async def connect_google_calendar(current_user: str = Depends(require_premium)):
     """Initiate Google Calendar OAuth flow (PREMIUM ONLY)"""
     if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
-        raise HTTPException(status_code=503, detail="Google Calendar integration not configured")
+        raise HTTPException(
+            status_code=503, 
+            detail="Google Calendar integration not configured. Please contact support to set up Google OAuth credentials."
+        )
     
-    # Create OAuth flow
-    flow = Flow.from_client_config(
-        {
-            "web": {
-                "client_id": GOOGLE_CLIENT_ID,
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token"
-            }
-        },
-        scopes=GOOGLE_CALENDAR_SCOPES,
-        redirect_uri=GOOGLE_REDIRECT_URI
-    )
+    # Validate redirect URI format
+    if not GOOGLE_REDIRECT_URI:
+        raise HTTPException(
+            status_code=503,
+            detail="Google OAuth redirect URI not configured"
+        )
     
-    authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        prompt='consent',
-        include_granted_scopes='true'
-    )
-    
-    # Store state for verification
-    await db.users.update_one(
-        {"user_id": current_user},
-        {"$set": {"google_calendar_oauth_state": state}}
-    )
-    
-    return {"authorization_url": authorization_url}
+    try:
+        # Create OAuth flow with error handling
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": GOOGLE_CLIENT_ID,
+                    "client_secret": GOOGLE_CLIENT_SECRET,
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [GOOGLE_REDIRECT_URI]
+                }
+            },
+            scopes=GOOGLE_CALENDAR_SCOPES,
+            redirect_uri=GOOGLE_REDIRECT_URI
+        )
+        
+        authorization_url, state = flow.authorization_url(
+            access_type='offline',
+            prompt='consent',
+            include_granted_scopes='true'
+        )
+        
+        # Store state for verification
+        await db.users.update_one(
+            {"user_id": current_user},
+            {"$set": {"google_calendar_oauth_state": state}}
+        )
+        
+        logging.info(f"Calendar OAuth initiated for user {current_user}")
+        return {"authorization_url": authorization_url}
+        
+    except Exception as e:
+        logging.error(f"Calendar OAuth initiation failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to initiate Google Calendar connection. Please verify OAuth credentials are correctly configured."
+        )
 
 @api_router.get("/auth/google/calendar/callback")
 async def google_calendar_callback(code: str, state: str):
