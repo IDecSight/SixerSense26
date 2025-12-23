@@ -9,6 +9,9 @@ import Dashboard from './pages/Dashboard';
 import MatchHistory from './pages/MatchHistory';
 import { Subscription } from './pages/Subscription';
 import Settings from './pages/Settings';
+import Insights from './pages/Insights';
+import PlayingXI from './pages/PlayingXI';
+import CricketGround from './pages/CricketGround';
 import DebugPanel from './pages/DebugPanel';
 import './App.css';
 
