@@ -1591,7 +1591,8 @@ async def parse_user_goals(req: GoalPromptRequest, current_user: str = Depends(g
     """Parse natural language goals and extract structured data"""
     try:
         # Use LLM to parse goals
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
+        llm.with_model("openai", "gpt-4o-mini")
         
         prompt = f"""You are an AI assistant helping parse user goals for a productivity app.
 
@@ -1687,7 +1688,8 @@ async def generate_tasks_from_goals(current_user: str = Depends(get_current_user
             raise HTTPException(status_code=400, detail="No active goals found")
         
         # Use LLM to generate tasks
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
+        llm.with_model("openai", "gpt-4o-mini")
         
         prompt = f"""You are the SixerSense Goal Architect AI creating today's Playing XI (daily game plan) for the user.
 
@@ -2144,7 +2146,8 @@ async def orchestrator_process(req: OrchestratorRequest, current_user: str = Dep
                 raise HTTPException(status_code=400, detail="user_goal_text is required in payload")
             
             # ANALYST: Parse goals using LLM
-            llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+            llm = LlmChat(api_key=EMERGENT_LLM_KEY)
+        llm.with_model("openai", "gpt-4o-mini")
             
             parse_prompt = f"""You are the Analyst role in SixerSense. Parse user goals into structured format.
 
