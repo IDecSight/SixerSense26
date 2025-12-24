@@ -1852,24 +1852,55 @@ Return ONLY valid JSON:
                     "long": goals_data[category].get("long_term", [])
                 }
         
-        # SAFE GOALS UPDATE - Only update goals, NEVER overwrite profile or settings
+        # STEP 2: CREATE OR UPDATE PROFILE
+        # Profile is the SINGLE source of truth - created/updated ONLY via Set Game Plan
         try:
-            print("💾 Updating goals (safe update)...")
-            update_result = await db.users.update_one(
-                {"user_id": current_user},
-                {"$set": {"goals": mapped_goals}}
-            )
+            print("💾 Creating/updating profile...")
             
-            if update_result.matched_count == 0:
-                print("⚠️ User not found during goals update")
+            # Get current user to check if profile exists
+            user_doc = await db.users.find_one({"user_id": current_user})
+            if not user_doc:
+                print("⚠️ User not found")
                 profile_goals_failed = True
-            elif update_result.modified_count == 0:
-                print("ℹ️ Goals unchanged (same as before)")
             else:
-                print("✅ Goals updated successfully")
+                current_profile = user_doc.get("profile")
+                now = datetime.now(timezone.utc)
                 
-        except Exception as goals_error:
-            print(f"❌ Goals update failed: {str(goals_error)}")
+                if current_profile is None:
+                    # CREATE NEW PROFILE
+                    print("   Creating new profile (first Set Game Plan)...")
+                    new_profile = {
+                        "name": user_doc.get("name", "User"),
+                        "email": user_doc.get("email", ""),
+                        "playing_style": "Balanced",
+                        "goals": mapped_goals,
+                        "created_at": now,
+                        "updated_at": now
+                    }
+                    
+                    update_result = await db.users.update_one(
+                        {"user_id": current_user},
+                        {"$set": {"profile": new_profile}}
+                    )
+                    print("✅ Profile created successfully")
+                else:
+                    # UPDATE EXISTING PROFILE - Only update goals and updated_at
+                    print("   Updating existing profile goals...")
+                    update_result = await db.users.update_one(
+                        {"user_id": current_user},
+                        {"$set": {
+                            "profile.goals": mapped_goals,
+                            "profile.updated_at": now
+                        }}
+                    )
+                    
+                    if update_result.modified_count == 0:
+                        print("ℹ️ Goals unchanged (same as before)")
+                    else:
+                        print("✅ Profile goals updated successfully")
+                
+        except Exception as profile_error:
+            print(f"❌ Profile update failed: {str(profile_error)}")
             profile_goals_failed = True
         
         # STEP 3: Get today's match
