@@ -1813,7 +1813,8 @@ async def set_game_plan(req: GoalPromptRequest, current_user: str = Depends(get_
     try:
         # STEP 1: Parse goals using AI
         print("📊 Parsing goals with AI...")
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
+        llm.with_model("openai", "gpt-4o-mini")
         
         parse_prompt = f"""You are an AI assistant parsing user goals for a productivity app.
 
