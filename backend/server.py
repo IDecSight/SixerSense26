@@ -2281,10 +2281,17 @@ Return ONLY valid JSON array:
   {{"title": "30 min strength or mobility workout", "category": "Health", "run_value": 4, "estimated_minutes": 30}},
   ...exactly 11 tasks in batting order...
 ]"""
-
-            messages = [UserMessage(content=captain_prompt)]
-            captain_response = await llm.run_async(messages=messages)
-            tasks_data = json.loads(captain_response.content)
+            
+            captain_llm = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"orchestrator_captain_{current_user}",
+                system_message=captain_prompt
+            )
+            captain_llm.with_model("openai", "gpt-4o-mini")
+            
+            captain_message = UserMessage(text="Generate today's Playing XI based on the goals provided.")
+            captain_response = await captain_llm.send_message(captain_message)
+            tasks_data = json.loads(captain_response)
             
             # Limit to 11 tasks
             if len(tasks_data) > 11:
