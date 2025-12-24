@@ -20,27 +20,20 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // STEP 1: PROVE CLICK FIRES
-    alert("🔥 SET GAME PLAN CLICKED - Button is wired!");
-    
-    // STEP 2: PROVE STATE EXISTS
-    alert("Goal text: " + (goalText || "EMPTY OR UNDEFINED"));
+    console.log('🎯 Set Game Plan submitted');
     
     if (!goalText || !goalText.trim()) {
-      alert("❌ VALIDATION FAILED: Goal text is empty");
       toast.error('Please enter your goals');
       return;
     }
-    
-    alert("✅ Validation passed, calling backend...");
+
     setLoading(true);
     
     try {
-      // STEP 3: FORCE API CALL WITH FETCH (bypass apiClient)
-      alert("📤 About to call backend with fetch...");
-      
       const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
       const token = localStorage.getItem('auth_token');
+      
+      console.log('📤 Calling /api/goals/set-game-plan...');
       
       const res = await fetch(`${backendUrl}/api/goals/set-game-plan`, {
         method: 'POST',
@@ -51,35 +44,46 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
         body: JSON.stringify({ goal_text: goalText })
       });
       
-      alert(`Backend responded with status: ${res.status}`);
-      
       const data = await res.json();
-      alert(`Backend response: ${JSON.stringify(data)}`);
+      console.log('✅ Backend response:', data);
       
       if (res.ok) {
-        toast.success('Game plan set successfully!');
-        setCaptainMessage(data.captain_message || "Goals received!");
+        // Show success feedback
+        toast.success('🏏 Game Plan Updated', {
+          description: data.message
+        });
         
+        // Display captain's message
+        setCaptainMessage(data.captain_message);
+        
+        // Show detailed success info
         setTimeout(() => {
-          onGoalsSet();
-          handleClose();
-        }, 1500);
+          toast.success('Playing XI Ready!', {
+            description: `${data.tasks_created} tasks created. ${data.old_tasks_deleted} old tasks replaced.`
+          });
+          
+          // Close modal and refresh dashboard
+          setTimeout(() => {
+            console.log('✅ Closing modal and refreshing...');
+            onGoalsSet();
+            handleClose();
+          }, 2000);
+        }, 500);
+        
       } else {
-        alert(`❌ Backend error: ${data.detail || 'Unknown error'}`);
-        toast.error('Failed to set game plan', {
+        console.error('❌ Backend error:', data);
+        toast.error('Failed to Set Game Plan', {
           description: data.detail || 'Unknown error'
         });
       }
       
     } catch (error) {
-      alert(`❌ Network error: ${error.message}`);
-      console.error('❌ Error:', error);
+      console.error('❌ Network error:', error);
       toast.error('Network Error', {
-        description: error.message
+        description: 'Unable to reach server. Please try again.'
       });
     } finally {
       setLoading(false);
-      alert("🏁 Processing complete");
     }
   };
 
