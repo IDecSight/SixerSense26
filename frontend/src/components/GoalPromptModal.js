@@ -21,6 +21,7 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
     e.stopPropagation();
     
     console.log('🎯 Set Game Plan submitted');
+    console.log('Goal text length:', goalText?.length);
     
     if (!goalText || !goalText.trim()) {
       toast.error('Please enter your goals');
@@ -34,6 +35,8 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
       const token = localStorage.getItem('auth_token');
       
       console.log('📤 Calling /api/goals/set-game-plan...');
+      console.log('Backend URL:', backendUrl);
+      console.log('Has token:', !!token);
       
       const res = await fetch(`${backendUrl}/api/goals/set-game-plan`, {
         method: 'POST',
@@ -44,7 +47,22 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
         body: JSON.stringify({ goal_text: goalText })
       });
       
-      const data = await res.json();
+      console.log('Response status:', res.status);
+      console.log('Response ok:', res.ok);
+      
+      // Check if response is JSON
+      const contentType = res.headers.get('content-type');
+      console.log('Content-Type:', contentType);
+      
+      let data;
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error('Non-JSON response:', text);
+        throw new Error('Server returned non-JSON response');
+      }
+      
       console.log('✅ Backend response:', data);
       
       if (res.ok) {
@@ -73,17 +91,21 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
       } else {
         console.error('❌ Backend error:', data);
         toast.error('Failed to Set Game Plan', {
-          description: data.detail || 'Unknown error'
+          description: data.detail || data.message || 'Unknown error'
         });
       }
       
     } catch (error) {
-      console.error('❌ Network error:', error);
+      console.error('❌ Network/Fetch error:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      
       toast.error('Network Error', {
-        description: 'Unable to reach server. Please try again.'
+        description: error.message || 'Unable to reach server. Please check your connection.'
       });
     } finally {
       setLoading(false);
+      console.log('🏁 Request complete');
     }
   };
 
