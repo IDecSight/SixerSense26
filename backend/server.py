@@ -1782,6 +1782,33 @@ Return ONLY valid JSON array in this EXACT format:
 
 # ==================== ORCHESTRATOR ENDPOINT ====================
 
+
+# ==================== SET GAME PLAN ENDPOINT (SIMPLIFIED) ====================
+
+@api_router.post("/goals/set-game-plan")
+async def set_game_plan(req: GoalPromptRequest, current_user: str = Depends(get_current_user)):
+    """
+    SIMPLIFIED endpoint to test click-to-backend flow
+    """
+    print("🔥🔥🔥 SET GAME PLAN ENDPOINT HIT 🔥🔥🔥")
+    print(f"User: {current_user}")
+    print(f"Goal text received: {req.goal_text[:100]}...")
+    
+    try:
+        # STEP 5: Return immediately to prove backend is reachable
+        return {
+            "success": True,
+            "message": "Game plan endpoint reached successfully",
+            "captain_message": "🏏 Backend is working! Your goals were received.",
+            "goal_text_length": len(req.goal_text),
+            "user_id": current_user
+        }
+        
+    except Exception as e:
+        print(f"❌ Error in set-game-plan: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/orchestrator/process")
 async def orchestrator_process(req: OrchestratorRequest, current_user: str = Depends(get_current_user)):
     """
