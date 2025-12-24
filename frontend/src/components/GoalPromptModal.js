@@ -131,6 +131,10 @@ I want to become a director in my career, build an AI product, stay fit, spend q
             <Button
               type="submit"
               disabled={loading || !goalText.trim()}
+              onClick={(e) => {
+                console.log('🔘 Submit button clicked directly');
+                // Form onSubmit will handle the actual submission
+              }}
               className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-[#4169E1] font-heading font-bold shadow-lg"
             >
               {loading ? (
