@@ -2159,9 +2159,6 @@ async def orchestrator_process(req: OrchestratorRequest, current_user: str = Dep
                 raise HTTPException(status_code=400, detail="user_goal_text is required in payload")
             
             # ANALYST: Parse goals using LLM
-            llm = LlmChat(api_key=EMERGENT_LLM_KEY)
-            llm.with_model("openai", "gpt-4o-mini")
-            
             parse_prompt = f"""You are the Analyst role in SixerSense. Parse user goals into structured format.
 
 User Goal Text:
@@ -2179,10 +2176,17 @@ Return ONLY valid JSON:
   "Spiritual": {{"short_term": [], "medium_term": [], "long_term": []}},
   "Travel": {{"short_term": [], "medium_term": [], "long_term": []}}
 }}"""
-
-            messages = [UserMessage(content=parse_prompt)]
-            analyst_response = await llm.run_async(messages=messages)
-            goals_data = json.loads(analyst_response.content)
+            
+            llm = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"orchestrator_analyst_{current_user}",
+                system_message=parse_prompt
+            )
+            llm.with_model("openai", "gpt-4o-mini")
+            
+            user_message = UserMessage(text=f"Parse these goals: {user_goal_text}")
+            analyst_response = await llm.send_message(user_message)
+            goals_data = json.loads(analyst_response)
             
             # MAP AI OUTPUT → PROFILE FORMAT
             # AI returns: short_term, medium_term, long_term
