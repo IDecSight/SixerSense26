@@ -76,6 +76,14 @@ app = FastAPI(title="Sixer Sense API")
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+
+# Health check endpoint
+@api_router.get("/health")
+async def health_check():
+    """Simple health check endpoint"""
+    return {"status": "ok", "service": "sixer-sense-api"}
+
+
 # ==================== MODELS ====================
 
 class UserProfile(BaseModel):
