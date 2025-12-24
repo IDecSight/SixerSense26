@@ -1945,24 +1945,24 @@ Return ONLY valid JSON:
                     "long": goals_data[category].get("long_term", [])
                 }
         
-        # SAFE PROFILE UPDATE - Only update profile.goals, NEVER overwrite profile
+        # SAFE GOALS UPDATE - Only update goals, NEVER overwrite profile or settings
         try:
-            print("💾 Updating profile.goals (safe update)...")
+            print("💾 Updating goals (safe update)...")
             update_result = await db.users.update_one(
                 {"user_id": current_user},
-                {"$set": {"profile.goals": mapped_goals}}
+                {"$set": {"goals": mapped_goals}}
             )
             
             if update_result.matched_count == 0:
-                print("⚠️ User not found during profile update")
+                print("⚠️ User not found during goals update")
                 profile_goals_failed = True
             elif update_result.modified_count == 0:
                 print("ℹ️ Goals unchanged (same as before)")
             else:
-                print("✅ Profile.goals updated successfully")
+                print("✅ Goals updated successfully")
                 
-        except Exception as profile_error:
-            print(f"❌ Profile update failed: {str(profile_error)}")
+        except Exception as goals_error:
+            print(f"❌ Goals update failed: {str(goals_error)}")
             profile_goals_failed = True
         
         # STEP 3: Get today's match
