@@ -13,32 +13,39 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     
-    console.log('🎯 Set Game Plan clicked');
+    console.log('🎯 Set Game Plan form submitted');
+    console.log('Event:', e);
     console.log('Goal text:', goalText);
+    console.log('Goal text length:', goalText?.length);
+    console.log('Goal text trimmed:', goalText?.trim());
     
-    if (!goalText.trim()) {
-      toast.error('Please enter your goals');
+    if (!goalText || !goalText.trim()) {
       console.error('❌ Goal text is empty');
+      toast.error('Please enter your goals');
       return;
     }
 
-    console.log('✅ Starting goal processing...');
+    console.log('✅ Validation passed, starting goal processing...');
     setLoading(true);
+    
     try {
       // Step 1: Parse goals
       console.log('📤 Calling /goals/parse...');
+      console.log('Request payload:', { goal_text: goalText });
+      
       const parseResponse = await apiClient.post('/goals/parse', {
         goal_text: goalText
       });
-      console.log('✅ Goals parsed:', parseResponse.data);
       
+      console.log('✅ Goals parsed successfully:', parseResponse.data);
       toast.success('Goals analyzed successfully!');
       
       // Step 2: Generate tasks
       console.log('📤 Calling /goals/generate-tasks...');
       const tasksResponse = await apiClient.post('/goals/generate-tasks');
-      console.log('✅ Tasks generated:', tasksResponse.data);
+      console.log('✅ Tasks generated successfully:', tasksResponse.data);
       
       setCaptainMessage(tasksResponse.data.captain_message);
       
@@ -50,7 +57,7 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
         
         // Close modal and refresh
         setTimeout(() => {
-          console.log('✅ Success! Navigating to dashboard...');
+          console.log('✅ Success! Calling onGoalsSet and closing modal...');
           onGoalsSet();
           handleClose();
         }, 2000);
@@ -58,14 +65,18 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
       
     } catch (error) {
       console.error('❌ Goal processing error:', error);
-      console.error('Error response:', error.response?.data);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       const errorMsg = error.response?.data?.detail || 'Failed to process goals';
       toast.error('Goal Processing Failed', {
         description: errorMsg
       });
     } finally {
       setLoading(false);
-      console.log('🏁 Processing complete');
+      console.log('🏁 Processing complete, loading set to false');
     }
   };
 
