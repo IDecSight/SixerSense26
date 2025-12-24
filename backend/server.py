@@ -1928,14 +1928,43 @@ Return ONLY valid JSON:
         # STEP 5: Generate fresh Playing XI from goals (dynamic generation)
         print("🎯 Generating dynamic Playing XI from goals...")
         
-        # Build goal summary for AI (prioritize short-term)
+        # Build goal summary for AI with PRIORITY ORDER
         goal_summary = []
+        
+        # Priority 1: Short-term goals (0-30 days) - HIGHEST
+        short_goals = []
         for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
             cat_goals = mapped_goals.get(category, {})
             short = cat_goals.get("short", [])
+            if short:
+                short_goals.append(f"{category}: {', '.join(short)}")
+        
+        # Priority 2: Medium-term goals (1-6 months)
+        medium_goals = []
+        for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+            cat_goals = mapped_goals.get(category, {})
             medium = cat_goals.get("medium", [])
-            if short or medium:
-                goal_summary.append(f"{category}: {', '.join(short + medium)}")
+            if medium:
+                medium_goals.append(f"{category}: {', '.join(medium)}")
+        
+        # Priority 3: Long-term goals (6+ months) - for planning/research tasks
+        long_goals = []
+        for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+            cat_goals = mapped_goals.get(category, {})
+            long = cat_goals.get("long", [])
+            if long:
+                long_goals.append(f"{category}: {', '.join(long)}")
+        
+        # Build prioritized goal summary
+        if short_goals:
+            goal_summary.append("SHORT-TERM GOALS (Priority 1 - Next 30 days):")
+            goal_summary.extend(short_goals)
+        if medium_goals:
+            goal_summary.append("\nMEDIUM-TERM GOALS (Priority 2 - Next 1-6 months):")
+            goal_summary.extend(medium_goals)
+        if long_goals:
+            goal_summary.append("\nLONG-TERM GOALS (Priority 3 - 6+ months, create planning tasks):")
+            goal_summary.extend(long_goals)
         
         if not goal_summary:
             print("⚠️ No goals found, using maintenance tasks")
@@ -1944,8 +1973,13 @@ Return ONLY valid JSON:
         # Captain generates Playing XI
         captain_prompt = f"""You are the Captain role in SixerSense. Generate today's Playing XI.
 
-User's Goals:
+User's Goals (PRIORITIZED):
 {chr(10).join(goal_summary)}
+
+TASK GENERATION PRIORITY:
+1. FIRST: Create tasks from SHORT-TERM goals (immediate actions)
+2. SECOND: Break down MEDIUM-TERM goals into today's actions
+3. THIRD: Create planning/research tasks for LONG-TERM goals
 
 Generate exactly 11 actionable daily tasks following this FIXED BATTING ORDER:
 
