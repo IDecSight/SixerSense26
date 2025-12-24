@@ -1846,7 +1846,7 @@ Return ONLY valid JSON:
         
         user_message = UserMessage(text=f"Parse these goals: {req.goal_text}")
         analyst_response = await llm.send_message(user_message)
-        goals_data = json.loads(analyst_response.content)
+        goals_data = json.loads(analyst_response)
         print("✅ Goals parsed successfully")
         
         # STEP 2: MAP AI OUTPUT → PROFILE FORMAT (safe mapping)
