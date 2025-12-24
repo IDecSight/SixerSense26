@@ -2147,7 +2147,7 @@ async def orchestrator_process(req: OrchestratorRequest, current_user: str = Dep
             
             # ANALYST: Parse goals using LLM
             llm = LlmChat(api_key=EMERGENT_LLM_KEY)
-        llm.with_model("openai", "gpt-4o-mini")
+            llm.with_model("openai", "gpt-4o-mini")
             
             parse_prompt = f"""You are the Analyst role in SixerSense. Parse user goals into structured format.
 
