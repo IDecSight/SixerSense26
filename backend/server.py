@@ -1932,13 +1932,16 @@ Return ONLY valid JSON:
         if not match_doc:
             raise HTTPException(status_code=404, detail="No active match found. Please start today's match first.")
         
-        # STEP 4: CLEAR EXISTING TASKS FOR TODAY (goals → tasks separation)
+        # STEP 4: CLEAR EXISTING TASKS FOR TODAY (ALWAYS)
         print("🗑️ Clearing existing tasks for today...")
         delete_result = await db.tasks.delete_many({
             "user_id": current_user,
             "match_id": match_doc["match_id"]
         })
-        print(f"   Deleted {delete_result.deleted_count} old tasks")
+        print(f"✅ Old tasks deleted: {delete_result.deleted_count} tasks removed")
+        
+        if delete_result.deleted_count > 0:
+            print(f"   📋 Cleared Playing XI to make room for fresh tasks")
         
         # STEP 5: Generate fresh Playing XI from goals (dynamic generation)
         print("🎯 Generating dynamic Playing XI from goals...")
