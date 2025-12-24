@@ -1821,7 +1821,10 @@ User Goal Text:
 "{req.goal_text}"
 
 Extract and classify goals into 6 categories: Health, Career, Finance, Relationships, Spiritual, Travel.
-Classify as short_term (0-12 months), medium_term (1-3 years), or long_term (5+ years).
+Classify goals by timeframe:
+- short_term: 0-30 days (immediate actions)
+- medium_term: 1-6 months (near-future objectives)
+- long_term: 6+ months (distant ambitions)
 
 Return ONLY valid JSON:
 {{
