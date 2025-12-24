@@ -186,6 +186,11 @@ class TaskCreateRequest(BaseModel):
 
 class GoalPromptRequest(BaseModel):
     goal_text: str  # Natural language goal description
+
+class OrchestratorRequest(BaseModel):
+    input_type: str  # SET_GAME_PLAN, TASK_RECOMMENDATION, MATCH_STRATEGY, etc.
+    payload: Dict  # Flexible payload based on input_type
+
 class TaskUpdateRequest(BaseModel):
     status: str
 
