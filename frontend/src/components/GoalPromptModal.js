@@ -14,22 +14,31 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('🎯 Set Game Plan clicked');
+    console.log('Goal text:', goalText);
+    
     if (!goalText.trim()) {
       toast.error('Please enter your goals');
+      console.error('❌ Goal text is empty');
       return;
     }
 
+    console.log('✅ Starting goal processing...');
     setLoading(true);
     try {
       // Step 1: Parse goals
+      console.log('📤 Calling /goals/parse...');
       const parseResponse = await apiClient.post('/goals/parse', {
         goal_text: goalText
       });
+      console.log('✅ Goals parsed:', parseResponse.data);
       
       toast.success('Goals analyzed successfully!');
       
       // Step 2: Generate tasks
+      console.log('📤 Calling /goals/generate-tasks...');
       const tasksResponse = await apiClient.post('/goals/generate-tasks');
+      console.log('✅ Tasks generated:', tasksResponse.data);
       
       setCaptainMessage(tasksResponse.data.captain_message);
       
@@ -41,19 +50,22 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
         
         // Close modal and refresh
         setTimeout(() => {
+          console.log('✅ Success! Navigating to dashboard...');
           onGoalsSet();
           handleClose();
         }, 2000);
       }, 500);
       
     } catch (error) {
-      console.error('Goal processing error:', error);
+      console.error('❌ Goal processing error:', error);
+      console.error('Error response:', error.response?.data);
       const errorMsg = error.response?.data?.detail || 'Failed to process goals';
       toast.error('Goal Processing Failed', {
         description: errorMsg
       });
     } finally {
       setLoading(false);
+      console.log('🏁 Processing complete');
     }
   };
 
