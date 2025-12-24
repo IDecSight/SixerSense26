@@ -70,6 +70,11 @@ GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI")
 GOOGLE_CALENDAR_SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
 
+# Emergent LLM Key
+EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+if not EMERGENT_LLM_KEY:
+    logging.warning("EMERGENT_LLM_KEY not found - AI features will be disabled")
+
 # Create the main app without a prefix
 app = FastAPI(title="Sixer Sense API")
 
