@@ -1815,8 +1815,6 @@ async def set_game_plan(req: GoalPromptRequest, current_user: str = Depends(get_
     try:
         # STEP 1: Parse goals using AI
         print("📊 Parsing goals with AI...")
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
-        llm.with_model("openai", "gpt-4o-mini")
         
         parse_prompt = f"""You are an AI assistant parsing user goals for a productivity app.
 
@@ -1839,8 +1837,15 @@ Return ONLY valid JSON:
   "Travel": {{"short_term": [], "medium_term": [], "long_term": []}}
 }}"""
         
-        messages = [UserMessage(content=parse_prompt)]
-        analyst_response = await llm.run_async(messages=messages)
+        llm = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"set_game_plan_{current_user}",
+            system_message=parse_prompt
+        )
+        llm.with_model("openai", "gpt-4o-mini")
+        
+        user_message = UserMessage(text=f"Parse these goals: {req.goal_text}")
+        analyst_response = await llm.send_message(user_message)
         goals_data = json.loads(analyst_response.content)
         print("✅ Goals parsed successfully")
         
