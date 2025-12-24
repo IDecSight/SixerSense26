@@ -897,6 +897,80 @@ async def get_profile(current_user: str = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="User not found")
     return user_doc.get("profile", {})
 
+
+
+# ==================== SETTINGS ROUTES ====================
+
+@api_router.get("/user/settings")
+async def get_user_settings(current_user: str = Depends(get_current_user)):
+    """
+    Get user settings - app behavior and preferences
+    Separate from profile (goals/identity)
+    """
+    user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Return settings or default if not exists
+    settings = user_doc.get("settings", {})
+    if not settings:
+        # Return default settings
+        default_settings = UserSettings().dict()
+        return default_settings
+    
+    return settings
+
+@api_router.patch("/user/settings")
+async def update_user_settings(req: UpdateSettingsRequest, current_user: str = Depends(get_current_user)):
+    """
+    Update user settings - app behavior and preferences
+    
+    CRITICAL RULES:
+    - ONLY updates settings object
+    - NEVER touches profile
+    - NEVER touches goals
+    - NEVER regenerates tasks
+    - Changes apply immediately to app behavior
+    """
+    print(f"🎚️ Updating settings for user {current_user}")
+    
+    try:
+        # Build update object with only provided fields
+        update_fields = {}
+        for field, value in req.dict(exclude_unset=True).items():
+            if value is not None:
+                update_fields[f"settings.{field}"] = value
+        
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        print(f"   Fields to update: {list(update_fields.keys())}")
+        
+        # Update ONLY settings, NEVER profile or goals
+        result = await db.users.update_one(
+            {"user_id": current_user},
+            {"$set": update_fields}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Fetch updated settings
+        user_doc = await db.users.find_one({"user_id": current_user}, {"_id": 0})
+        updated_settings = user_doc.get("settings", {})
+        
+        print(f"✅ Settings updated successfully")
+        
+        return {
+            "success": True,
+            "message": "Settings updated successfully",
+            "settings": updated_settings
+        }
+        
+    except Exception as e:
+        print(f"❌ Settings update error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update settings: {str(e)}")
+
 # ==================== MATCH ROUTES ====================
 
 @api_router.get("/matches/today")
