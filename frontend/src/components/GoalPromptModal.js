@@ -11,6 +11,11 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
   const [loading, setLoading] = useState(false);
   const [captainMessage, setCaptainMessage] = useState('');
 
+  // Debug: Log when modal state changes
+  React.useEffect(() => {
+    console.log('🚪 GoalPromptModal state changed:', { open, hasOnClose: !!onClose, hasOnGoalsSet: !!onGoalsSet });
+  }, [open, onClose, onGoalsSet]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
