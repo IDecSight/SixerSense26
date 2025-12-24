@@ -1692,9 +1692,6 @@ async def generate_tasks_from_goals(current_user: str = Depends(get_current_user
             raise HTTPException(status_code=400, detail="No active goals found")
         
         # Use LLM to generate tasks
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
-        llm.with_model("openai", "gpt-4o-mini")
-        
         prompt = f"""You are the SixerSense Goal Architect AI creating today's Playing XI (daily game plan) for the user.
 
 User's Goals:
@@ -1737,13 +1734,20 @@ Return ONLY valid JSON array in this EXACT format:
   {{"title": "5 min silence + gratitude", "category": "Spiritual", "run_value": 1, "estimated_minutes": 5}},
   ...exactly 11 tasks in batting order...
 ]"""
-
-        messages = [UserMessage(content=prompt)]
-        response = await llm.run_async(messages=messages)
+        
+        llm = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"generate_playing_xi_{current_user}",
+            system_message=prompt
+        )
+        llm.with_model("openai", "gpt-4o-mini")
+        
+        user_message = UserMessage(text="Generate today's Playing XI based on the goals provided.")
+        response = await llm.send_message(user_message)
         
         # Parse JSON response
         import json
-        tasks_data = json.loads(response.content)
+        tasks_data = json.loads(response)
         
         # Validate and limit to 11 tasks
         if len(tasks_data) > 11:
