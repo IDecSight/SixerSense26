@@ -92,9 +92,9 @@ async def health_check():
 # ==================== MODELS ====================
 
 class GoalStructure(BaseModel):
-    short: List[str] = []  # 0-12 months
-    medium: List[str] = []  # 1-3 years
-    long: List[str] = []  # 5+ years
+    short: List[str] = []   # 0-30 days
+    medium: List[str] = []  # 1-6 months
+    long: List[str] = []    # 6+ months
 
 class UserGoals(BaseModel):
     Health: GoalStructure = GoalStructure()
