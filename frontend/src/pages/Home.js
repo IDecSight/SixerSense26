@@ -309,6 +309,13 @@ export const Home = () => {
           )}
         </div>
       </main>
+
+      {/* Goal Prompt Modal */}
+      <GoalPromptModal
+        open={showGoalPrompt}
+        onClose={() => setShowGoalPrompt(false)}
+        onGoalsSet={handleGoalsSet}
+      />
     </div>
   );
 };
