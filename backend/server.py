@@ -1779,6 +1779,199 @@ Return ONLY valid JSON array in this EXACT format:
         logging.error(f"Task generation error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to generate tasks: {str(e)}")
 
+
+# ==================== ORCHESTRATOR ENDPOINT ====================
+
+@api_router.post("/orchestrator/process")
+async def orchestrator_process(req: OrchestratorRequest, current_user: str = Depends(get_current_user)):
+    """
+    SixerSense Orchestrator - Processes inputs through Captain, Coach, Analyst, Scout roles
+    Returns JSON only - executes backend actions based on input_type
+    """
+    try:
+        input_type = req.input_type.upper()
+        payload = req.payload
+        
+        if input_type == "SET_GAME_PLAN":
+            # Extract user goal text
+            user_goal_text = payload.get("user_goal_text", "")
+            if not user_goal_text:
+                raise HTTPException(status_code=400, detail="user_goal_text is required in payload")
+            
+            # ANALYST: Parse goals using LLM
+            llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+            
+            parse_prompt = f"""You are the Analyst role in SixerSense. Parse user goals into structured format.
+
+User Goal Text:
+"{user_goal_text}"
+
+Extract and classify goals into 6 categories: Health, Career, Finance, Relationships, Spiritual, Travel.
+For each category, classify as short_term (0-12 months), medium_term (1-3 years), or long_term (5+ years).
+
+Return ONLY valid JSON:
+{{
+  "Health": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Career": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Finance": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Relationships": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Spiritual": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Travel": {{"short_term": [], "medium_term": [], "long_term": []}}
+}}"""
+
+            messages = [UserMessage(content=parse_prompt)]
+            analyst_response = await llm.run_async(messages=messages)
+            goals_data = json.loads(analyst_response.content)
+            
+            # Update user profile goals (DATABASE ACTION)
+            goals_update = {}
+            for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+                if category in goals_data:
+                    goals_update[f"goals.{category}.short"] = goals_data[category].get("short_term", [])
+                    goals_update[f"goals.{category}.medium"] = goals_data[category].get("medium_term", [])
+                    goals_update[f"goals.{category}.long"] = goals_data[category].get("long_term", [])
+            
+            await db.users.update_one(
+                {"user_id": current_user},
+                {"$set": goals_update}
+            )
+            
+            # SCOUT & COACH: Analyze goals and prepare strategy
+            goal_summary = []
+            for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+                cat_goals = goals_data.get(category, {})
+                short = cat_goals.get("short_term", [])
+                medium = cat_goals.get("medium_term", [])
+                if short or medium:
+                    goal_summary.append(f"{category}: {', '.join(short + medium)}")
+            
+            # Get today's match
+            match_doc = await db.matches.find_one({
+                "user_id": current_user,
+                "date": datetime.now(timezone.utc).date().isoformat(),
+                "status": {"$in": ["in_progress", "not_started"]}
+            })
+            
+            if not match_doc:
+                raise HTTPException(status_code=404, detail="No active match found. Please start today's match first.")
+            
+            # CAPTAIN: Generate Playing XI with fixed batting order
+            captain_prompt = f"""You are the Captain role in SixerSense. Generate today's Playing XI.
+
+User's Goals:
+{chr(10).join(goal_summary)}
+
+Generate exactly 11 actionable daily tasks following this FIXED BATTING ORDER:
+
+Player 1 (Opener 1) – Health & Energy
+Player 2 (Opener 2) – Mindset / Spiritual
+Player 3 (No.3) – Career Impact
+Player 4 (No.4) – Thought Leadership / Learning
+Player 5 (No.5) – Product / Skill / IP Building
+Player 6 (No.6) – Wealth / Finance
+Player 7 (No.7) – Relationships
+Player 8 (No.8) – Learning / Upskilling
+Player 9 (No.9) – Systems / Automation
+Player 10 (No.10) – Recovery / Self-Care
+Player 11 (No.11) – Reflection / Scorecard
+
+RULES:
+- Tasks must be SMALL (5-60 minutes, executable today)
+- Tasks must be PERSONAL and aligned to user's specific goals
+- Use cricket language subtly
+- If category has no explicit goal, generate maintenance task
+- Tasks must be dynamic and fresh
+- Run values: 1 (maintenance), 4 (meaningful), 6 (breakthrough)
+
+Map categories appropriately:
+- Health = Health & Energy, Recovery
+- Spiritual = Mindset / Spiritual, Reflection
+- Career = Career Impact, Thought Leadership, Product/Skill, Systems
+- Finance = Wealth / Finance
+- Relationships = Relationships
+- Travel = Learning / Upskilling (when applicable)
+
+Return ONLY valid JSON array:
+[
+  {{"title": "30 min strength or mobility workout", "category": "Health", "run_value": 4, "estimated_minutes": 30}},
+  ...exactly 11 tasks in batting order...
+]"""
+
+            messages = [UserMessage(content=captain_prompt)]
+            captain_response = await llm.run_async(messages=messages)
+            tasks_data = json.loads(captain_response.content)
+            
+            # Limit to 11 tasks
+            if len(tasks_data) > 11:
+                tasks_data = tasks_data[:11]
+            
+            # Create tasks in database (DATABASE ACTION)
+            created_tasks = []
+            for idx, task_data in enumerate(tasks_data):
+                task_id = f"task_{uuid.uuid4().hex[:12]}"
+                
+                estimated_minutes = task_data.get("estimated_minutes", 30)
+                balls_consumed = min(6, max(1, estimated_minutes // 15))
+                
+                task_doc = {
+                    "task_id": task_id,
+                    "user_id": current_user,
+                    "match_id": match_doc["match_id"],
+                    "title": task_data["title"],
+                    "category": task_data["category"],
+                    "run_value": task_data["run_value"],
+                    "estimated_minutes": estimated_minutes,
+                    "balls_consumed": balls_consumed,
+                    "status": "pending",
+                    "batting_position": idx + 1,  # Track batting order
+                    "started_at": None,
+                    "completed_at": None,
+                    "scheduled_start": None,
+                    "sync_to_calendar": False,
+                    "calendar_event_id": None,
+                    "tracking_type": "orchestrator_generated",
+                    "external_link": None,
+                    "tracking_data": {"source": "orchestrator", "input_type": "SET_GAME_PLAN"},
+                    "created_at": datetime.now(timezone.utc)
+                }
+                
+                await db.tasks.insert_one(task_doc)
+                task_doc.pop("_id", None)
+                created_tasks.append(task_doc)
+            
+            # Captain's message
+            captain_msg = "🏏 Your Game Plan is Ready\nYour goals are locked. Today's Playing XI has been created based on your ambitions.\nPlay today well — championships are won daily."
+            
+            logging.info(f"Orchestrator: Created {len(created_tasks)} tasks for user {current_user} via SET_GAME_PLAN")
+            
+            # Return orchestrator response
+            return {
+                "success": True,
+                "input_type": "SET_GAME_PLAN",
+                "actions_executed": [
+                    "UPDATE_USER_PROFILE_GOALS",
+                    "CREATE_TODAY_PLAYING_XI"
+                ],
+                "orchestrator_output": {
+                    "goals_updated": True,
+                    "tasks_created": len(created_tasks),
+                    "captain_message": captain_msg,
+                    "playing_xi": created_tasks
+                },
+                "message": f"Game plan set successfully. {len(created_tasks)} tasks created for today's match."
+            }
+        
+        else:
+            raise HTTPException(status_code=400, detail=f"Unsupported INPUT_TYPE: {input_type}")
+    
+    except json.JSONDecodeError as e:
+        logging.error(f"Orchestrator JSON parse error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process orchestrator response")
+    except Exception as e:
+        logging.error(f"Orchestrator error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Orchestrator processing failed: {str(e)}")
+
+
 # ==================== WALLET ROUTES ====================
 
 @api_router.get("/wallet/balance")
