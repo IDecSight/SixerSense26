@@ -1823,18 +1823,38 @@ Return ONLY valid JSON:
             analyst_response = await llm.run_async(messages=messages)
             goals_data = json.loads(analyst_response.content)
             
-            # Update user profile goals (DATABASE ACTION)
+            # MAP AI OUTPUT → PROFILE FORMAT
+            # AI returns: short_term, medium_term, long_term
+            # Profile expects: short, medium, long
             goals_update = {}
-            for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
-                if category in goals_data:
-                    goals_update[f"goals.{category}.short"] = goals_data[category].get("short_term", [])
-                    goals_update[f"goals.{category}.medium"] = goals_data[category].get("medium_term", [])
-                    goals_update[f"goals.{category}.long"] = goals_data[category].get("long_term", [])
+            profile_goals_failed = False
             
-            await db.users.update_one(
-                {"user_id": current_user},
-                {"$set": goals_update}
-            )
+            try:
+                for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+                    if category in goals_data:
+                        # Map short_term → short, medium_term → medium, long_term → long
+                        goals_update[f"goals.{category}.short"] = goals_data[category].get("short_term", [])
+                        goals_update[f"goals.{category}.medium"] = goals_data[category].get("medium_term", [])
+                        goals_update[f"goals.{category}.long"] = goals_data[category].get("long_term", [])
+                
+                # SAFE PROFILE UPDATE - Only update goals, don't overwrite profile
+                update_result = await db.users.update_one(
+                    {"user_id": current_user},
+                    {"$set": goals_update}
+                )
+                
+                if update_result.matched_count == 0:
+                    logging.warning(f"User {current_user} not found during goal update")
+                    profile_goals_failed = True
+                elif update_result.modified_count == 0:
+                    logging.info(f"Goals unchanged for user {current_user}")
+                else:
+                    logging.info(f"Goals updated successfully for user {current_user}")
+                    
+            except Exception as profile_error:
+                logging.error(f"Profile goal update failed: {str(profile_error)}")
+                profile_goals_failed = True
+                # Continue execution - don't fail the entire request
             
             # SCOUT & COACH: Analyze goals and prepare strategy
             goal_summary = []
