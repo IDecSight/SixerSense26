@@ -1964,21 +1964,29 @@ Return ONLY valid JSON array:
             
             logging.info(f"Orchestrator: Created {len(created_tasks)} tasks for user {current_user} via SET_GAME_PLAN")
             
+            # Determine actions executed and success message
+            actions_executed = []
+            if not profile_goals_failed:
+                actions_executed.append("UPDATE_USER_PROFILE_GOALS")
+            actions_executed.append("CREATE_TODAY_PLAYING_XI")
+            
+            success_message = f"Game plan set successfully. {len(created_tasks)} tasks created for today's match."
+            if profile_goals_failed:
+                success_message = f"Goals saved partially. Tasks created successfully. ({len(created_tasks)} tasks for today's match)"
+            
             # Return orchestrator response
             return {
                 "success": True,
                 "input_type": "SET_GAME_PLAN",
-                "actions_executed": [
-                    "UPDATE_USER_PROFILE_GOALS",
-                    "CREATE_TODAY_PLAYING_XI"
-                ],
+                "actions_executed": actions_executed,
                 "orchestrator_output": {
-                    "goals_updated": True,
+                    "goals_updated": not profile_goals_failed,
                     "tasks_created": len(created_tasks),
                     "captain_message": captain_msg,
                     "playing_xi": created_tasks
                 },
-                "message": f"Game plan set successfully. {len(created_tasks)} tasks created for today's match."
+                "message": success_message,
+                "partial_success": profile_goals_failed
             }
         
         else:
