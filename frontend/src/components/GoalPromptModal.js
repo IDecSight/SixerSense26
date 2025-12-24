@@ -20,68 +20,66 @@ export const GoalPromptModal = ({ open, onClose, onGoalsSet }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('🎯 Set Game Plan form submitted');
-    console.log('Event:', e);
-    console.log('Goal text:', goalText);
-    console.log('Goal text length:', goalText?.length);
-    console.log('Goal text trimmed:', goalText?.trim());
+    // STEP 1: PROVE CLICK FIRES
+    alert("🔥 SET GAME PLAN CLICKED - Button is wired!");
+    
+    // STEP 2: PROVE STATE EXISTS
+    alert("Goal text: " + (goalText || "EMPTY OR UNDEFINED"));
     
     if (!goalText || !goalText.trim()) {
-      console.error('❌ Goal text is empty');
+      alert("❌ VALIDATION FAILED: Goal text is empty");
       toast.error('Please enter your goals');
       return;
     }
-
-    console.log('✅ Validation passed, starting goal processing...');
+    
+    alert("✅ Validation passed, calling backend...");
     setLoading(true);
     
     try {
-      // Step 1: Parse goals
-      console.log('📤 Calling /goals/parse...');
-      console.log('Request payload:', { goal_text: goalText });
+      // STEP 3: FORCE API CALL WITH FETCH (bypass apiClient)
+      alert("📤 About to call backend with fetch...");
       
-      const parseResponse = await apiClient.post('/goals/parse', {
-        goal_text: goalText
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
+      const token = localStorage.getItem('auth_token');
+      
+      const res = await fetch(`${backendUrl}/api/goals/set-game-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ goal_text: goalText })
       });
       
-      console.log('✅ Goals parsed successfully:', parseResponse.data);
-      toast.success('Goals analyzed successfully!');
+      alert(`Backend responded with status: ${res.status}`);
       
-      // Step 2: Generate tasks
-      console.log('📤 Calling /goals/generate-tasks...');
-      const tasksResponse = await apiClient.post('/goals/generate-tasks');
-      console.log('✅ Tasks generated successfully:', tasksResponse.data);
+      const data = await res.json();
+      alert(`Backend response: ${JSON.stringify(data)}`);
       
-      setCaptainMessage(tasksResponse.data.captain_message);
-      
-      // Show success message
-      setTimeout(() => {
-        toast.success('Playing XI ready!', {
-          description: `${tasksResponse.data.tasks.length} tasks created for today's match`
-        });
+      if (res.ok) {
+        toast.success('Game plan set successfully!');
+        setCaptainMessage(data.captain_message || "Goals received!");
         
-        // Close modal and refresh
         setTimeout(() => {
-          console.log('✅ Success! Calling onGoalsSet and closing modal...');
           onGoalsSet();
           handleClose();
-        }, 2000);
-      }, 500);
+        }, 1500);
+      } else {
+        alert(`❌ Backend error: ${data.detail || 'Unknown error'}`);
+        toast.error('Failed to set game plan', {
+          description: data.detail || 'Unknown error'
+        });
+      }
       
     } catch (error) {
-      console.error('❌ Goal processing error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
-      const errorMsg = error.response?.data?.detail || 'Failed to process goals';
-      toast.error('Goal Processing Failed', {
-        description: errorMsg
+      alert(`❌ Network error: ${error.message}`);
+      console.error('❌ Error:', error);
+      toast.error('Network Error', {
+        description: error.message
       });
     } finally {
       setLoading(false);
-      console.log('🏁 Processing complete, loading set to false');
+      alert("🏁 Processing complete");
     }
   };
 
