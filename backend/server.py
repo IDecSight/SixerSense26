@@ -1788,25 +1788,226 @@ Return ONLY valid JSON array in this EXACT format:
 @api_router.post("/goals/set-game-plan")
 async def set_game_plan(req: GoalPromptRequest, current_user: str = Depends(get_current_user)):
     """
-    SIMPLIFIED endpoint to test click-to-backend flow
+    Complete Set Game Plan flow with safe profile updates and dynamic task generation
     """
-    print("🔥🔥🔥 SET GAME PLAN ENDPOINT HIT 🔥🔥🔥")
+    print("🔥 SET GAME PLAN ENDPOINT HIT")
     print(f"User: {current_user}")
-    print(f"Goal text received: {req.goal_text[:100]}...")
+    print(f"Goal text length: {len(req.goal_text)}")
     
     try:
-        # STEP 5: Return immediately to prove backend is reachable
+        # STEP 1: Parse goals using AI
+        print("📊 Parsing goals with AI...")
+        llm = LlmChat(api_key=EMERGENT_LLM_KEY, model_name="gpt-4o-mini")
+        
+        parse_prompt = f"""You are an AI assistant parsing user goals for a productivity app.
+
+User Goal Text:
+"{req.goal_text}"
+
+Extract and classify goals into 6 categories: Health, Career, Finance, Relationships, Spiritual, Travel.
+Classify as short_term (0-12 months), medium_term (1-3 years), or long_term (5+ years).
+
+Return ONLY valid JSON:
+{{
+  "Health": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Career": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Finance": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Relationships": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Spiritual": {{"short_term": [], "medium_term": [], "long_term": []}},
+  "Travel": {{"short_term": [], "medium_term": [], "long_term": []}}
+}}"""
+        
+        messages = [UserMessage(content=parse_prompt)]
+        analyst_response = await llm.run_async(messages=messages)
+        goals_data = json.loads(analyst_response.content)
+        print("✅ Goals parsed successfully")
+        
+        # STEP 2: MAP AI OUTPUT → PROFILE FORMAT (safe mapping)
+        # AI returns: short_term, medium_term, long_term
+        # Profile expects: short, medium, long
+        profile_goals_failed = False
+        mapped_goals = {}
+        
+        for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+            if category in goals_data:
+                mapped_goals[category] = {
+                    "short": goals_data[category].get("short_term", []),
+                    "medium": goals_data[category].get("medium_term", []),
+                    "long": goals_data[category].get("long_term", [])
+                }
+        
+        # SAFE PROFILE UPDATE - Only update profile.goals, NEVER overwrite profile
+        try:
+            print("💾 Updating profile.goals (safe update)...")
+            update_result = await db.users.update_one(
+                {"user_id": current_user},
+                {"$set": {"profile.goals": mapped_goals}}
+            )
+            
+            if update_result.matched_count == 0:
+                print("⚠️ User not found during profile update")
+                profile_goals_failed = True
+            elif update_result.modified_count == 0:
+                print("ℹ️ Goals unchanged (same as before)")
+            else:
+                print("✅ Profile.goals updated successfully")
+                
+        except Exception as profile_error:
+            print(f"❌ Profile update failed: {str(profile_error)}")
+            profile_goals_failed = True
+        
+        # STEP 3: Get today's match
+        print("🏏 Fetching today's match...")
+        match_doc = await db.matches.find_one({
+            "user_id": current_user,
+            "date": datetime.now(timezone.utc).date().isoformat(),
+            "status": {"$in": ["in_progress", "not_started"]}
+        })
+        
+        if not match_doc:
+            raise HTTPException(status_code=404, detail="No active match found. Please start today's match first.")
+        
+        # STEP 4: CLEAR EXISTING TASKS FOR TODAY (goals → tasks separation)
+        print("🗑️ Clearing existing tasks for today...")
+        delete_result = await db.tasks.delete_many({
+            "user_id": current_user,
+            "match_id": match_doc["match_id"]
+        })
+        print(f"   Deleted {delete_result.deleted_count} old tasks")
+        
+        # STEP 5: Generate fresh Playing XI from goals (dynamic generation)
+        print("🎯 Generating dynamic Playing XI from goals...")
+        
+        # Build goal summary for AI (prioritize short-term)
+        goal_summary = []
+        for category in ["Health", "Career", "Finance", "Relationships", "Spiritual", "Travel"]:
+            cat_goals = mapped_goals.get(category, {})
+            short = cat_goals.get("short", [])
+            medium = cat_goals.get("medium", [])
+            if short or medium:
+                goal_summary.append(f"{category}: {', '.join(short + medium)}")
+        
+        if not goal_summary:
+            print("⚠️ No goals found, using maintenance tasks")
+            goal_summary = ["Balanced maintenance across all categories"]
+        
+        # Captain generates Playing XI
+        captain_prompt = f"""You are the Captain role in SixerSense. Generate today's Playing XI.
+
+User's Goals:
+{chr(10).join(goal_summary)}
+
+Generate exactly 11 actionable daily tasks following this FIXED BATTING ORDER:
+
+Player 1 (Opener 1) – Health & Energy
+Player 2 (Opener 2) – Mindset / Spiritual
+Player 3 (No.3) – Career Impact
+Player 4 (No.4) – Thought Leadership / Learning
+Player 5 (No.5) – Product / Skill / IP Building
+Player 6 (No.6) – Wealth / Finance
+Player 7 (No.7) – Relationships
+Player 8 (No.8) – Learning / Upskilling
+Player 9 (No.9) – Systems / Automation
+Player 10 (No.10) – Recovery / Self-Care
+Player 11 (No.11) – Reflection / Scorecard
+
+CRITICAL RULES:
+- Tasks must be SMALL (5-60 minutes, executable today)
+- Tasks must be PERSONAL and aligned to user's specific goals
+- Use cricket language subtly
+- If category has no explicit goal, generate maintenance task
+- Tasks must be dynamic and reflect the goals provided
+- Run values: 1 (maintenance), 4 (meaningful), 6 (breakthrough)
+
+Map categories appropriately:
+- Health = Health & Energy, Recovery
+- Spiritual = Mindset / Spiritual, Reflection
+- Career = Career Impact, Thought Leadership, Product/Skill, Systems
+- Finance = Wealth / Finance
+- Relationships = Relationships
+- Travel = Learning / Upskilling (when applicable)
+
+Return ONLY valid JSON array:
+[
+  {{"title": "30 min strength or mobility workout", "category": "Health", "run_value": 4, "estimated_minutes": 30}},
+  ...exactly 11 tasks in batting order...
+]"""
+        
+        messages = [UserMessage(content=captain_prompt)]
+        captain_response = await llm.run_async(messages=messages)
+        tasks_data = json.loads(captain_response.content)
+        
+        # Limit to 11 tasks
+        if len(tasks_data) > 11:
+            tasks_data = tasks_data[:11]
+            print(f"⚠️ Trimmed tasks to 11 (was {len(tasks_data)})")
+        
+        # STEP 6: Create fresh tasks in database
+        print(f"📝 Creating {len(tasks_data)} fresh tasks...")
+        created_tasks = []
+        
+        for idx, task_data in enumerate(tasks_data):
+            task_id = f"task_{uuid.uuid4().hex[:12]}"
+            estimated_minutes = task_data.get("estimated_minutes", 30)
+            balls_consumed = min(6, max(1, estimated_minutes // 15))
+            
+            task_doc = {
+                "task_id": task_id,
+                "user_id": current_user,
+                "match_id": match_doc["match_id"],
+                "title": task_data["title"],
+                "category": task_data["category"],
+                "run_value": task_data["run_value"],
+                "estimated_minutes": estimated_minutes,
+                "balls_consumed": balls_consumed,
+                "status": "pending",
+                "batting_position": idx + 1,
+                "started_at": None,
+                "completed_at": None,
+                "scheduled_start": None,
+                "sync_to_calendar": False,
+                "calendar_event_id": None,
+                "tracking_type": "goal_generated",
+                "external_link": None,
+                "tracking_data": {"source": "set_game_plan", "goal_based": True},
+                "created_at": datetime.now(timezone.utc)
+            }
+            
+            await db.tasks.insert_one(task_doc)
+            task_doc.pop("_id", None)
+            created_tasks.append(task_doc)
+        
+        print(f"✅ Created {len(created_tasks)} tasks successfully")
+        
+        # Captain's message
+        captain_msg = "🏏 Your Game Plan is Ready\nYour goals are locked. Today's Playing XI has been created based on your ambitions.\nPlay today well — championships are won daily."
+        
+        # STEP 7: Return success response
+        success_message = f"Game plan set successfully. {len(created_tasks)} tasks created for today's match."
+        if profile_goals_failed:
+            success_message = f"Goals saved partially. Tasks created successfully. ({len(created_tasks)} tasks)"
+        
+        print("🎉 Set Game Plan completed successfully")
+        
         return {
             "success": True,
-            "message": "Game plan endpoint reached successfully",
-            "captain_message": "🏏 Backend is working! Your goals were received.",
-            "goal_text_length": len(req.goal_text),
-            "user_id": current_user
+            "message": success_message,
+            "captain_message": captain_msg,
+            "goals_updated": not profile_goals_failed,
+            "tasks_created": len(created_tasks),
+            "tasks": created_tasks,
+            "old_tasks_deleted": delete_result.deleted_count,
+            "partial_success": profile_goals_failed
         }
         
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parse error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to parse AI response")
     except Exception as e:
-        print(f"❌ Error in set-game-plan: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"❌ Set Game Plan error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to set game plan: {str(e)}")
 
 
 @api_router.post("/orchestrator/process")
