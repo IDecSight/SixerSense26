@@ -92,17 +92,15 @@ async def health_check():
 # ==================== MODELS ====================
 
 class UserProfile(BaseModel):
-    primary_goal: str = "Balance"  # Career growth, Health, Wealth, Balance
-    profession: Optional[str] = None
-    life_stage: str = "Working Professional"  # Student, Working Professional, Entrepreneur
-    daily_availability: str = "Medium"  # Low, Medium, High
-    preferred_focus_areas: List[str] = ["Career", "Health"]  # 2-3 from six categories
-    playing_style: str = "Balanced"  # Aggressive, Balanced, Defensive (Phase 7)
-
+    # Identity & Strategy - Updated ONLY via "Set Game Plan"
+    name: str
+    email: str
+    playing_style: str = "Balanced"  # Aggressive, Balanced, Defensive
+    
 class GoalStructure(BaseModel):
-    short: List[str] = []  # 0-30 days
-    medium: List[str] = []  # 1-6 months
-    long: List[str] = []  # 6+ months
+    short: List[str] = []  # 0-12 months
+    medium: List[str] = []  # 1-3 years
+    long: List[str] = []  # 5+ years
 
 class UserGoals(BaseModel):
     Health: GoalStructure = GoalStructure()
@@ -112,6 +110,17 @@ class UserGoals(BaseModel):
     Spiritual: GoalStructure = GoalStructure()
     Travel: GoalStructure = GoalStructure()
 
+class UserSettings(BaseModel):
+    # App Behavior & Preferences - Updated via Settings Screen
+    preferred_playing_style: str = "Balanced"  # Aggressive, Balanced, Defensive
+    notifications_enabled: bool = True
+    daily_reminder_time: Optional[str] = "09:00"  # HH:MM format
+    default_match_format: str = "T20"  # T20, ODI, Test
+    language: str = "en"
+    theme: str = "light"  # light, dark
+    calendar_sync_enabled: bool = False
+    health_sync_enabled: bool = False
+
 class User(BaseModel):
     user_id: str
     email: str
@@ -120,12 +129,13 @@ class User(BaseModel):
     is_premium: bool = False
     wallet_balance: float = 0.0
     profile: Optional[UserProfile] = None
+    settings: Optional[UserSettings] = UserSettings()  # New: Settings object
     country: str = DEFAULT_COUNTRY  # User's country code (e.g., "IN", "US")
     currency: str = "INR"  # User's preferred currency
     playing_xi: Optional[List[Dict]] = None  # 11 players representing life roles (Phase 4)
     strongest_category: Optional[str] = None  # Auto-calculated (Phase 7)
     weakest_category: Optional[str] = None  # Auto-calculated (Phase 7)
-    goals: Optional[UserGoals] = None  # User's parsed goals from prompt
+    goals: Optional[UserGoals] = None  # User's parsed goals from Set Game Plan
     win_streak: int = 0
     next_target: int = 60
     total_bonus_runs: int = 0
