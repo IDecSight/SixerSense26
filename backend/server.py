@@ -1591,9 +1591,6 @@ async def parse_user_goals(req: GoalPromptRequest, current_user: str = Depends(g
     """Parse natural language goals and extract structured data"""
     try:
         # Use LLM to parse goals
-        llm = LlmChat(api_key=EMERGENT_LLM_KEY)
-        llm.with_model("openai", "gpt-4o-mini")
-        
         prompt = f"""You are an AI assistant helping parse user goals for a productivity app.
 
 The user has entered the following goal description:
@@ -1621,13 +1618,20 @@ Return ONLY valid JSON in this exact format:
   "Spiritual": {{"short_term": [], "medium_term": [], "long_term": []}},
   "Travel": {{"short_term": [], "medium_term": [], "long_term": []}}
 }}"""
-
-        messages = [UserMessage(content=prompt)]
-        response = await llm.run_async(messages=messages)
+        
+        llm = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"parse_goals_{current_user}",
+            system_message=prompt
+        )
+        llm.with_model("openai", "gpt-4o-mini")
+        
+        user_message = UserMessage(text=f"Parse these goals: {req.goal_text}")
+        response = await llm.send_message(user_message)
         
         # Parse JSON response
         import json
-        goals_data = json.loads(response.content)
+        goals_data = json.loads(response)
         
         # Update user's goals in database
         goals_update = {}
