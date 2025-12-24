@@ -91,15 +91,6 @@ async def health_check():
 
 # ==================== MODELS ====================
 
-class UserProfile(BaseModel):
-    # Single source of truth - Updated ONLY via "Set Game Plan"
-    name: str
-    email: str
-    playing_style: str = "Balanced"  # Aggressive, Balanced, Defensive
-    goals: Optional[UserGoals] = None  # User's goals from Set Game Plan
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    
 class GoalStructure(BaseModel):
     short: List[str] = []  # 0-12 months
     medium: List[str] = []  # 1-3 years
@@ -112,6 +103,15 @@ class UserGoals(BaseModel):
     Relationships: GoalStructure = GoalStructure()
     Spiritual: GoalStructure = GoalStructure()
     Travel: GoalStructure = GoalStructure()
+
+class UserProfile(BaseModel):
+    # Single source of truth - Updated ONLY via "Set Game Plan"
+    name: str
+    email: str
+    playing_style: str = "Balanced"  # Aggressive, Balanced, Defensive
+    goals: Optional[UserGoals] = None  # User's goals from Set Game Plan
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 class User(BaseModel):
     user_id: str
