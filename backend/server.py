@@ -2044,8 +2044,8 @@ Return ONLY valid JSON array:
             tasks_data = tasks_data[:11]
             print(f"⚠️ Trimmed tasks to 11 (was {len(tasks_data)})")
         
-        # STEP 6: Create fresh tasks in database
-        print(f"📝 Creating {len(tasks_data)} fresh tasks...")
+        # STEP 6: Create fresh tasks in database (ALWAYS INSERT EXACTLY WHAT AI RETURNED)
+        print(f"📝 Inserting {len(tasks_data)} fresh tasks from Orchestrator...")
         created_tasks = []
         
         for idx, task_data in enumerate(tasks_data):
@@ -2079,7 +2079,15 @@ Return ONLY valid JSON array:
             task_doc.pop("_id", None)
             created_tasks.append(task_doc)
         
-        print(f"✅ Created {len(created_tasks)} tasks successfully")
+        print(f"✅ New Playing XI inserted: {len(created_tasks)} tasks created")
+        print(f"   🏏 Batting order: Player 1-{len(created_tasks)}")
+        
+        # Verify tasks were actually created
+        verify_count = await db.tasks.count_documents({
+            "user_id": current_user,
+            "match_id": match_doc["match_id"]
+        })
+        print(f"   ✓ Database verification: {verify_count} tasks now in today's match")
         
         # Captain's message
         captain_msg = "🏏 Your Game Plan is Ready\nYour goals are locked. Today's Playing XI has been created based on your ambitions.\nPlay today well — championships are won daily."
