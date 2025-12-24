@@ -235,6 +235,18 @@ class UpdateFormatRequest(BaseModel):
     match_id: str
     format: str
 
+
+class UpdateSettingsRequest(BaseModel):
+    preferred_playing_style: Optional[str] = None
+    notifications_enabled: Optional[bool] = None
+    daily_reminder_time: Optional[str] = None
+    default_match_format: Optional[str] = None
+    language: Optional[str] = None
+    theme: Optional[str] = None
+    calendar_sync_enabled: Optional[bool] = None
+    health_sync_enabled: Optional[bool] = None
+
+
 # ==================== AUTH HELPER ====================
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
