@@ -2092,12 +2092,18 @@ Return ONLY valid JSON array:
         # Captain's message
         captain_msg = "🏏 Your Game Plan is Ready\nYour goals are locked. Today's Playing XI has been created based on your ambitions.\nPlay today well — championships are won daily."
         
-        # STEP 7: Return success response
+        # STEP 7: VERIFY AND RETURN SUCCESS (ONLY AFTER DB WRITES COMPLETE)
+        print("\n📊 SET GAME PLAN SUMMARY:")
+        print(f"   ✅ Profile goals updated: {not profile_goals_failed}")
+        print(f"   ✅ Old tasks deleted: {delete_result.deleted_count}")
+        print(f"   ✅ New tasks created: {len(created_tasks)}")
+        print(f"   ✅ Database operations: COMPLETE")
+        
         success_message = f"Game plan set successfully. {len(created_tasks)} tasks created for today's match."
         if profile_goals_failed:
             success_message = f"Goals saved partially. Tasks created successfully. ({len(created_tasks)} tasks)"
         
-        print("🎉 Set Game Plan completed successfully")
+        print("🎉 Set Game Plan completed successfully\n")
         
         return {
             "success": True,
