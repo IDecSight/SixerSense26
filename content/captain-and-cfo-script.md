@@ -131,7 +131,10 @@
 
 ---
 
-## Part 4 — Fact-check checklist
+## Part 4: Fact-check checklist
+
+> **Update (production pass):** every item below was checked during video production. Three corrections went into the narration: Joginder had **7** internationals before the final (not 4); the last over went **wide, dot, six, caught**; and Dhoni **averaged ~30 across 7 innings** before the 2011 final rather than being in poor form "all tournament". 2023 attendance is confirmed at **92,453**. The full log is in `video/README.md`, and the final narration is in `video/work/narration.tsv`.
+
 
 1. **2007 final:** date (24 Sept 2007), venue (Wanderers, Johannesburg), India 157/5, Pakistan 152 all out, margin 5 runs.
 2. **Joginder Sharma:** number of international appearances before the final; exact last-over sequence (wide, dot, six, then the scoop caught by Sreesanth).

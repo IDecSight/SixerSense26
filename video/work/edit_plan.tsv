@@ -1,0 +1,35 @@
+line	visual	overlay	gap
+L01	H1	PAK NEED 13 OFF 6|Johannesburg · 24 Sept 2007	0.3
+L02	S01	7 internationals before the final|Joginder Sharma	0.3
+L03	S02	GENIUS? OR LUCK?|	0.4
+TITLE	CARD	THE CAPTAIN & THE CFO|How both decide under uncertainty	0
+L04	S03		0.3
+L05	S04	EDGE · DOWNSIDE · PROCESS|Three decision rules	0.6
+L06	S05	TARGET 275|Mumbai · 2 April 2011 · World Cup final	0.3
+L07	S06	INDIA 114/3|Kohli out · 21.4 overs	0.3
+L08	H2	DHONI PROMOTES HIMSELF|Averaged ~30 in 7 innings before the final	0.3
+L09	S07	THE INFORMATION EDGE|Years facing Muralitharan in CSK nets	0.3
+L10	S08	91* (79)|India win by 6 wickets	0.3
+L11	S09	CIRCLE OF COMPETENCE|Warren Buffett	0.4
+L12	RULE1	RULE 1|Bet where you have an edge	0.8
+L13	S10	92,453 FANS · INDIA 10–0|Ahmedabad · 19 Nov 2023 · World Cup final	0.3
+L14	H3	AUSTRALIA WILL BOWL|Pat Cummins wins the toss	0.3
+L15	S11	DRY PITCH + EVENING DEW|Layer 1: read the conditions	0.3
+L16	S03+S12	CUT OFF THE WORST CASE|Layer 2: asymmetric downside	0.3
+L17	S13	INDIA 240 ALL OUT|Head 137 (120) · Australia win by 6 wickets	0.3
+L18	S14	MORE CASH · LESS DEBT · STAGED BETS|Downside protection	0.3
+L19	S15	ONE-WAY vs TWO-WAY DOORS|Jeff Bezos · 2015 shareholder letter	0.4
+L20	RULE2	RULE 2|Avoid ruin before you chase return	0.8
+L21	S16	13 OFF 6|Back to Johannesburg, 2007	0.3
+L22	S17	OVERS 17–19 > OVER 20|Resource allocation	0.3
+L23	S18	OVER 17: 3 SIXES, 19 RUNS|Misbah-ul-Haq vs Harbhajan Singh	0.3
+L24	S19	WIDE · DOT · SIX|6 needed off 4	0.3
+L25	H4	INDIA WIN BY 5 RUNS|Misbah c Sreesanth b Joginder	0.4
+L26	S20	SAME DECISION. TWO STORIES.|	0.3
+L27	S21+S02	"RESULTING"|Annie Duke, Thinking in Bets (2018)	0.3
+L28	S22	DECISION JOURNAL|Info · Options · Odds · then Outcome	0.4
+L29	RULE3	RULE 3|Grade the process, not the scoreboard	0.8
+L30	S23	"TRUST THE PROCESS" ≠ AN EXCUSE|	0.3
+L31	S24	THE PRE-MORTEM|Gary Klein · Harvard Business Review, 2007	0.5
+L32	S25+S04	EDGE · DOWNSIDE · PROCESS|	0.4
+L33	S26	GENIUS OR LUCK?|Tell us in the comments	1.5
